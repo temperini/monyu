@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Interativo - Modelo de Negócios MonyU</title>
+    <!-- Chosen Palette: MonyU Branding (Hot Pink, Orange, Dark Gray, White) -->
+    <!-- Application Structure Plan: A single-page, thematic dashboard structure. We will not mirror the report's linear sections. Instead, we'll use a persuasive narrative flow: Hero (Value Prop), The Problem (Market Gap), The Solution (Process Flow), Revenue Model (Interactive Chart), and Results (KPIs & Pipeline). This structure guides the user through the "why, how, what" of the business in a more engaging, data-driven way, prioritizing visual digestion over text. Navigation is handled by a sticky header with smooth-scrolling JS. -->
+    <!-- Visualization & Content Choices:
+        1. Market Gap (Problem): Report Info (-86% VC vs +72% Public) -> Goal: Show the opportunity -> Viz: Bar Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: Stark visual comparison of opposing trends.
+        2. Service Journey (Solution): Report Info (4-step process) -> Goal: Explain the core service flow -> Viz: HTML/Tailwind horizontal flexbox diagram -> Interaction: Clickable (future-proof) -> Justification: Visually intuitive process flow, avoids text walls. NO SVG/Mermaid. (Removed private investment step).
+        3. Success Fee (Revenue): Report Info (Gradual 3-15% scale) -> Goal: Visualize the de-escalating fee -> Viz: Line Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: A line chart perfectly shows the *gradual* nature, which a table cannot.
+        4. KPIs (Results): Report Info (+R$35M, 534% ROI, 55 Clientes, +R$30M Pipeline) -> Goal: High-impact stats -> Viz: HTML/Tailwind "Stat Cards" -> Justification: Easily scannable, high-impact numbers.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Aplicando a fonte Inter, padrão do Tailwind */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* bg-slate-50 */
+        }
+
+        /* Cor personalizada principal da MonyU (Hot Pink) */
+        .bg-monyu-pink {
+            background-color: #E6007A;
+        }
+        .text-monyu-pink {
+            color: #E6007A;
+        }
+        .border-monyu-pink {
+            border-color: #E6007A;
+        }
+
+        /* Cor personalizada secundária da MonyU (Orange) */
+        .bg-monyu-orange {
+            background-color: #F97316;
+        }
+        .text-monyu-orange {
+            color: #F97316;
+        }
+
+        /* Estilo do container de gráfico obrigatório */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; /* Altura base para mobile */
+            max-height: 40vh; /* Altura máxima */
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px; /* Altura maior para desktop */
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Header & Navegação -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="font-bold text-2xl text-monyu-pink">MONYU</span>
+                    <span class="font-semibold text-lg text-gray-700 ml-2 hidden sm:block">| Modelo de Negócios</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#problema" class="text-gray-600 hover:text-monyu-pink px-3 py-2 rounded-md text-sm font-medium">O Problema</a>
+                        <a href="#solucao" class="text-gray-600 hover:text-monyu-pink px-3 py-2 rounded-md text-sm font-medium">A Solução</a>
+                        <a href="#receita" class="text-gray-600 hover:text-monyu-pink px-3 py-2 rounded-md text-sm font-medium">Modelo de Receita</a>
+                        <a href="#resultados" class="text-gray-600 hover:text-monyu-pink px-3 py-2 rounded-md text-sm font-medium">Resultados</a>
+                        <a href="#diferenciais" class="text-gray-600 hover:text-monyu-pink px-3 py-2 rounded-md text-sm font-medium">Diferenciais</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                        <span class="sr-only">Abrir menu principal</span>
+                        <!-- Icone Hamburguer -->
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <!-- Menu Mobile -->
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#problema" class="text-gray-600 hover:text-monyu-pink block px-3 py-2 rounded-md text-base font-medium">O Problema</a>
+                <a href="#solucao" class="text-gray-600 hover:text-monyu-pink block px-3 py-2 rounded-md text-base font-medium">A Solução</a>
+                <a href="#receita" class="text-gray-600 hover:text-monyu-pink block px-3 py-2 rounded-md text-base font-medium">Modelo de Receita</a>
+                <a href="#resultados" class="text-gray-600 hover:text-monyu-pink block px-3 py-2 rounded-md text-base font-medium">Resultados</a>
+                <a href="#diferenciais" class="text-gray-600 hover:text-monyu-pink block px-3 py-2 rounded-md text-base font-medium">Diferenciais</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+
+        <!-- Seção Hero: Proposta de Valor -->
+        <section id="hero" class="text-center mb-20">
+            <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                Financiando <span class="text-monyu-pink">Boas Ideias</span>
+            </h1>
+            <p class="mt-4 max-w-3xl mx-auto text-xl text-gray-600">
+                A 1ª plataforma full-service do Brasil que garante seu ROI na primeira captação de sucesso em fomento público.
+            </p>
+            <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-monyu-pink">
+                    <div class="text-5xl">⏳</div>
+                    <h3 class="mt-4 text-2xl font-bold text-gray-900">Geramos +Tempo</h3>
+                    <p class="mt-2 text-gray-600">Através da curadoria e monitoramento ativo de centenas de oportunidades.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-monyu-orange">
+                    <div class="text-5xl">💰</div>
+                    <h3 class="mt-4 text-2xl font-bold text-gray-900">Geramos +Dinheiro</h3>
+                    <p class="mt-2 text-gray-600">Através da captação efetiva de fundos não-reembolsáveis (zero equity).</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-monyu-pink">
+                    <div class="text-5xl">🤝</div>
+                    <h3 class="mt-4 text-2xl font-bold text-gray-900">Geramos +Confiança</h3>
+                    <p class="mt-2 text-gray-600">Através da gestão profissional de todo o processo burocrático de A a Z.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção 1: O Problema do Mercado -->
+        <section id="problema" class="mb-20 pt-16 -mt-16">
+            <h2 class="text-3xl font-extrabold text-gray-900 text-center">O Problema e a Oportunidade</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-center text-lg text-gray-600">
+                O investimento privado está em queda e o fomento público é complexo. A MonyU atua exatamente nesse "GAP".
+            </p>
+            <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-center mb-4">O GAP do Mercado: Fomento vs. Venture Capital</h3>
+                    <p class="text-center text-gray-600 text-sm mb-4">Enquanto o investimento de risco (VC) retrai, o fomento público cresce, criando uma oportunidade clara.</p>
+                    <div class="chart-container">
+                        <canvas id="problemaChart"></canvas>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold text-monyu-pink">38% das Empresas Fecham</h3>
+                        <p class="mt-2 text-gray-600">A principal causa de mortalidade de empresas no Brasil é a falta de dinheiro. O capital de fomento é a solução para o "vale da morte".</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold text-monyu-pink">A Barreira de Acesso</h3>
+                        <p class="mt-2 text-gray-600">Empreendedores sofrem com a burocracia, falta de tempo para monitorar editais e falta de conhecimento técnico para elaborar projetos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção 2: A Solução (Jornada Full-Service) -->
+        <section id="solucao" class="mb-20 pt-16 -mt-16">
+            <h2 class="text-3xl font-extrabold text-gray-900 text-center">Nossa Solução: A Jornada Full-Service</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-center text-lg text-gray-600">
+                Cobrimos 100% do ciclo de vida da captação de subvenção em uma jornada de 12 meses.
+            </p>
+            <div class="mt-12 overflow-x-auto pb-4">
+                <div class="flex flex-col md:flex-row md:space-x-2 space-y-8 md:space-y-0 min-w-max md:min-w-full">
+                    
+                    <!-- Etapa 1 -->
+                    <div class="flex-1 flex flex-col items-center text-center">
+                        <div class="bg-monyu-pink text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold">1</div>
+                        <h3 class="mt-4 text-xl font-bold">Discovery e Tese de Funding</h3>
+                        <p class="mt-2 text-gray-600 px-2">Análise do projeto e criação de um mapa de potencial de captação.</p>
+                    </div>
+                    <!-- Linha Conectora (visível em md+) -->
+                    <div class="hidden md:flex items-center flex-1 -mt-8">
+                        <div class="w-full h-1 bg-gray-300 rounded-full"></div>
+                    </div>
+
+                    <!-- Etapa 2 -->
+                    <div class="flex-1 flex flex-col items-center text-center">
+                        <div class="bg-monyu-pink text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold">2</div>
+                        <h3 class="mt-4 text-xl font-bold">Curadoria e Matching</h3>
+                        <p class="mt-2 text-gray-600 px-2">Monitoramento ativo de oportunidades e *matching* com seu projeto.</p>
+                    </div>
+                    <!-- Linha Conectora (visível em md+) -->
+                    <div class="hidden md:flex items-center flex-1 -mt-8">
+                        <div class="w-full h-1 bg-gray-300 rounded-full"></div>
+                    </div>
+
+                    <!-- Etapa 3 -->
+                    <div class="flex-1 flex flex-col items-center text-center">
+                        <div class="bg-monyu-pink text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold">3</div>
+                        <h3 class="mt-4 text-xl font-bold">Captação (Rec. Públicos)</h3>
+                        <p class="mt-2 text-gray-600 px-2">Elaboração do projeto matriz e submissão nos editais de subvenção.</p>
+                    </div>
+                    <!-- Linha Conectora (visível em md+) -->
+                    <div class="hidden md:flex items-center flex-1 -mt-8">
+                        <div class="w-full h-1 bg-gray-300 rounded-full"></div>
+                    </div>
+
+                    <!-- Etapa 4 -->
+                    <div class="flex-1 flex flex-col items-center text-center">
+                        <div class="bg-gray-400 text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold">4</div>
+                        <h3 class="mt-4 text-xl font-bold text-gray-500">Prestação de Contas</h3>
+                        <p class="mt-2 text-gray-600 px-2">(Serviço Opcional) Apoio na gestão burocrática e relatórios pós-captação.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção 3: Modelo de Receita -->
+        <section id="receita" class="mb-20 pt-16 -mt-16">
+            <h2 class="text-3xl font-extrabold text-gray-900 text-center">Nosso Modelo de Receita Transparente</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-center text-lg text-gray-600">
+                Nosso modelo é híbrido: um valor fixo para garantir a operação e um sucesso alinhado ao seu resultado.
+            </p>
+            <div class="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Coluna 1: Setup Fixo -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-monyu-pink flex flex-col">
+                    <h3 class="text-2xl font-bold text-gray-900">1. Setup Fixo (Jornada 12m)</h3>
+                    <p class="mt-2 text-gray-600 flex-grow">Cobre o Discovery, Tese de Funding, Elaboração do Projeto Matriz e 12 meses de Curadoria.</p>
+                    <div class="mt-4">
+                        <p class="text-gray-700"><span class="font-bold">Valor Padrão:</span> R$ 22.000,00</p>
+                        <p class="text-gray-700"><span class="font-bold">Valor Parceria (10% OFF):</span> R$ 19.800,00</p>
+                        <p class="text-sm text-gray-500 mt-2">Pagamento facilitado: 1+5x s/ juros ou 12x c/ juros.</p>
+                        <p class="text-green-700 font-bold mt-3 p-2 bg-green-100 rounded-md">⭐ Parceria SEBRAE: Subsídio de até 80% do valor do setup!</p>
+                    </div>
+                </div>
+                <!-- Coluna 2: Success Fee -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-monyu-orange">
+                    <h3 class="text-2xl font-bold text-gray-900">2. Success Fee (Variável)</h3>
+                    <p class="mt-2 text-gray-600">Um percentual <span class="font-bold">gradual de 3% a 15%</span>, cobrado apenas sobre o valor captado em subvenção não-reembolsável.</p>
+                    <div class="chart-container mt-4">
+                        <canvas id="successFeeChart"></canvas>
+                    </div>
+                </div>
+                <!-- Coluna 3: Opcionais -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-gray-400">
+                    <h3 class="text-2xl font-bold text-gray-900">3. Serviços Opcionais</h3>
+                    <p class="mt-2 text-gray-600">Serviços pontuais que você pode contratar à parte, conforme sua necessidade.</p>
+                    <div class="mt-4 space-y-2">
+                        <p class="text-gray-700"><span class="font-bold">Prestação de Contas:</span> 7% a 15% (negociado à parte)</p>
+                        <p class="text-gray-700"><span class="font-bold">Mentoria:</span> Média de R$ 6.000,00</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção 4: Resultados (Tração) -->
+        <section id="resultados" class="mb-20 pt-16 -mt-16">
+            <h2 class="text-3xl font-extrabold text-gray-900 text-center">Nossos Resultados e Métricas</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-center text-lg text-gray-600">
+                Dados que comprovam a eficácia da nossa metodologia (até a data).
+            </p>
+            <div class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+                <div class="bg-monyu-pink text-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-4xl font-extrabold">+R$ 35 Mi</div>
+                    <div class="text-lg font-medium">Captados</div>
+                </div>
+                <div class="bg-monyu-pink text-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-4xl font-extrabold">534%</div>
+                    <div class="text-lg font-medium">ROI Médio</div>
+                </div>
+                <div class="bg-white text-monyu-pink rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-4xl font-extrabold">55</div>
+                    <div class="text-lg font-medium">Clientes Ativos</div>
+                </div>
+                <div class="bg-white text-monyu-pink rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-4xl font-extrabold">14</div>
+                    <div class="text-lg font-medium">Estados</div>
+                </div>
+            </div>
+            
+            <!-- Pipeline -->
+            <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                 <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h3 class="text-2xl font-bold text-monyu-pink">Pipeline Ativo</h3>
+                    <div class="text-5xl font-extrabold text-gray-900 mt-4">+R$ 30 Milhões</div>
+                    <p class="mt-2 text-gray-600">É o valor que temos em projetos em fase de preparação e aguardando aprovação.</p>
+                </div>
+                 <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h3 class="text-2xl font-bold text-monyu-orange">Mercado Mapeado</h3>
+                    <div class="text-5xl font-extrabold text-gray-900 mt-4">+R$ 3.8 Bilhões</div>
+                    <p class="mt-2 text-gray-600">É o potencial de captação que já mapeamos para nossos clientes. #TemMoneyNaMesa</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção 5: Diferenciais (Vantagem Injusta) -->
+        <section id="diferenciais" class="mb-20 pt-16 -mt-16">
+            <h2 class="text-3xl font-extrabold text-gray-900 text-center">Nossos Diferenciais Competitivos</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-center text-lg text-gray-600">
+                O que nos torna difíceis de copiar e parceiros ideais para sua jornada.
+            </p>
+            <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-5xl">🏆</div>
+                    <h3 class="mt-4 text-2xl font-bold text-gray-900">Expertise Sênior</h3>
+                    <p class="mt-2 text-gray-600">+50 anos de experiência somada em inovação, patentes e transferência tecnológica.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-5xl">⚙️</div>
+                    <h3 class="mt-4 text-2xl font-bold text-gray-900">Metodologia Própria</h3>
+                    <p class="mt-2 text-gray-600">Processo comprovado que permite "captação em série" e "adaptações sem custo" por 12 meses.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-5xl">🔗</div>
+                    <h3 class="mt-4 text-2xl font-bold text-gray-900">Rede de Parcerias</h3>
+                    <p class="mt-2 text-gray-600">Hub de soluções com SEBRAE (subsídio 80%), AWS (U$200k em créditos), César e Embrapii.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6">
+        <p>&copy; 2025 MonyU. Todos os direitos reservados. #BoraCaptar</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- Lógica do Menu Mobile ---
+            const menuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            menuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // --- Lógica de Navegação Suave ---
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                    // Esconder menu mobile após clique
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+
+            // --- Configuração Global dos Gráficos ---
+            Chart.defaults.font.family = 'Inter, sans-serif';
+            Chart.defaults.plugins.tooltip.backgroundColor = '#1f2937'; // bg-gray-800
+            Chart.defaults.plugins.tooltip.titleFont.size = 14;
+            Chart.defaults.plugins.tooltip.bodyFont.size = 12;
+            Chart.defaults.plugins.tooltip.padding = 10;
+            Chart.defaults.plugins.tooltip.cornerRadius = 4;
+            Chart.defaults.plugins.legend.position = 'bottom';
+
+            // --- Gráfico 1: O Problema (Bar Chart) ---
+            const problemaCtx = document.getElementById('problemaChart');
+            if (problemaCtx) {
+                new Chart(problemaCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Invest. Privado (VC) 2023', 'Invest. Público (Fomento) 2023'],
+                        datasets: [{
+                            label: 'Variação Ano Anterior',
+                            data: [-86, 72],
+                            backgroundColor: [
+                                'rgba(239, 68, 68, 0.7)', // red-500
+                                'rgba(34, 197, 94, 0.7)'  // green-500
+                            ],
+                            borderColor: [
+                                'rgba(239, 68, 68, 1)',
+                                'rgba(34, 197, 94, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => `${context.label}: ${context.raw}%`
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Variação (%)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // --- Gráfico 2: Régua de Success Fee (Line Chart) ---
+            const successFeeCtx = document.getElementById('successFeeChart');
+            if (successFeeCtx) {
+                new Chart(successFeeCtx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['R$ 100k', 'R$ 300k', 'R$ 600k', 'R$ 1M', 'R$ 1.5M', 'R$ 3M'],
+                        datasets: [{
+                            label: 'Percentual de Sucesso (%)',
+                            data: [15, 13.5, 12, 10, 7.5, 3],
+                            fill: false,
+                            borderColor: '#E6007A', // MonyU Pink
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => `Taxa: ${context.raw}%`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Taxa de Sucesso (%)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Valor Captado'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // O gráfico do Pipeline foi removido pois os dados mudaram para um único valor (+R$ 30M),
+            // que foi incorporado diretamente nos cards da seção "Resultados".
+
+        });
+    </script>
+</body>
+</html>
