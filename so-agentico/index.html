@@ -715,6 +715,107 @@ a{color:var(--accent);text-decoration:none}
 .np-x{color:var(--text-3);width:22px;height:22px;display:grid;place-items:center;border-radius:6px}
 .np-x:hover{background:var(--border);color:var(--text)}
 @media (max-width:900px){.kb-layout{grid-template-columns:1fr}.np-modes{grid-template-columns:1fr}}
+/* ============ GigaMonyU + Treinamentos ============ */
+.preview-strip{display:flex;align-items:center;gap:.8rem;padding:.75rem 1rem;border-radius:var(--radius-s);flex-wrap:wrap;
+  background:color-mix(in srgb,var(--monyu-yellow) 7%,var(--surface));border:1px dashed color-mix(in srgb,var(--monyu-yellow) 50%,transparent);
+  font-size:.74rem;color:var(--text-2)}
+.preview-strip b{color:var(--warn)}
+.preview-strip button{margin-left:auto;font-size:.7rem;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:8px;padding:.35rem .7rem;transition:all var(--dur)}
+.preview-strip button:hover{background:var(--grad-brand);color:#fff;border-color:transparent}
+.needs{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem}
+.need-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-m);padding:1.05rem;display:flex;flex-direction:column;gap:.5rem;
+  cursor:pointer;transition:transform var(--dur) var(--ease),border-color var(--dur),box-shadow var(--dur);text-align:left;animation:rise .5s var(--ease) backwards}
+.need-card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:var(--shadow-2)}
+.need-card .n-ico{width:38px;height:38px;border-radius:11px;background:var(--grad-brand);display:grid;place-items:center;font-size:1rem}
+.need-card b{font-size:.84rem;line-height:1.35}
+.need-card span{font-size:.68rem;color:var(--text-3);line-height:1.45}
+.eros-banner{display:flex;gap:.9rem;align-items:center;padding:.95rem 1.1rem;border-radius:var(--radius-m);flex-wrap:wrap;
+  background:linear-gradient(120deg,rgba(255,92,31,.14),rgba(255,115,0,.07));border:1px solid color-mix(in srgb,var(--c-eros) 40%,transparent)}
+.eros-banner .av{width:42px;height:42px}
+.eros-banner p{flex:1;font-size:.76rem;color:var(--text-2);line-height:1.5;min-width:220px}
+.prest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+.prest{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-m);padding:1rem;display:flex;flex-direction:column;gap:.55rem;animation:rise .5s var(--ease) backwards;transition:transform var(--dur) var(--ease),box-shadow var(--dur)}
+.prest:hover{transform:translateY(-3px);box-shadow:var(--shadow-2)}
+.prest-head{display:flex;align-items:center;gap:.6rem}
+.prest-avatar{width:42px;height:42px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:grid;place-items:center;font-weight:800;font-size:.76rem;color:var(--text-2);flex-shrink:0}
+.prest-head b{font-size:.82rem;display:block;line-height:1.25}
+.prest-head span{font-size:.64rem;color:var(--text-3)}
+.prest-verified{margin-left:auto;font-size:.56rem;font-weight:800;color:var(--ok);background:color-mix(in srgb,var(--ok) 11%,transparent);padding:.2rem .5rem;border-radius:99px;white-space:nowrap}
+.prest-stats{font-size:.7rem;color:var(--text-2);line-height:1.5}
+.prest-stats b{color:var(--text)}
+.prest-rating{font-size:.7rem;color:var(--warn);font-weight:700}
+.prest .btn-ghost.sent{color:var(--ok);border-color:var(--ok);cursor:default}
+.conn-row{display:flex;align-items:center;gap:.7rem;padding:.7rem .8rem;border:1px solid var(--border);border-radius:var(--radius-s);background:var(--surface-2);margin-bottom:.55rem;font-size:.76rem;flex-wrap:wrap}
+.conn-row:last-child{margin-bottom:0}
+.conn-row .prest-avatar{width:34px;height:34px;font-size:.64rem}
+.conn-row b{flex:1;min-width:140px}
+.conn-status{font-size:.6rem;font-weight:800;padding:.22rem .6rem;border-radius:99px;white-space:nowrap}
+.conn-status.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 11%,transparent)}
+.conn-status.wait{color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,transparent)}
+.tier-chips{display:flex;gap:.5rem;flex-wrap:wrap}
+.tier-chip{font-size:.66rem;font-weight:700;padding:.4rem .75rem;border-radius:99px;border:1px solid var(--border);color:var(--text-2)}
+.tier-chip b{color:var(--text)}
+.trails{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem}
+.trail{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-m);padding:1.15rem;display:flex;flex-direction:column;gap:.55rem;animation:rise .5s var(--ease) backwards;transition:transform var(--dur) var(--ease),box-shadow var(--dur)}
+.trail:hover{transform:translateY(-3px);box-shadow:var(--shadow-2)}
+.trail.cert{border-color:var(--monyu-pink);box-shadow:0 0 0 1px var(--monyu-pink)}
+.trail-top{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.trail-top .t-ico{width:38px;height:38px;border-radius:11px;background:var(--grad-brand);display:grid;place-items:center;font-size:1rem;flex-shrink:0}
+.trail-top b{font-size:.9rem;flex:1;min-width:140px}
+.trail-lvl{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);background:var(--surface-2);padding:.2rem .55rem;border-radius:99px;white-space:nowrap}
+.trail-gift{font-size:.6rem;font-weight:800;color:#5B4700;background:var(--monyu-yellow);padding:.2rem .55rem;border-radius:99px;white-space:nowrap}
+.trail p{font-size:.74rem;color:var(--text-2);line-height:1.5;flex:1}
+.trail-meta{font-size:.66rem;color:var(--text-3)}
+.trail-prog{display:flex;align-items:center;gap:.6rem;font-size:.66rem;color:var(--text-3)}
+.trail-prog .fichas-bar{flex:1;margin:0;height:6px}
+.lesson{display:flex;align-items:center;gap:.7rem;padding:.65rem .75rem;border:1px solid var(--border);border-radius:var(--radius-s);background:var(--surface-2);margin-bottom:.5rem;font-size:.76rem;cursor:pointer;transition:border-color var(--dur),transform .12s var(--ease);width:100%;text-align:left}
+.lesson:hover{border-color:var(--accent);transform:translateX(2px)}
+.lesson:last-child{margin-bottom:0}
+.lesson .av{width:30px;height:30px;border-radius:9px}
+.lesson b{flex:1;min-width:150px}
+.lesson span{font-size:.64rem;color:var(--text-3);white-space:nowrap}
+@media (max-width:1180px){.needs,.prest-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.needs,.prest-grid,.trails{grid-template-columns:1fr}.preview-strip button{margin-left:0}}
+/* ============ v12: upsell membro + perfis + trilhas ============ */
+.upsell-pro{position:relative;border-color:color-mix(in srgb,var(--monyu-pink) 40%,transparent);background:linear-gradient(115deg,color-mix(in srgb,var(--monyu-pink) 9%,var(--surface)),var(--surface) 55%,color-mix(in srgb,var(--monyu-orange) 6%,var(--surface)))}
+.up-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:1.8rem;align-items:center}
+@media (max-width:980px){.up-grid{grid-template-columns:1fr;gap:1rem}}
+.up-tag{position:absolute;top:-10px;left:16px;background:var(--grad-brand);color:#fff;font-size:.56rem;font-weight:800;padding:.2rem .65rem;border-radius:99px;letter-spacing:.05em;text-transform:uppercase}
+.up-benefits{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+.up-benefits li{font-size:.76rem;color:var(--text-2);line-height:1.5;padding-left:1.2rem;position:relative}
+.up-benefits li::before{content:"✓";position:absolute;left:0;color:var(--ok);font-weight:800}
+.up-tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem}
+.up-tier{border:1px solid var(--border);border-radius:11px;padding:.7rem .5rem;text-align:center;position:relative;background:var(--surface-2)}
+.up-tier.best{border-color:var(--monyu-pink);box-shadow:0 0 0 1px var(--monyu-pink)}
+.up-tier b{display:block;font-size:.78rem}
+.up-tier>span{display:block;font-size:.8rem;font-weight:800;margin:.15rem 0}
+.up-tier small{font-size:.56rem;color:var(--text-3);line-height:1.3;display:block}
+.prest.destaque{border-color:var(--monyu-yellow);box-shadow:0 0 0 1px var(--monyu-yellow)}
+.pr-badges{display:flex;gap:.4rem;flex-wrap:wrap}
+.pr-badge{font-size:.56rem;font-weight:800;padding:.2rem .55rem;border-radius:99px;white-space:nowrap}
+.pr-badge.dest{color:#5B4700;background:var(--monyu-yellow)}
+.pr-badge.souser{color:var(--monyu-pink);background:var(--accent-soft)}
+.pr-port{display:flex;flex-direction:column;gap:.4rem}
+.pr-port div{font-size:.74rem;color:var(--text-2);padding:.5rem .65rem;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;line-height:1.4}
+.pr-quote{font-size:.74rem;color:var(--text-2);font-style:italic;line-height:1.55;border-left:3px solid var(--monyu-pink);padding:.2rem 0 .2rem .75rem;margin-bottom:.6rem}
+.pr-quote b{display:block;font-style:normal;font-size:.62rem;color:var(--text-3);margin-top:.25rem}
+.tr-body{flex:1;overflow-y:auto;display:grid;grid-template-columns:340px 1fr;gap:1.2rem;padding:1.3rem 1.4rem;max-width:1180px;width:100%;margin:0 auto;align-items:start}
+.tr-lessons{display:flex;flex-direction:column;gap:.45rem}
+.lesson-item{display:flex;align-items:center;gap:.6rem;padding:.6rem .7rem;border:1px solid var(--border);border-radius:10px;background:var(--surface);
+  font-size:.74rem;text-align:left;width:100%;transition:border-color var(--dur),transform .12s var(--ease)}
+.lesson-item:hover{border-color:var(--accent);transform:translateX(2px)}
+.lesson-item.cur{border-color:var(--monyu-pink);box-shadow:0 0 0 1px var(--monyu-pink);background:var(--accent-soft)}
+.lesson-item .li-n{width:24px;height:24px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:grid;place-items:center;font-size:.62rem;font-weight:800;color:var(--text-3);flex-shrink:0}
+.lesson-item.done .li-n{background:var(--ok);border-color:transparent;color:#fff}
+.lesson-item b{flex:1;font-weight:600;line-height:1.35}
+.lesson-item span{font-size:.62rem;color:var(--text-3);white-space:nowrap}
+.tr-player{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-m);padding:1.2rem;position:sticky;top:0}
+.tr-video{aspect-ratio:16/9;border-radius:12px;background:linear-gradient(140deg,#1c1c1c,#2a2a2a);display:grid;place-items:center;margin-bottom:1rem;border:1px solid var(--border)}
+html[data-theme="light"] .tr-video{background:linear-gradient(140deg,#e8e8e8,#f2f2f2)}
+.tr-play{width:64px;height:64px;border-radius:50%;background:var(--grad-brand);display:grid;place-items:center;color:#fff;font-size:1.4rem;box-shadow:0 10px 30px -8px rgba(255,0,85,.6);transition:transform .15s var(--ease)}
+.tr-play:hover{transform:scale(1.08)}
+@media (max-width:980px){.tr-body{grid-template-columns:1fr}.tr-player{position:static}}
+@media (max-width:640px){.up-tiers{grid-template-columns:1fr}}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
@@ -881,13 +982,13 @@ a{color:var(--accent);text-decoration:none}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/></svg>
         Fichas &amp; plano
       </a>
-      <a class="nav-item" href="#" data-soonmod="giga">
+      <a class="nav-item" href="#" data-nav="giga">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.4 3.4-5 6.5-5s5.7 1.6 6.5 5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 15.2c1.7.7 2.7 2.2 3 4.8"/></svg>
-        GigaMonyU <span class="nav-tag">em breve</span>
+        GigaMonyU <span class="nav-tag">prévia</span>
       </a>
-      <a class="nav-item" href="#" data-soonmod="trein">
+      <a class="nav-item" href="#" data-nav="trein">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2 9l10 5 10-5-10-5z"/><path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/><path d="M22 9v5"/></svg>
-        Treinamentos <span class="nav-tag">em breve</span>
+        Treinamentos <span class="nav-tag">prévia</span>
       </a>
       <a class="nav-item" href="#" data-toast="Central de ajuda e FAQ — em breve no piloto">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.9.8c0 1.6-2.4 2.2-2.4 3.7M12 17h.01"/></svg>
@@ -1525,6 +1626,192 @@ a{color:var(--accent);text-decoration:none}
         </p>
       </section>
 
+      <!-- ============================================================ VIEW: GIGAMONYU (prévia) -->
+      <section class="view" id="view-giga" aria-label="GigaMonyU">
+        <div class="hero">
+          <div>
+            <div class="page-title">GigaMonyU <span class="demo-badge">◈ demo</span></div>
+            <p class="page-sub">Encontre quem executa com você — consultores, pesquisadores e ICTs verificados pela MonyU</p>
+          </div>
+        </div>
+        <div class="preview-strip">
+          🚧 <span><b>Módulo em construção</b> — prévia navegável · lançamento previsto: out–dez/2026</span>
+          <button data-soonmod="giga">🔔 Avisar-me no lançamento</button>
+        </div>
+
+        <section aria-label="Necessidades">
+          <div class="section-head">
+            <h2>O que o seu projeto precisa?</h2>
+            <span class="hint">escolha a necessidade e veja quem pode ajudar</span>
+          </div>
+          <div class="needs">
+            <button class="need-card" data-gfilter="consultor" style="animation-delay:.03s">
+              <span class="n-ico" aria-hidden="true">✍️</span>
+              <b>Consultor para elaborar ou revisar projeto</b>
+              <span>Especialistas em FINEP, EMBRAPII e FAPs que trabalham junto com a Ada e com você.</span>
+            </button>
+            <button class="need-card" data-gfilter="pesquisador" style="animation-delay:.08s">
+              <span class="n-ico" aria-hidden="true">🔬</span>
+              <b>Pesquisador ou ICT para o P&amp;D</b>
+              <span>Parcerias que destravam instrumentos de fomento e fortalecem a equipe executora.</span>
+            </button>
+            <button class="need-card" data-gfilter="contas" style="animation-delay:.13s">
+              <span class="n-ico" aria-hidden="true">🧾</span>
+              <b>Especialista em prestação de contas</b>
+              <span>Compliance do recurso aprovado, sem glosas — até a Clara chegar, e junto com ela depois.</span>
+            </button>
+            <button class="need-card" data-gfilter="squad" style="animation-delay:.18s">
+              <span class="n-ico" aria-hidden="true">💻</span>
+              <b>Squad de desenvolvimento</b>
+              <span>Times técnicos para construir o produto do seu projeto de PD&amp;I — do protótipo ao TRL 8.</span>
+            </button>
+          </div>
+        </section>
+
+        <div class="eros-banner">
+          <svg class="av" aria-hidden="true"><use href="#av-eros"/></svg>
+          <p><b>Em 2027, o Eros faz esse trabalho por você:</b> matching automático entre os seus projetos e os prestadores certos, por 3 fichas. Até lá, use os filtros — ou conheça o
+          <button class="ag-link" data-agkey="eros" style="--alc:var(--c-eros)">Eros</button> e ative o aviso de lançamento.</p>
+        </div>
+
+        <div class="didyou-slot" aria-live="polite"></div>
+
+        <section aria-label="Vitrine de prestadores">
+          <div class="section-head">
+            <h2>Vitrine de prestadores</h2>
+            <span class="hint" data-tip="Identidade completa é revelada após a conexão ser aceita — proteção para os dois lados">perfis verificados · identidade parcial até a conexão</span>
+          </div>
+          <div class="toolbar" role="group" aria-label="Filtrar prestadores">
+            <button class="filter-chip on" data-gchip="todos">Todos (8)</button>
+            <button class="filter-chip" data-gchip="consultor">Consultores</button>
+            <button class="filter-chip" data-gchip="pesquisador">Pesquisadores &amp; ICTs</button>
+            <button class="filter-chip" data-gchip="squad">Squads de dev</button>
+            <button class="filter-chip" data-gchip="contas">Prestação de contas</button>
+          </div>
+          <div class="prest-grid" id="prestGrid"></div>
+        </section>
+
+        <section class="card" aria-label="Minhas conexões">
+            <div class="section-head"><h2>Minhas conexões</h2><span class="hint">a conversa acontece dentro da plataforma</span></div>
+            <div class="conn-row">
+              <span class="prest-avatar" aria-hidden="true">MS</span>
+              <b>Consultora M.S. · Fortaleza-CE</b>
+              <span class="conn-status ok">Conectado</span>
+              <button class="btn-ghost" style="font-size:.7rem;padding:.4rem .8rem" data-toast="Chat interno da conexão — em breve no piloto">Abrir conversa</button>
+            </div>
+            <div class="conn-row">
+              <span class="prest-avatar" aria-hidden="true">NL</span>
+              <b>ICT Nordeste Lab · Fortaleza-CE</b>
+              <span class="conn-status wait">Aguardando aceite</span>
+              <button class="btn-ghost" style="font-size:.7rem;padding:.4rem .8rem" data-toast="Solicitação cancelada. (demo)">Cancelar</button>
+            </div>
+            <p style="font-size:.66rem;color:var(--text-3);line-height:1.55;margin-top:.8rem">
+              🛡 Por segurança e conformidade, todo contato acontece exclusivamente dentro da plataforma:
+              perfis auditados, acordo padronizado e histórico registrado — proteção para você e para o prestador.
+            </p>
+        </section>
+
+        <section class="card upsell-pro" aria-label="Para prestadores">
+          <span class="up-tag">para prestadores</span>
+          <div class="up-grid">
+            <div>
+              <h2 style="font-size:1.15rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.5rem">Você também presta serviços de captação?</h2>
+              <p style="font-size:.8rem;color:var(--text-2);line-height:1.6;margin-bottom:.9rem">
+                Entre na vitrine do GigaMonyU e receba conexões qualificadas de quem já está buscando fomento — sem CAC, sem caçar cliente.
+              </p>
+              <ul class="up-benefits">
+                <li>Conexões de proponentes com projeto e verba mapeados</li>
+                <li>Até <b>30% de desconto</b> nos planos do SO Agêntico</li>
+                <li><b>Destaque pago</b>: apareça primeiro nas buscas da sua especialidade</li>
+              </ul>
+            </div>
+            <div>
+              <div class="up-tiers">
+                <div class="up-tier"><b>Free</b><span>grátis</span><small>3 candidaturas/mês</small></div>
+                <div class="up-tier best"><span class="p-tag" style="background:var(--grad-brand);color:#fff">mais escolhido</span><b>Pro</b><span>R$ 97/mês</span><small>ilimitado + SO Starter −30%</small></div>
+                <div class="up-tier"><b>Studio</b><span>R$ 297/mês</span><small>sala exclusiva + SO Pro −30%</small></div>
+              </div>
+              <div style="display:flex;gap:.6rem;margin-top:.9rem;flex-wrap:wrap">
+                <button class="btn-primary" style="flex:1" data-toast="Pré-cadastro de membro prestador registrado! Entraremos em contato no lançamento. (demo)">Quero ser membro</button>
+                <button class="btn-ghost" style="flex:1" data-toast="Indicação enviada! Seu indicado ganha prioridade no acesso — e você, benefícios de finder. (demo)">Indicar um prestador</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- ============================================================ VIEW: TREINAMENTOS (prévia) -->
+      <section class="view" id="view-trein" aria-label="Treinamentos">
+        <div class="hero">
+          <div>
+            <div class="page-title">Treinamentos <span class="demo-badge">◈ demo</span></div>
+            <p class="page-sub">Trilhas práticas para dominar a captação de recursos — do primeiro edital à captação recorrente</p>
+          </div>
+        </div>
+        <div class="preview-strip">
+          🚧 <span><b>Módulo em construção</b> — prévia navegável · lançamento previsto: 4º trimestre de 2026</span>
+          <button data-soonmod="trein">🔔 Avisar-me no lançamento</button>
+        </div>
+
+        <section aria-label="Trilhas">
+          <div class="section-head">
+            <h2>Trilhas por objetivo</h2>
+            <span class="hint">trilhas básicas inclusas em todos os planos · certificação à parte</span>
+          </div>
+          <div class="trails">
+            <article class="trail" data-trail="primeira" style="animation-delay:.03s">
+              <div class="trail-top"><span class="t-ico" aria-hidden="true">🌱</span><b>Primeira captação</b><span class="trail-lvl">começando</span></div>
+              <p>Como funciona o fomento não-reembolsável, o que um edital espera de você e os erros que eliminam projetos antes da avaliação.</p>
+              <span class="trail-meta">8 aulas · 1h10 · certificado MonyU</span>
+              <div class="trail-prog"><div class="fichas-bar"><i data-trbar="primeira" style="width:38%"></i></div><span data-trlabel="primeira">3 de 8 aulas</span></div>
+              <button class="btn-primary" style="font-size:.76rem" data-tropen="primeira">Continuar trilha</button>
+            </article>
+            <article class="trail" data-trail="agentes" style="animation-delay:.08s">
+              <div class="trail-top"><span class="t-ico" aria-hidden="true">🤖</span><b>Dominando os agentes</b><span class="trail-lvl">essencial</span><span class="trail-gift">🎁 +5 fichas ao concluir</span></div>
+              <p>Como extrair o máximo de cada agente — do scan do Rico à revisão dos textos da Ada — gastando menos fichas para chegar mais longe.</p>
+              <span class="trail-meta">9 aulas · 1h30 · certificado MonyU</span>
+              <div class="trail-prog"><div class="fichas-bar"><i data-trbar="agentes" style="width:0%"></i></div><span data-trlabel="agentes">não iniciada</span></div>
+              <button class="btn-primary" style="font-size:.76rem" data-tropen="agentes">Começar trilha</button>
+            </article>
+            <article class="trail" data-trail="recorrente" style="animation-delay:.13s">
+              <div class="trail-top"><span class="t-ico" aria-hidden="true">📈</span><b>Captação recorrente</b><span class="trail-lvl">avançado</span></div>
+              <p>Pipeline de oportunidades, gestão de contrapartidas e prestação de contas — para transformar uma aprovação em várias.</p>
+              <span class="trail-meta">7 aulas · 1h05 · certificado MonyU</span>
+              <div class="trail-prog"><div class="fichas-bar"><i data-trbar="recorrente" style="width:0%"></i></div><span data-trlabel="recorrente">não iniciada</span></div>
+              <button class="btn-primary" style="font-size:.76rem" data-tropen="recorrente">Começar trilha</button>
+            </article>
+            <article class="trail cert" style="animation-delay:.18s">
+              <div class="trail-top"><span class="t-ico" aria-hidden="true">🎓</span><b>Certificação MonyU</b><span class="trail-lvl" style="color:var(--monyu-pink)">credencial profissional</span></div>
+              <p>Para consultores e parceiros: metodologia MonyU completa, com prova e credencial que abre as portas do GigaMonyU e do white label.</p>
+              <span class="trail-meta">24 aulas + avaliação · produto à parte</span>
+              <div style="display:flex;gap:.55rem;flex-wrap:wrap">
+                <button class="btn-primary" style="font-size:.76rem" data-toast="Detalhes e pré-inscrição da Certificação MonyU — em breve. (demo)">Conhecer a certificação</button>
+                <button class="btn-ghost" style="font-size:.76rem" data-nav="giga">Ver o GigaMonyU</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="card" aria-label="Aulas contextuais">
+          <div class="section-head">
+            <h2>Aprenda onde a dúvida nasce</h2>
+            <span class="hint" data-tip="Estas aulas também aparecem dentro da plataforma, no momento exato do uso">aulas curtas ligadas ao seu fluxo de trabalho</span>
+          </div>
+          <button class="lesson" data-toast="Aula: Como revisar um projeto da Ada — em breve no piloto. (demo)">
+            <svg class="av" aria-hidden="true"><use href="#av-ada"/></svg>
+            <b>Como revisar um projeto da Ada antes de submeter</b><span>6 min · aparece no workspace de revisão</span>
+          </button>
+          <button class="lesson" data-toast="Aula: Lendo o diagnóstico da Íris — em breve no piloto. (demo)">
+            <svg class="av" aria-hidden="true"><use href="#av-iris"/></svg>
+            <b>Lendo o diagnóstico da Íris: quando competir e quando esperar</b><span>5 min · aparece após cada diagnóstico</span>
+          </button>
+          <button class="lesson" data-toast="Aula: Conhecimento que vale fichas — em breve no piloto. (demo)">
+            <svg class="av" aria-hidden="true"><use href="#av-rico"/></svg>
+            <b>Conhecimento que vale fichas: o que indexar (e o que não)</b><span>7 min · aparece na tela Conhecimento</span>
+          </button>
+        </section>
+      </section>
+
       <footer class="app-footer" aria-label="Assinatura MonyU">
         <svg viewBox="0 0 1563 938" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo MonyU">
 <path transform="translate(164,311)" d="m0 0h17l13 4 11 7 7 7 10 13 14 18 10 13 4-2 11-14 13-16 11-14 9-8 12-6 8-2h17l13 4 9 5 10 9 6 9 4 9 2 10v141l-3 12-6 11-10 11-13 8-9 3-7 1-17-1-12-4-10-6-7-7-6-12-2-10 14-19 13-18 4-5 1-3-6 5-9 11-14 14-13 9-11 4h-10l-11-4-11-8-13-12-9-11-6-7-1 1 12 17 14 19 5 7-2 10-6 12-8 8-14 7-16 3h-8l-11-2-14-7-11-10-7-11-4-11-1-5v-142l3-12 5-10 9-10 8-6 11-5z" fill="#FE0058"/>
@@ -1932,6 +2219,35 @@ a{color:var(--accent);text-decoration:none}
 <aside class="drawer" id="agDrawer" role="dialog" aria-modal="true" aria-label="Detalhes do agente">
   <div id="agDrawerInner" style="display:flex;flex-direction:column;height:100%"></div>
 </aside>
+
+<!-- Drawer: perfil do prestador -->
+<div class="drawer-scrim" id="prScrim" aria-hidden="true"></div>
+<aside class="drawer" id="prDrawer" role="dialog" aria-modal="true" aria-label="Perfil do prestador">
+  <div id="prInner" style="display:flex;flex-direction:column;height:100%"></div>
+</aside>
+
+<!-- Overlay: trilha de treinamento -->
+<div class="ws" id="trOv" role="dialog" aria-modal="true" aria-label="Trilha de treinamento">
+  <div class="ws-head">
+    <span class="t-ico" id="trIco" style="width:40px;height:40px;border-radius:11px;background:var(--grad-brand);display:grid;place-items:center;font-size:1.1rem" aria-hidden="true">🌱</span>
+    <div class="ws-title"><b id="trName">Trilha</b><span id="trMeta">—</span></div>
+    <div class="ws-progress"><span id="trProg">0%</span></div>
+    <button class="ws-close" id="trClose" aria-label="Fechar trilha">✕</button>
+  </div>
+  <div class="tr-body">
+    <div class="tr-lessons" id="trLessons"></div>
+    <div class="tr-player">
+      <div class="tr-video"><button class="tr-play" data-toast="O player de vídeo chega com o lançamento do módulo — esta é a prévia navegável. (demo)" aria-label="Reproduzir aula">▶</button></div>
+      <h3 id="trLTitle" style="font-size:.95rem;font-weight:800;margin-bottom:.3rem">Aula</h3>
+      <p id="trLMeta" style="font-size:.68rem;color:var(--text-3);margin-bottom:.6rem">—</p>
+      <p style="font-size:.78rem;color:var(--text-2);line-height:1.6;margin-bottom:1rem">Aula prática, direto ao ponto, com exemplos reais de projetos aprovados e material de apoio para download no lançamento.</p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+        <button class="btn-primary" id="trDone" style="font-size:.78rem">✓ Concluir aula e avançar</button>
+        <button class="btn-ghost" style="font-size:.78rem" data-toast="Material de apoio disponível no lançamento do módulo. (demo)">Material de apoio</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Central de atividade dos agentes -->
 <div class="tray" id="tray" role="status" aria-label="Atividade dos agentes">
@@ -2847,6 +3163,42 @@ a{color:var(--accent);text-decoration:none}
     if(card&&(e.key==='Enter'||e.key===' ')&&!e.target.closest('button')){e.preventDefault();openDrawer(parseInt(card.getAttribute('data-ag'),10))}
   });
 
+  /* ================= Módulos em breve ================= */
+  var SOONMOD={
+    giga:{name:'GigaMonyU',eta:'Previsto para out–dez/2026',
+      icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.4 3.4-5 6.5-5s5.7 1.6 6.5 5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 15.2c1.7.7 2.7 2.2 3 4.8"/></svg>',
+      desc:'O ecossistema de prestadores da MonyU: um marketplace que conecta o seu projeto a consultores, pesquisadores e ICTs verificados — sem que você precise procurar fora da plataforma.',
+      items:['Vitrine de prestadores com histórico e avaliações','Matching automático com o seu projeto (via Eros)','Contratação e comunicação sempre dentro da plataforma']},
+    trein:{name:'Treinamentos',eta:'Previsto para o 4º trimestre de 2026',
+      icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2 9l10 5 10-5-10-5z"/><path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/></svg>',
+      desc:'Trilhas práticas de capacitação para você dominar a captação de recursos: como funcionam os editais, o que os avaliadores esperam e como extrair o máximo de cada agente.',
+      items:['Trilhas por nível: do primeiro edital à captação recorrente','Aulas curtas com casos reais de projetos aprovados','Certificado MonyU ao concluir cada trilha']},
+    banca:{name:'A Banca',eta:'Previsto para nov/2026',
+      icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M5 6h14M7 6l-3 6a3.5 3.5 0 0 0 7 0L8 6M17 6l-3 6a3.5 3.5 0 0 0 7 0l-3-6M12 6v13M8 21h8"/></svg>',
+      desc:'Uma banca de avaliadores simulados, treinada nos critérios reais de cada edital, dá nota no seu projeto antes da banca oficial — para você submeter só quando estiver forte.',
+      items:['Nota por quesito, no padrão do edital escolhido','Parecer detalhado com pontos fracos priorizados','Reavaliação após ajustes para medir a evolução']}
+  };
+  var soonKey='';
+  document.addEventListener('click',function(e){
+    var t=e.target.closest('[data-soonmod]');
+    if(!t)return;
+    e.preventDefault();
+    soonKey=t.getAttribute('data-soonmod');
+    var m=SOONMOD[soonKey];
+    $('#soonName').textContent=m.name;
+    $('#soonIcon').innerHTML=m.icon;
+    $('#soonEta').textContent=m.eta;
+    $('#soonDesc').textContent=m.desc;
+    $('#soonList').innerHTML=m.items.map(function(it){
+      return '<li style="font-size:.78rem;color:var(--text-2);line-height:1.45;padding-left:1.15rem;position:relative"><span style="position:absolute;left:0;color:var(--ok);font-weight:800;font-size:.72rem">✓</span>'+it+'</li>';
+    }).join('');
+    open($('#soonModal'));
+  });
+  $('#soonSubscribe').addEventListener('click',function(){
+    close($('#soonModal'));
+    toast('Pronto! Você será avisado assim que '+SOONMOD[soonKey].name+' for lançado. (demo)');
+  });
+
   /* ================= Resolver saldo (padrão único) ================= */
   window.__monyuTelemetry=window.__monyuTelemetry||[];
   function track(ev,data){window.__monyuTelemetry.push({t:new Date().toISOString(),ev:ev,data:data||{}})}
@@ -3128,7 +3480,8 @@ a{color:var(--accent);text-decoration:none}
     agLink('banca','A Banca')+' não é um agente — é um conselho. Avaliadores simulados, com perfis e critérios diferentes, analisam o seu projeto como numa banca real: apontam pontos fortes e fracos e entregam recomendações práticas para aumentar as suas chances de aprovação.',
     'O '+agLink('rico','Rico')+' encontra as oportunidades; a '+agLink('iris','Íris')+' diz se vale a pena competir por elas. Juntos custam 6 fichas — muito menos do que semanas de trabalho investidas no edital errado.',
     'Os agentes ficam mais inteligentes com você: cada documento adicionado ao <button class="ag-link" data-nav="conhecimento">Conhecimento</button> melhora os textos da '+agLink('ada','Ada')+' e a precisão da '+agLink('iris','Íris')+'. E o contexto de um projeto nunca se mistura com o de outro.',
-    'Um projeto 100% elaborado na plataforma pode ser adaptado para outro edital pela '+agLink('ada','Ada')+' por apenas 5 fichas — bem menos que a elaboração completa. Um bom projeto pode render mais de uma captação.'
+    'Um projeto 100% elaborado na plataforma pode ser adaptado para outro edital pela '+agLink('ada','Ada')+' por apenas 5 fichas — bem menos que a elaboração completa. Um bom projeto pode render mais de uma captação.',
+    'Você presta serviços de captação — ou conhece quem preste? Consultores, pesquisadores, ICTs e squads entram na vitrine do <button class="ag-link" data-nav="giga">GigaMonyU</button>, recebem conexões qualificadas e ganham até 30% de desconto nos planos do SO Agêntico. Membros em Destaque aparecem primeiro.'
   ];
   var dyIdx=Math.floor(Math.random()*TIPS.length);
   var dyHidden=store.get('didyou-hide','')===new Date().toDateString();
@@ -3207,6 +3560,227 @@ a{color:var(--accent);text-decoration:none}
     if(webPendIdx>-1)openDrawer(webPendIdx);
   });
 
+  /* ================= GigaMonyU (prévia) ================= */
+  var PREST=[
+    {ini:'MS',nome:'Consultora M.S.',loc:'Fortaleza-CE',cat:'consultor',tags:'Subvenção FINEP · Energia',stats:'<b>12 projetos aprovados</b> · R$ 8,4 mi captados',rating:'★ 4,9',dest:true,souser:true,resp:'responde em ~2h',
+      bio:'Consultora sênior em engenharia de captação, especializada em subvenção econômica FINEP para o setor de energia. Atua da tese à submissão, em parceria com os agentes do SO.',
+      port:['Subvenção FINEP · Energia solar · R$ 3,2 mi · 2025','FINEP Mais Inovação · Armazenamento · R$ 2,1 mi · 2024','FUNCAP Inovafit · IoT · R$ 480 mil · 2024'],
+      rev:[['Conduziu nossa primeira captação com uma clareza que a gente não encontrou em lugar nenhum.','Proponente · biotec · mar/2026'],['Revisão cirúrgica do projeto que a Ada elaborou. Aprovamos na primeira.','Proponente · energia · jan/2026']]},
+    {ini:'NL',nome:'ICT Nordeste Lab',loc:'Fortaleza-CE',cat:'pesquisador',tags:'Energia renovável · credenciada EMBRAPII',stats:'<b>23 projetos executados</b> · 4 laboratórios',rating:'★ 4,7',dest:true,souser:false,resp:'responde em ~1 dia',
+      bio:'ICT credenciada EMBRAPII com 4 laboratórios de energia renovável. Parceria com a ICT destrava projetos cooperativos e instrumentos exclusivos de fomento.',
+      port:['EMBRAPII · Transição energética · R$ 1,6 mi · 2025','Projeto cooperativo · Hidrogênio · R$ 2,8 mi · 2024'],
+      rev:[['A parceria com o Lab viabilizou um edital que sozinhos não poderíamos acessar.','Proponente · indústria · mai/2026']]},
+    {ini:'RT',nome:'Consultor R.T.',loc:'São Paulo-SP',cat:'consultor',tags:'EMBRAPII · Indústria 4.0',stats:'<b>9 projetos aprovados</b> · R$ 5,1 mi captados',rating:'★ 4,8',dest:false,souser:false,resp:'responde em ~4h',
+      bio:'Especialista em projetos cooperativos EMBRAPII para indústria 4.0, com forte rede de Unidades credenciadas no Sudeste.',
+      port:['EMBRAPII · Manufatura avançada · R$ 1,8 mi · 2025','SENAI Inovação · IoT industrial · R$ 540 mil · 2024'],
+      rev:[['Encontrou a Unidade EMBRAPII certa em uma semana.','Proponente · manufatura · fev/2026']]},
+    {ini:'LA',nome:'Dr. L.A.',loc:'Recife-PE',cat:'pesquisador',tags:'IA embarcada · Doutor (UFPE)',stats:'<b>7 projetos executados</b> · 14 publicações',rating:'★ 4,9',dest:false,souser:true,resp:'responde em ~6h',
+      bio:'Doutor em IA embarcada pela UFPE. Atua como pesquisador-parceiro em projetos de PD&I, fortalecendo a equipe executora exigida pelos editais.',
+      port:['CNPq Universal · IA embarcada · 36 meses · 2024','FACEPE · Sistemas inteligentes · 2023'],
+      rev:[['A presença dele na equipe mudou a nota do quesito capacidade técnica.','Proponente · agtech · abr/2026']]},
+    {ini:'S4',nome:'Squad Quatro Devs',loc:'Remoto · Brasil',cat:'squad',tags:'MVPs e TRL 4–7 · IoT e IA',stats:'<b>17 produtos entregues</b> · squads de 3 a 6 devs',rating:'★ 4,8',dest:false,souser:true,resp:'responde em ~3h',
+      bio:'Squad de desenvolvimento para projetos de PD&I: transforma o plano aprovado em produto — firmware, backend e dashboards — com entregas quinzenais auditáveis para a prestação de contas.',
+      port:['Plataforma IoT de telemetria · TRL 5→7 · 2025','Sistema embarcado de gestão energética · 2024','MVP de marketplace B2B · 2024'],
+      rev:[['Entregas documentadas do jeito que a prestação de contas pede. Raro.','Proponente · energia · jun/2026']]},
+    {ini:'DV',nome:'DevHub Nordeste',loc:'Recife-PE',cat:'squad',tags:'Software embarcado · energia',stats:'<b>9 projetos de P&D</b> executados',rating:'★ 4,7',dest:false,souser:false,resp:'responde em ~1 dia',
+      bio:'Hub de squads especializado em software embarcado para o setor de energia, com experiência em projetos FINEP e EMBRAPII.',
+      port:['Firmware de inversores · projeto FINEP · 2025','Gateway IoT industrial · 2024'],
+      rev:[['Time técnico que entende a lógica de projeto de fomento.','Proponente · energia · dez/2025']]},
+    {ini:'PF',nome:'Consultora P.F.',loc:'Belo Horizonte-MG',cat:'contas',tags:'Prestação de contas FINEP/CNPq',stats:'<b>31 prestações</b> · zero glosas',rating:'★ 5,0',dest:false,souser:false,resp:'responde em ~5h',
+      bio:'Especialista em prestação de contas de recursos públicos (FINEP, CNPq, FAPs). 31 prestações aprovadas sem uma única glosa.',
+      port:['Prestação FINEP subvenção · R$ 3,2 mi · 2025','Prestação CNPq · 36 meses · 2024'],
+      rev:[['Dormimos tranquilos na auditoria.','Proponente · saúde · mar/2026']]},
+    {ini:'CN',nome:'Dra. C.N.',loc:'Campinas-SP',cat:'pesquisador',tags:'Baterias e armazenamento · 2 patentes',stats:'<b>11 projetos executados</b> · 2 patentes',rating:'★ 4,8',dest:false,souser:false,resp:'responde em ~8h',
+      bio:'Pesquisadora em eletroquímica e armazenamento de energia, com 2 patentes depositadas e experiência em projetos cooperativos.',
+      port:['Baterias de segunda vida · projeto cooperativo · 2025','Célula estacionária · P&D ANEEL · 2023'],
+      rev:[['Trouxe rigor científico que o edital exigia.','Proponente · energia · nov/2025']]}
+  ];
+  PREST.sort(function(a,b){return (b.dest?1:0)-(a.dest?1:0)});
+  var CONNSENT={};
+  function prBadges(pr){
+    var h='';
+    if(pr.dest)h+='<span class="pr-badge dest">⭐ Destaque</span>';
+    if(pr.souser)h+='<span class="pr-badge souser">▲ usa o SO Agêntico</span>';
+    return h?'<span class="pr-badges">'+h+'</span>':'';
+  }
+  var prestGrid=$('#prestGrid');
+  function renderPrest(){
+    prestGrid.innerHTML=PREST.map(function(pr,i){
+      return '<article class="prest'+(pr.dest?' destaque':'')+'" data-gcat="'+pr.cat+'" data-pr="'+i+'" style="animation-delay:'+(0.03+i*0.04)+'s" tabindex="0" role="button" aria-label="Ver perfil de '+pr.nome+'">'+
+        '<div class="prest-head"><span class="prest-avatar" aria-hidden="true">'+pr.ini+'</span>'+
+          '<div><b>'+pr.nome+'</b><span>'+pr.loc+' · '+pr.tags+'</span></div>'+
+          '<span class="prest-verified">✓ Verificado</span></div>'+
+        prBadges(pr)+
+        '<span class="prest-stats">'+pr.stats+'</span>'+
+        '<span class="prest-rating">'+pr.rating+' <span style="color:var(--text-3);font-weight:500">· '+pr.resp+'</span></span>'+
+        (CONNSENT[i]
+          ?'<button class="btn-ghost sent" style="font-size:.74rem">✓ Solicitação enviada</button>'
+          :'<button class="btn-ghost" data-conn="'+i+'" style="font-size:.74rem">Solicitar conexão</button>')+
+        '<button class="ag-more">Ver perfil completo →</button>'+
+      '</article>';
+    }).join('');
+  }
+  renderPrest();
+  var prDrawer=$('#prDrawer'),prScrim=$('#prScrim'),prInner=$('#prInner');
+  function closePr(){prDrawer.classList.remove('open');prScrim.classList.remove('show')}
+  function openPr(i){
+    var pr=PREST[i];
+    prInner.innerHTML=
+      '<div class="drawer-head">'+
+        '<span class="prest-avatar" style="width:52px;height:52px;font-size:.9rem" aria-hidden="true">'+pr.ini+'</span>'+
+        '<div><h3>'+pr.nome+'</h3><div class="drole">'+pr.loc+' · '+pr.tags+'</div>'+
+        '<div style="margin-top:.35rem;display:flex;gap:.4rem;flex-wrap:wrap"><span class="prest-verified">✓ Verificado MonyU</span>'+prBadges(pr)+'</div></div>'+
+        '<button class="drawer-close" id="prClose" aria-label="Fechar perfil">✕</button>'+
+      '</div>'+
+      '<div class="drawer-body">'+
+        '<div class="dsec"><p style="font-size:.84rem;color:var(--text);font-weight:600;line-height:1.55">'+pr.bio+'</p></div>'+
+        '<div class="key-stats" style="grid-template-columns:1fr 1fr;margin-bottom:1.15rem">'+
+          '<div class="kstat"><small>Resultados</small><b style="font-size:.78rem">'+pr.stats.replace(/<[^>]+>/g,'')+'</b></div>'+
+          '<div class="kstat"><small>Avaliação · resposta</small><b style="font-size:.78rem">'+pr.rating+' · '+pr.resp+'</b></div>'+
+        '</div>'+
+        '<div class="dsec"><h4>Portfólio verificado</h4><div class="pr-port">'+pr.port.map(function(x){return '<div>'+x+'</div>'}).join('')+'</div></div>'+
+        '<div class="dsec"><h4>O que dizem os proponentes</h4>'+pr.rev.map(function(r){return '<div class="pr-quote">“'+r[0]+'”<b>'+r[1]+'</b></div>'}).join('')+'</div>'+
+        '<div class="dsec"><h4>Como funciona a conexão</h4><ul class="yes">'+
+          '<li>Você solicita — o prestador vê o seu projeto e o contexto</li>'+
+          '<li>No aceite, a identidade completa é revelada para os dois lados</li>'+
+          '<li>Conversa, proposta e acordo padronizado, tudo dentro da plataforma</li>'+
+        '</ul></div>'+
+        (pr.dest?'<p style="font-size:.62rem;color:var(--text-3)">⭐ Este perfil contratou Destaque e aparece primeiro nas buscas da sua categoria. O selo Verificado independe do Destaque.</p>':'')+
+      '</div>'+
+      '<div class="drawer-foot">'+
+        (CONNSENT[i]
+          ?'<button class="btn-ghost sent">✓ Solicitação enviada</button>'
+          :'<button class="btn-primary" data-conn="'+i+'">Solicitar conexão</button>')+
+        '<button class="btn-ghost" data-toast="Perfis salvos — em breve no piloto (demo)">☆ Salvar</button>'+
+      '</div>';
+    prDrawer.classList.add('open');prScrim.classList.add('show');
+    prInner.querySelector('#prClose').addEventListener('click',closePr);
+  }
+  prScrim.addEventListener('click',closePr);
+  document.addEventListener('click',function(e){
+    var ch=e.target.closest('[data-gchip]');
+    if(ch){
+      $$('.filter-chip[data-gchip]').forEach(function(x){x.classList.remove('on')});
+      ch.classList.add('on');
+      var f=ch.getAttribute('data-gchip');
+      $$('#prestGrid .prest').forEach(function(c){
+        c.style.display=(f==='todos'||c.getAttribute('data-gcat')===f)?'':'none';
+      });
+      return;
+    }
+    var nd=e.target.closest('[data-gfilter]');
+    if(nd){
+      showView('giga');
+      var f2=nd.getAttribute('data-gfilter');
+      $$('.filter-chip[data-gchip]').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-gchip')===f2)});
+      $$('#prestGrid .prest').forEach(function(c){
+        c.style.display=(c.getAttribute('data-gcat')===f2)?'':'none';
+      });
+      return;
+    }
+    var cn=e.target.closest('[data-conn]');
+    if(cn&&!cn.classList.contains('sent')){
+      var idx=parseInt(cn.getAttribute('data-conn'),10);
+      CONNSENT[idx]=1;
+      renderPrest();
+      if(prDrawer.classList.contains('open'))openPr(idx);
+      toast('Solicitação enviada a '+PREST[idx].nome+'. Você será avisado no aceite — a conversa acontece dentro da plataforma. (demo)');
+      return;
+    }
+    var card=e.target.closest('[data-pr]');
+    if(card&&!e.target.closest('button')){openPr(parseInt(card.getAttribute('data-pr'),10));return}
+    if(card&&e.target.closest('.ag-more')){openPr(parseInt(card.getAttribute('data-pr'),10))}
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closePr()});
+
+  /* ================= Trilhas de treinamento (prévia) ================= */
+  var TRAILS={
+    primeira:{name:'Primeira captação',ico:'🌱',gift:0,lessons:[
+      {t:'O mapa do fomento não-reembolsável no Brasil',d:'9 min',done:true},
+      {t:'Subvenção, cooperativo ou bolsa: qual instrumento é o seu',d:'8 min',done:true},
+      {t:'A anatomia de um edital',d:'10 min',done:true},
+      {t:'Lendo um edital como um avaliador',d:'11 min'},
+      {t:'Elegibilidade: os 7 erros que eliminam antes da nota',d:'8 min'},
+      {t:'Contrapartida sem sustos',d:'7 min'},
+      {t:'Montando o cronograma físico-financeiro',d:'9 min'},
+      {t:'Checklist final antes de submeter',d:'8 min'}]},
+    agentes:{name:'Dominando os agentes',ico:'🤖',gift:5,lessons:[
+      {t:'O pipeline da captação em 7 minutos',d:'7 min'},
+      {t:'Rico: scans que encontram o edital certo',d:'9 min'},
+      {t:'Íris: lendo o diagnóstico como um estrategista',d:'10 min'},
+      {t:'Conhecimento: o que indexar (e o que não)',d:'8 min'},
+      {t:'Ada: brief perfeito, projeto forte',d:'12 min'},
+      {t:'Revisando a Ada: o checklist do olho humano',d:'11 min'},
+      {t:'Adaptação: um projeto, várias captações',d:'8 min'},
+      {t:'Kai e Aurora: os agentes de estratégia',d:'10 min'},
+      {t:'Autonomia: seu time no automático, com segurança',d:'9 min'}]},
+    recorrente:{name:'Captação recorrente',ico:'📈',gift:0,lessons:[
+      {t:'De uma aprovação para um pipeline',d:'9 min'},
+      {t:'Gestão de contrapartidas em múltiplos projetos',d:'10 min'},
+      {t:'Prestação de contas que protege a próxima captação',d:'11 min'},
+      {t:'Relacionamento com o financiador',d:'8 min'},
+      {t:'Equipe executora: montando o time recorrente',d:'9 min'},
+      {t:'Indicadores que os conselhos querem ver',d:'9 min'},
+      {t:'O ciclo anual do fomento: calendário estratégico',d:'9 min'}]}
+  };
+  var trOv=$('#trOv'),trKey='',trIdx=0;
+  function trPct(k){var L=TRAILS[k].lessons;return Math.round(L.filter(function(l){return l.done}).length/L.length*100)}
+  function trSyncCard(k){
+    var L=TRAILS[k].lessons,n=L.filter(function(l){return l.done}).length;
+    var bar=$('[data-trbar="'+k+'"]'),lab=$('[data-trlabel="'+k+'"]');
+    if(bar)bar.style.width=trPct(k)+'%';
+    if(lab)lab.textContent=n===0?'não iniciada':(n===L.length?'✓ trilha concluída':n+' de '+L.length+' aulas');
+  }
+  function renderTrail(){
+    var T=TRAILS[trKey],L=T.lessons;
+    $('#trIco').textContent=T.ico;
+    $('#trName').textContent=T.name;
+    $('#trMeta').textContent=L.length+' aulas · certificado MonyU ao concluir'+(T.gift?' · 🎁 +'+T.gift+' fichas':'');
+    $('#trProg').textContent=trPct(trKey)+'% concluído';
+    $('#trLessons').innerHTML=L.map(function(l,i){
+      return '<button class="lesson-item'+(l.done?' done':'')+(i===trIdx?' cur':'')+'" data-lesson="'+i+'">'+
+        '<span class="li-n">'+(l.done?'✓':(i+1))+'</span><b>'+l.t+'</b><span>'+l.d+'</span></button>';
+    }).join('');
+    var cur=L[trIdx];
+    $('#trLTitle').textContent='Aula '+(trIdx+1)+': '+cur.t;
+    $('#trLMeta').textContent=cur.d+' · '+T.name+(cur.done?' · ✓ concluída':'');
+    $('#trDone').textContent=cur.done?'✓ Aula concluída — rever':'✓ Concluir aula e avançar';
+    trSyncCard(trKey);
+  }
+  function openTrail(k){
+    trKey=k;
+    var L=TRAILS[k].lessons,first=0;
+    for(var i=0;i<L.length;i++){if(!L[i].done){first=i;break}}
+    trIdx=first;
+    renderTrail();
+    trOv.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+  function closeTrail(){trOv.classList.remove('open');document.body.style.overflow=''}
+  document.addEventListener('click',function(e){
+    var tb=e.target.closest('[data-tropen]');
+    if(tb){openTrail(tb.getAttribute('data-tropen'));return}
+    var li=e.target.closest('[data-lesson]');
+    if(li){trIdx=parseInt(li.getAttribute('data-lesson'),10);renderTrail();return}
+  });
+  $('#trClose').addEventListener('click',closeTrail);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&trOv.classList.contains('open'))closeTrail()});
+  $('#trDone').addEventListener('click',function(){
+    var T=TRAILS[trKey],L=T.lessons;
+    if(!L[trIdx].done){
+      L[trIdx].done=true;
+      var all=L.every(function(l){return l.done});
+      if(all){
+        if(T.gift){saldo+=T.gift;syncSaldo();}
+        toast('🎉 Trilha "'+T.name+'" concluída! Certificado MonyU emitido'+(T.gift?' + '+T.gift+' fichas adicionadas ao seu saldo':'')+'. (demo)');
+      }else{
+        toast('Aula concluída! Próxima: '+(L[trIdx+1]?L[trIdx+1].t:'—'));
+      }
+      for(var i=0;i<L.length;i++){if(!L[i].done){trIdx=i;break}}
+    }
+    renderTrail();
+  });
+
   /* ================= Paleta de comandos ================= */
   var cmdk=$('#cmdk'),cmdkInput=$('#cmdkInput'),cmdkList=$('#cmdkList');
   var commands=[
@@ -3217,6 +3791,8 @@ a{color:var(--accent);text-decoration:none}
     {t:'Ir para Conhecimento',run:function(){showView('conhecimento')}},
     {t:'Revisar e copiar projeto Microrredes (Ada)',run:function(){openWs()}},
     {t:'Adicionar conhecimento (indexar documentos)',run:function(){showView('conhecimento');open($('#kbModal'))}},
+    {t:'Ir para GigaMonyU (prévia)',run:function(){showView('giga')}},
+    {t:'Ir para Treinamentos (prévia)',run:function(){showView('trein')}},
     {t:'Executar scan do Rico · 1 ficha',run:function(){openRun('rico')}},
     {t:'Diagnóstico de elegibilidade (Íris) · 5 fichas',run:function(){openRun('iris')}},
     {t:'Elaborar projeto (Ada) · 10–20 fichas',run:function(){openRun('ada')}},
