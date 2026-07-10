@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Área do Diagnóstico de Incentivos da MonyU. Resultado individual não indexável."
+    />
+    <meta name="robots" content="noindex,nofollow,noarchive,nosnippet" />
+    <meta name="googlebot" content="noindex,nofollow,noarchive,nosnippet" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="canonical" href="https://www.monyu.com.br/diagnostico/" />
+    <link rel="icon" type="image/png" href="../logo%20monyu%20-%20full.png" />
+    <title>Executar Diagnóstico de Incentivos | MonyU</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <div class="app-shell" id="app" data-page="diagnostico">
+      <header class="app-header" aria-label="Cabeçalho do diagnóstico">
+        <a class="brand" href="../index.html" aria-label="MonyU, página inicial">
+          <img src="../logo%20monyu%20-%20full.png" alt="MonyU" />
+        </a>
+
+        <div class="header-context">
+          <p class="eyebrow">Diagnóstico de Incentivos e Funding</p>
+          <p class="session-label" id="sessionLabel">Nova análise</p>
+        </div>
+
+        <div class="header-actions">
+          <span class="save-status" id="saveStatus">Salvo neste dispositivo</span>
+          <button class="text-button" type="button" id="saveButton">Salvar e sair</button>
+          <span class="user-avatar" aria-label="Perfil da empresa">E</span>
+        </div>
+      </header>
+
+      <main id="inicio">
+        <section class="diagnostic-view" id="diagnosticView" aria-labelledby="questionTitle">
+          <section class="progress-region" aria-label="Progresso do diagnóstico">
+            <div class="step-summary">
+              <span class="step-label" id="stepLabel">Etapa 1 de 6</span>
+              <strong class="step-name" id="stepName">Direcionamento</strong>
+            </div>
+            <div class="progress-track" aria-hidden="true">
+              <span class="progress-fill" id="progressFill"></span>
+            </div>
+            <div class="progress-count" id="progressCount">Questão 1</div>
+            <ol class="stepper" id="stepper" aria-label="Etapas do diagnóstico"></ol>
+          </section>
+
+          <div class="workspace">
+            <section class="question-panel" id="questionPanel" aria-live="polite">
+              <div class="question-heading">
+                <p class="question-index" id="questionIndex">01</p>
+                <div>
+                  <p class="section-kicker" id="sectionKicker">COMEÇAMOS PELO ESSENCIAL</p>
+                  <h1 id="questionTitle" tabindex="-1">O que a empresa mais quer resolver agora?</h1>
+                  <p class="question-help" id="questionHelp">
+                    Escolha a prioridade que melhor representa este momento.
+                  </p>
+                </div>
+              </div>
+
+              <div class="choice-list" id="choiceList" role="radiogroup" aria-labelledby="questionTitle"></div>
+
+              <div class="question-footer">
+                <button class="back-button" type="button" id="backButton" disabled>
+                  <span aria-hidden="true">←</span>
+                  Voltar
+                </button>
+                <p class="selection-hint" id="selectionHint">Selecione uma opção para continuar</p>
+                <button class="continue-button" type="button" id="continueButton" disabled>
+                  Continuar
+                  <span aria-hidden="true">→</span>
+                </button>
+              </div>
+            </section>
+
+            <aside class="insight-panel" aria-labelledby="pathwaysTitle">
+              <div class="insight-topline">
+                <p class="section-kicker">MAPA EM FORMAÇÃO</p>
+                <span class="signal-dot" aria-hidden="true"></span>
+              </div>
+              <h2 id="pathwaysTitle">Trilhas que vamos avaliar</h2>
+              <p class="insight-description" id="pathwaysDescription">
+                Sua resposta organiza o diagnóstico pelas oportunidades mais relevantes.
+              </p>
+
+              <div class="pathways" id="pathways"></div>
+
+              <div class="insight-divider" aria-hidden="true"></div>
+
+              <div class="time-estimate">
+                <span class="time-icon" aria-hidden="true">◷</span>
+                <div>
+                  <p>Tempo estimado restante</p>
+                  <strong id="timeEstimate">5 a 8 minutos</strong>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="result-view" id="resultView" hidden aria-labelledby="resultTitle">
+          <header class="result-hero">
+            <div class="result-hero-copy">
+              <p class="section-kicker">DIAGNÓSTICO CONCLUÍDO</p>
+              <h1 id="resultTitle" tabindex="-1">Seu mapa de oportunidades está pronto.</h1>
+              <p class="result-intro" id="resultIntro"></p>
+            </div>
+            <div class="result-actions" aria-label="Ações do resultado">
+              <button class="secondary-button" type="button" id="exportButton">
+                <span aria-hidden="true">↓</span>
+                Exportar resumo
+              </button>
+              <button class="secondary-button" type="button" id="printButton">
+                <span aria-hidden="true">⎙</span>
+                Imprimir
+              </button>
+              <button class="primary-button" type="button" id="restartButton">
+                <span aria-hidden="true">↺</span>
+                Nova análise
+              </button>
+            </div>
+          </header>
+
+          <section class="profile-band" aria-labelledby="profileTitle">
+            <div>
+              <p class="section-kicker">PERFIL IDENTIFICADO</p>
+              <h2 id="profileTitle">Sua empresa em uma leitura rápida</h2>
+              <div class="profile-signature" id="profileSignals" aria-label="Resumo do perfil da empresa"></div>
+            </div>
+            <p class="profile-innovation" id="profileInnovation"></p>
+          </section>
+
+          <section class="primary-result" id="primaryResult"></section>
+
+          <section class="result-section" id="opportunitiesSection">
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">PRIORIDADES</p>
+                <h2>Oportunidades mais relevantes</h2>
+              </div>
+              <p>Mostramos no máximo três caminhos para manter a decisão objetiva.</p>
+            </div>
+            <div class="opportunity-list" id="opportunityList"></div>
+          </section>
+
+          <section class="result-columns">
+            <section class="compact-result-section" id="preparationSection">
+              <div class="section-heading compact-heading">
+                <div>
+                  <p class="section-kicker">PREPARAÇÃO</p>
+                  <h2>O que pode ser preparado</h2>
+                </div>
+              </div>
+              <div class="preparation-list" id="preparationList"></div>
+            </section>
+
+            <aside class="risk-panel" id="riskPanel" aria-labelledby="riskTitle">
+              <p class="section-kicker">PONTOS DE ATENÇÃO</p>
+              <h2 id="riskTitle">O que validar antes de avançar</h2>
+              <div class="risk-list" id="riskList"></div>
+            </aside>
+          </section>
+
+          <section class="assumptions-section">
+            <details>
+              <summary>Premissas e limites desta simulação</summary>
+              <div class="assumptions-content" id="assumptionsContent"></div>
+            </details>
+          </section>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <p>Estimativa preliminar, sem valor de parecer fiscal, contábil ou jurídico.</p>
+        <button class="support-link" type="button" id="privacyButton">Como os dados são tratados</button>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="../script.js" defer></script>
+  </body>
+</html>

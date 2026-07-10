@@ -1,0 +1,10 @@
+{
+  "name": "Diagnóstico de Incentivos | MonyU",
+  "short_name": "MonyU",
+  "description": "Diagnóstico executivo de incentivos, inovação e eficiência fiscal.",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#000000",
+  "theme_color": "#000000"
+}

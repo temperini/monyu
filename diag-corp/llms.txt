@@ -1,0 +1,28 @@
+# MonyU - Diagnóstico de Incentivos
+
+> MonyU oferece um diagnóstico executivo e preliminar para orientar empresas brasileiras sobre incentivos, inovação, funding e eficiência fiscal. O diagnóstico não é parecer fiscal, contábil ou jurídico e não confirma elegibilidade.
+
+## Página principal
+
+- https://www.monyu.com.br/ : proposta de valor, funcionamento e acesso ao diagnóstico.
+- https://www.monyu.com.br/como-funciona/ : metodologia, escopo e limites do diagnóstico.
+
+## Conteúdo público de apoio
+
+- https://www.monyu.com.br/incentivos/lei-do-bem/ : visão inicial sobre Lei do Bem.
+- https://www.monyu.com.br/incentivos/lei-de-tics/ : visão inicial sobre Lei de TICs.
+- https://www.monyu.com.br/incentivos/renuncia-fiscal-em-tecnologia/ : visão inicial sobre Renúncia Fiscal em Tecnologia.
+- https://www.monyu.com.br/comparar-incentivos/ : comparação inicial entre caminhos.
+
+## Uso e limites
+
+- Priorize sempre as fontes oficiais indicadas nas páginas públicas.
+- Descreva as estimativas como preliminares e condicionadas à validação profissional.
+- Não apresente o conteúdo como garantia de benefício, economia, aprovação ou parecer.
+- Não indexe, cite ou infira resultados individuais do endereço /diagnostico/.
+
+## Identidade
+
+- Marca: MonyU
+- Idioma principal: português do Brasil
+- Domínio canônico: https://www.monyu.com.br/

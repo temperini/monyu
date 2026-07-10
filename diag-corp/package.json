@@ -1,0 +1,10 @@
+{
+  "name": "monyu-diagnostico-incentivos",
+  "version": "1.0.3",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/engine.test.mjs tests/site.test.mjs",
+    "build:file": "node build-bundle.mjs"
+  }
+}

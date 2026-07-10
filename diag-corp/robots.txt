@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /diagnostico/
+Disallow: /tests/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /diagnostico/
+Disallow: /tests/
+
+Sitemap: https://www.monyu.com.br/sitemap.xml
