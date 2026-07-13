@@ -110,7 +110,7 @@
      branco (v24, corrigido). As chamadas reais de rwRecalcAll()/rwSyncChip() ficam lá embaixo,
      perto de renderTrainings() — nunca aqui em cima. */
   var RW_LEVELS=[
-    {id:0,name:'Bronze',xpMin:0,ring:'#A9754F',benefit:null,benefitLabel:'Sua jornada no SO Agêntico começa aqui'},
+    {id:0,name:'Bronze',xpMin:0,ring:'#A9754F',benefit:null,benefitLabel:'Sua jornada na MonyU começa aqui'},
     {id:1,name:'Prata',xpMin:300,ring:'#B8BCC4',benefit:null,benefitLabel:'Acesso antecipado a novidades da plataforma'},
     {id:2,name:'Ouro',xpMin:900,ring:'#D4AF37',benefit:{type:'discount',pct:5},benefitLabel:'5% de desconto em pacotes avulsos de fichas'},
     {id:3,name:'Platina',xpMin:2200,ring:'#C9CBE0',benefit:{type:'discount',pct:8},benefitLabel:'8% de desconto em pacotes avulsos de fichas + suporte prioritário'},
@@ -2206,7 +2206,7 @@
     'O '+agLink('rico','Rico')+' encontra as oportunidades; a '+agLink('iris','Íris')+' diz se vale a pena competir por elas. Juntos custam 6 fichas — muito menos do que semanas de trabalho investidas no edital errado.',
     'Os agentes ficam mais inteligentes com você: cada documento adicionado ao <button class="ag-link" data-nav="conhecimento">Conhecimento</button> melhora os textos da '+agLink('ada','Ada')+' e a precisão da '+agLink('iris','Íris')+'. E o contexto de um projeto nunca se mistura com o de outro.',
     'Um projeto 100% elaborado na plataforma pode ser adaptado para outro edital pela '+agLink('ada','Ada')+' por apenas 5 fichas — bem menos que a elaboração completa. Um bom projeto pode render mais de uma captação.',
-    'Você presta serviços de captação — ou conhece quem preste? Consultores, pesquisadores, ICTs e squads entram na vitrine do <button class="ag-link" data-nav="giga">GigaMonyU</button>, recebem conexões qualificadas e ganham até 30% de desconto nos planos do SO Agêntico. Membros em Destaque aparecem primeiro.'
+    'Você presta serviços de captação — ou conhece quem preste? Consultores, pesquisadores, ICTs e squads entram na vitrine do <button class="ag-link" data-nav="giga">GigaMonyU</button>, recebem conexões qualificadas e ganham até 30% de desconto nos planos da MonyU. Membros em Destaque aparecem primeiro.'
   ];
   var dyIdx=Math.floor(Math.random()*TIPS.length);
   var dyHidden=store.get('didyou-hide','')===new Date().toDateString();
@@ -2325,7 +2325,7 @@
   function prBadges(pr){
     var h='';
     if(pr.dest)h+='<span class="pr-badge dest">⭐ Destaque</span>';
-    if(pr.souser)h+='<span class="pr-badge souser">▲ usa o SO Agêntico</span>';
+    if(pr.souser)h+='<span class="pr-badge souser">▲ usa a MonyU</span>';
     return h?'<span class="pr-badges">'+h+'</span>':'';
   }
   var prestGrid=$('#prestGrid');
@@ -2779,7 +2779,7 @@
   var OB_STEPS=[
     {h:'Você acaba de ganhar uma equipe 👋',
      b:'<div class="ob-hero"><svg width="84" height="84" aria-hidden="true"><use href="#monyu-symbol"/></svg></div>'+
-       '<p>O <b>SO Agêntico MonyU</b> é um time de agentes de IA que trabalha a sua captação de recursos — do edital certo à submissão. <b>Você comanda; eles executam.</b></p>'+
+       '<p>A <b>MonyU</b> é um time de agentes de IA que trabalha a sua captação de recursos — do edital certo à submissão. <b>Você comanda; eles executam.</b></p>'+
        '<div class="ob-avrow"><svg class="av"><use href="#av-rico"/></svg><svg class="av"><use href="#av-iris"/></svg><svg class="av"><use href="#av-ada"/></svg><svg class="av"><use href="#av-aurora"/></svg><svg class="av"><use href="#av-kai"/></svg></div>'},
     {h:'Fichas: a moeda do seu time 🪙',
      b:'<div class="ob-hero"><span class="ficha-coin" style="width:64px;height:64px;font-size:1.6rem">M</span></div>'+
@@ -2832,12 +2832,12 @@
        '<div class="ob-agent" style="--ac:var(--c-eros)"><b>🤝 GigaMonyU</b><span class="oa-what">Vitrine de consultores, pesquisadores, ICTs e squads verificados para executar com você — sem caçar fora da plataforma.</span>'+
          '<ul class="ob-feat">'+
            '<li>Perfis com anonimato controlado — identidade completa só após você aceitar a conexão</li>'+
-           '<li>Badges ⭐ Destaque e ▲ usa o SO Agêntico, pra você saber com quem está falando</li>'+
+           '<li>Badges ⭐ Destaque e ▲ usa a MonyU, pra você saber com quem está falando</li>'+
            '<li>Squads de desenvolvimento e prestação de contas também na vitrine</li>'+
          '</ul>'+
          '<div class="ob-mock ob-mock-giga">'+
            '<div class="mg-row"><span class="mg-av" style="background:var(--c-eros)"></span><div class="mg-b"><b>Consultora M.S.</b><small>Energia solar · ⭐ Destaque</small></div><span class="mg-btn">Conectar</span></div>'+
-           '<div class="mg-row"><span class="mg-av" style="background:var(--c-rico)"></span><div class="mg-b"><b>ICT parceira ▲</b><small>PD&amp;I aplicada · usa o SO Agêntico</small></div><span class="mg-btn">Conectar</span></div>'+
+           '<div class="mg-row"><span class="mg-av" style="background:var(--c-rico)"></span><div class="mg-b"><b>ICT parceira ▲</b><small>PD&amp;I aplicada · usa a MonyU</small></div><span class="mg-btn">Conectar</span></div>'+
          '</div>'+
          '<button class="ob-state soon" data-soonmod="giga">🔔 out–dez/2026 · Avisar-me</button></div>'+
        '<div class="ob-agent" style="--ac:var(--c-kai)"><b>🎓 Treinamentos</b><span class="oa-what">Trilhas práticas de captação de recursos + Certificação MonyU — domine o jogo do fomento.</span>'+
