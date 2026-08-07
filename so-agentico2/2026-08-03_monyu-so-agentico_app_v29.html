@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="2026-08-03_monyu-so-agentico_tokens_v29.css?v=7">
-<link rel="stylesheet" href="2026-08-03_monyu-so-agentico_app_v29.css?v=31">
+<link rel="stylesheet" href="2026-08-03_monyu-so-agentico_app_v29.css?v=33">
 </head>
 <body>
 <a class="skip-link" href="#conteudo">Pular para o conteúdo principal</a>
@@ -245,15 +245,15 @@
         <svg class="profile-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg>
       </button>
       <div class="profile-flyout" id="profileFlyout" role="menu">
-        <a class="pf-item" href="#" data-toast="Perfil — em breve no piloto" role="menuitem">
+        <a class="pf-item" href="#" data-nav="perfil" role="menuitem">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
           Perfil
         </a>
-        <a class="pf-item" href="#" data-toast="Dados da empresa — em breve no piloto" role="menuitem">
+        <a class="pf-item" href="#" data-nav="empresa" role="menuitem">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1"/></svg>
           Dados da empresa
         </a>
-        <a class="pf-item" href="#" data-toast="Configurações — em breve no piloto" role="menuitem">
+        <a class="pf-item" href="#" data-nav="config" role="menuitem">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83"/></svg>
           Configurações
         </a>
@@ -1301,6 +1301,202 @@
         </p>
       </section>
 
+      <!-- ============================================================ VIEW: PERFIL -->
+      <section class="view" id="view-perfil" aria-label="Perfil">
+        <div class="hero">
+          <div>
+            <h1 class="page-title">Perfil</h1>
+            <p class="page-sub">Seus dados pessoais, segurança e preferências de conta.</p>
+          </div>
+        </div>
+        <div class="settings-grid">
+          <div>
+            <section class="card" aria-label="Dados pessoais" style="margin-bottom:1.2rem">
+              <div class="section-head"><h2>Dados pessoais</h2></div>
+              <div class="field-row">
+                <div class="form-field"><label for="pfNome">Nome completo</label><input type="text" id="pfNome" value="Evandro Temperini"></div>
+                <div class="form-field"><label for="pfCargo">Cargo na empresa</label><input type="text" id="pfCargo" value="Fundador &amp; CEO"></div>
+              </div>
+              <div class="field-row">
+                <div class="form-field"><label for="pfEmail">E-mail</label><input type="email" id="pfEmail" value="evandro@novatechenergia.com.br" disabled></div>
+                <div class="form-field"><label for="pfTel">Telefone</label><input type="tel" id="pfTel" value="(85) 99999-0000"></div>
+              </div>
+              <button class="btn-primary" id="pfSaveBtn">Salvar alterações</button>
+            </section>
+
+            <section class="card" aria-label="Segurança" style="margin-bottom:1.2rem">
+              <div class="section-head"><h2>Segurança</h2></div>
+              <div class="field-row">
+                <div class="form-field"><label for="pfSenhaAtual">Senha atual</label><input type="password" id="pfSenhaAtual" placeholder="••••••••" autocomplete="current-password"></div>
+                <div class="form-field"><label for="pfSenhaNova">Nova senha</label><input type="password" id="pfSenhaNova" placeholder="mínimo 8 caracteres" autocomplete="new-password"></div>
+              </div>
+              <button class="btn-ghost" id="pfSenhaBtn">Alterar senha</button>
+              <div class="section-head" style="margin-top:1.4rem"><h2 style="font-size:.9rem">Sessões ativas</h2></div>
+              <div class="doc-row"><b>Chrome · Fortaleza, CE</b><span class="status-pill ok">Este dispositivo</span></div>
+              <div class="doc-row"><b>Safari · iPhone</b><span class="status-pill pending">Ativo há 2 dias</span><button class="btn-ghost" style="font-size:.7rem;padding:.35rem .7rem" data-toast="Sessão encerrada. (demo)">Encerrar</button></div>
+            </section>
+
+            <section class="card danger-card" aria-label="Zona de risco">
+              <div class="section-head"><h2>Zona de risco</h2></div>
+              <p style="font-size:.82rem;color:var(--text-2);line-height:1.55;margin-bottom:.9rem">Excluir sua conta remove seu acesso, projetos e histórico da MonyU. Esta ação não pode ser desfeita.</p>
+              <div class="form-field">
+                <label for="pfDelConfirm">Digite <b>NovaTech Energia</b> para confirmar</label>
+                <input type="text" id="pfDelConfirm" placeholder="NovaTech Energia" autocomplete="off">
+              </div>
+              <button class="btn-primary" id="pfDelBtn" disabled style="background:var(--accent)">Excluir minha conta</button>
+            </section>
+          </div>
+
+          <div class="settings-side">
+            <section class="card" aria-label="Papel na equipe">
+              <div class="section-head"><h2 style="font-size:.9rem">Papel na equipe</h2></div>
+              <div style="display:flex;align-items:center;gap:.6rem">
+                <span class="avatar" aria-hidden="true">EV</span>
+                <div><b style="display:block;font-size:.88rem">Administrador</b><span style="font-size:.72rem;color:var(--text-3)">Acesso total, incluindo faturamento</span></div>
+              </div>
+              <button class="btn-ghost" style="width:100%;margin-top:.9rem;font-size:.76rem" data-nav="config">Gerenciar equipe</button>
+            </section>
+            <section class="card" aria-label="Preferências">
+              <div class="section-head"><h2 style="font-size:.9rem">Preferências</h2></div>
+              <p style="font-size:.78rem;color:var(--text-3);line-height:1.55">Tema, contraste, fonte e animações ficam no ícone de acessibilidade, na barra superior. Notificações por canal ficam em Configurações.</p>
+              <button class="btn-ghost" style="width:100%;margin-top:.7rem;font-size:.76rem" data-nav="config">Ir para Configurações</button>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ VIEW: DADOS DA EMPRESA -->
+      <section class="view" id="view-empresa" aria-label="Dados da empresa">
+        <div class="hero">
+          <div>
+            <h1 class="page-title">Dados da empresa</h1>
+            <p class="page-sub">Essas informações alimentam o matching dos agentes com editais, quanto mais completo, melhor a recomendação.</p>
+          </div>
+        </div>
+
+        <section class="card" aria-label="Identificação" style="margin-bottom:1.2rem">
+          <div class="section-head"><h2>Identificação</h2></div>
+          <div class="field-row">
+            <div class="form-field"><label for="empRazao">Razão social</label><input type="text" id="empRazao" value="NovaTech Energia Soluções Ltda."></div>
+            <div class="form-field"><label for="empFantasia">Nome fantasia</label><input type="text" id="empFantasia" value="NovaTech Energia"></div>
+          </div>
+          <div class="field-row">
+            <div class="form-field"><label for="empCnpj">CNPJ</label><input type="text" id="empCnpj" value="12.345.678/0001-90"></div>
+            <div class="form-field"><label for="empFundacao">Fundação</label><input type="month" id="empFundacao" value="2021-03"></div>
+          </div>
+          <div class="form-field"><label for="empSite">Site</label><input type="text" id="empSite" value="novatechenergia.com.br"></div>
+        </section>
+
+        <section class="card" aria-label="Classificação" style="margin-bottom:1.2rem">
+          <div class="section-head"><h2>Classificação</h2></div>
+          <div class="field-row">
+            <div class="form-field"><label for="empPorte">Porte</label>
+              <select id="empPorte"><option>MEI</option><option selected>ME</option><option>EPP</option><option>Média empresa</option><option>Grande empresa</option></select>
+            </div>
+            <div class="form-field"><label for="empTema">Área temática</label>
+              <select id="empTema"><option selected>Energia</option><option>Agro</option><option>Biotec</option><option>Saúde</option><option>Indústria 4.0</option><option>Outra</option></select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="form-field"><label for="empRegime">Regime tributário</label>
+              <select id="empRegime"><option>Simples Nacional</option><option selected>Lucro Presumido</option><option>Lucro Real</option></select>
+            </div>
+            <div class="form-field"><label for="empEnquadramento">Enquadramento</label>
+              <select id="empEnquadramento"><option selected>Startup / empresa de base tecnológica</option><option>Empresa estabelecida</option><option>ICT (instituição de ciência e tecnologia)</option><option>Outro</option></select>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" aria-label="Perfil de elegibilidade para fomento" style="margin-bottom:1.2rem">
+          <div class="section-head">
+            <h2>Perfil de elegibilidade para fomento</h2>
+            <span class="hint" data-tip="Rico, Kai e Bartô usam estes campos para calcular match e força do projeto em cada edital">usado pelo matching dos agentes</span>
+          </div>
+          <div class="field-row">
+            <div class="form-field"><label for="empFatur">Faturamento anual</label>
+              <select id="empFatur"><option>Pré-operacional (sem faturamento)</option><option>Até R$ 360 mil</option><option selected>R$ 360 mil a R$ 4,8 milhões</option><option>R$ 4,8 milhões a R$ 20 milhões</option><option>Acima de R$ 20 milhões</option></select>
+            </div>
+            <div class="form-field"><label for="empFunc">Nº de funcionários</label>
+              <select id="empFunc"><option>1 a 5</option><option selected>6 a 20</option><option>21 a 50</option><option>51 a 200</option><option>Mais de 200</option></select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Já recebeu fomento público antes?</label>
+            <div style="display:flex;gap:1.2rem;margin-top:.3rem">
+              <label style="display:flex;align-items:center;gap:.4rem;font-size:.84rem;font-weight:500"><input type="radio" name="empFomentoAntes" checked> Sim</label>
+              <label style="display:flex;align-items:center;gap:.4rem;font-size:.84rem;font-weight:500"><input type="radio" name="empFomentoAntes"> Não</label>
+            </div>
+          </div>
+          <div class="form-field"><label for="empFomentoQuais">Quais fontes</label><input type="text" id="empFomentoQuais" value="FINEP (Subvenção), FAPESP"></div>
+          <div class="form-field"><label for="empCertif">Certificações</label><input type="text" id="empCertif" placeholder="Ex.: Lei do Bem, Rota 2030" value="Lei do Bem"></div>
+        </section>
+
+        <section class="card" aria-label="Documentos e certidões" style="margin-bottom:1.2rem">
+          <div class="section-head">
+            <h2>Documentos e certidões</h2>
+            <span class="hint">exigidos na maioria dos editais na hora de submeter</span>
+          </div>
+          <div class="doc-row"><b>Contrato social</b><span class="status-pill ok">✓ Enviado</span></div>
+          <div class="doc-row"><b>CND Federal</b><span class="status-pill ok">✓ Válida até 12/2026</span></div>
+          <div class="doc-row"><b>CND Municipal</b><span class="status-pill pending">Pendente</span><button class="btn-ghost" style="font-size:.7rem;padding:.35rem .7rem" data-toast="Upload de documento — em breve no piloto">Enviar</button></div>
+          <div class="doc-row"><b>Certidão FGTS</b><span class="status-pill pending">Pendente</span><button class="btn-ghost" style="font-size:.7rem;padding:.35rem .7rem" data-toast="Upload de documento — em breve no piloto">Enviar</button></div>
+          <div class="eros-banner" style="margin-top:1rem;background:linear-gradient(120deg,color-mix(in srgb,var(--c-carlito) 20%,transparent),color-mix(in srgb,var(--c-carlito) 8%,transparent));border-color:color-mix(in srgb,var(--c-carlito) 40%,transparent)">
+            <svg class="av" aria-hidden="true"><use href="#av-carlito"/></svg>
+            <p><b>O Carlito busca essas certidões por você:</b> checklist documental completo, monitorado até vencer, sem caçar CND uma por uma. Em breve, 5 fichas por checklist,
+            <button class="ag-link" data-soonmod="carlito" style="--alc:var(--c-carlito)">avisar quando disponível</button></p>
+          </div>
+        </section>
+
+        <button class="btn-primary" id="empSaveBtn">Salvar dados da empresa</button>
+      </section>
+
+      <!-- ============================================================ VIEW: CONFIGURAÇÕES -->
+      <section class="view" id="view-config" aria-label="Configurações">
+        <div class="hero">
+          <div>
+            <h1 class="page-title">Configurações</h1>
+            <p class="page-sub">Notificações, equipe e privacidade da sua conta.</p>
+          </div>
+        </div>
+
+        <section class="card" aria-label="Notificações" style="margin-bottom:1.2rem">
+          <div class="section-head"><h2>Notificações por e-mail</h2></div>
+          <div class="a11y-row"><label for="notifOportunidades">Novas oportunidades com match</label><span class="switch"><input type="checkbox" id="notifOportunidades" checked><span class="track-sw"></span><span class="thumb"></span></span></div>
+          <div class="a11y-row"><label for="notifAprovacoes">Aprovações pendentes</label><span class="switch"><input type="checkbox" id="notifAprovacoes" checked><span class="track-sw"></span><span class="thumb"></span></span></div>
+          <div class="a11y-row"><label for="notifPrazos">Prazos urgentes</label><span class="switch"><input type="checkbox" id="notifPrazos" checked><span class="track-sw"></span><span class="thumb"></span></span></div>
+          <div class="a11y-row"><label for="notifNovidades">Novidades e treinamentos</label><span class="switch"><input type="checkbox" id="notifNovidades"><span class="track-sw"></span><span class="thumb"></span></span></div>
+        </section>
+
+        <section class="card" aria-label="Equipe" style="margin-bottom:1.2rem">
+          <div class="section-head">
+            <h2>Membros da equipe</h2>
+            <span class="hint" id="teamCountHint">3 de 5 vagas do plano Starter</span>
+          </div>
+          <div class="invite-row">
+            <input type="email" id="teamInviteEmail" placeholder="e-mail do convidado">
+            <select id="teamInviteRole"><option value="Editor">Editor</option><option value="Visualizador">Visualizador</option><option value="Administrador">Administrador</option></select>
+            <button class="btn-primary" id="teamInviteBtn">Convidar</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="team-table">
+              <thead><tr><th>Membro</th><th>Papel</th><th>Status</th><th></th></tr></thead>
+              <tbody id="teamTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card" aria-label="Privacidade e dados" style="margin-bottom:1.2rem">
+          <div class="section-head"><h2>Privacidade e dados (LGPD)</h2></div>
+          <div class="doc-row"><b>Exportar meus dados</b><button class="btn-ghost" style="font-size:.7rem;padding:.4rem .8rem" id="exportDataBtn">Solicitar exportação</button></div>
+          <div class="doc-row"><b>Política de privacidade</b><button class="btn-ghost" style="font-size:.7rem;padding:.4rem .8rem" data-toast="Política de privacidade — em breve no piloto">Ver</button></div>
+          <div class="doc-row"><b>Termos de uso</b><button class="btn-ghost" style="font-size:.7rem;padding:.4rem .8rem" data-toast="Termos de uso — em breve no piloto">Ver</button></div>
+        </section>
+
+        <div class="preview-strip">
+          🚧 <span><b>Integrações</b> — Google Drive, Slack e mais chegam em breve.</span>
+        </div>
+      </section>
+
 
       <footer class="app-footer" aria-label="Assinatura MonyU">
         <svg viewBox="0 0 1563 938" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo MonyU">
@@ -1538,6 +1734,19 @@
         <b id="referLinkUrl">monyu.com.br/convite/evandro-temp</b>
         <button type="button" id="referCopyBtn">Copiar link</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Modal: confirmação genérica (ações críticas) ============ -->
+<div class="modal" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="modal-box">
+    <button class="modal-close" data-close="confirmModal" aria-label="Fechar">✕</button>
+    <h3 id="confirmTitle">Confirmar ação</h3>
+    <p class="sub" id="confirmBody"></p>
+    <div class="modal-actions">
+      <button class="btn-ghost" data-close="confirmModal">Cancelar</button>
+      <button class="btn-primary" id="confirmOkBtn" style="background:var(--accent)">Confirmar</button>
     </div>
   </div>
 </div>
@@ -1995,6 +2204,6 @@
   <span id="toastMsg"></span>
 </div>
 
-<script src="2026-08-03_monyu-so-agentico_app_v29.js?v=23"></script>
+<script src="2026-08-03_monyu-so-agentico_app_v29.js?v=26"></script>
 </body>
 </html>

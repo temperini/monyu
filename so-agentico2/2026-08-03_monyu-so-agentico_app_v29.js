@@ -946,6 +946,7 @@
     if(name==='atividade'&&typeof renderAtividade==='function')renderAtividade();
     if(name==='resultados'&&typeof renderResultados==='function')renderResultados();
     if(name==='rewards'&&typeof renderRewards==='function')renderRewards();
+    if(name==='config'&&typeof renderTeam==='function')renderTeam();
     /* Marca as oportunidades vistas só ao ENTRAR na tela (não no carregamento
        inicial da página, que já popula #oppsFull escondido por trás de outra
        view) — senão o selo "novo" nunca teria a chance de aparecer pra
@@ -1119,6 +1120,7 @@
       if(profileFlyout.classList.contains('open')&&!e.target.closest('.profile-wrap'))closeProfileFlyout();
     });
     document.addEventListener('keydown',function(e){if(e.key==='Escape')closeProfileFlyout()});
+    profileFlyout.addEventListener('click',function(e){if(e.target.closest('[data-nav]'))closeProfileFlyout()});
   }
 
   /* ================= Toast ================= */
@@ -1134,15 +1136,127 @@
     if(t){if(t.tagName==='A')e.preventDefault();toast(t.getAttribute('data-toast'))}
   });
 
-  /* Sair: único item do menu de perfil com efeito real no piloto (os demais
-     — Perfil, Dados da empresa, Configurações — seguem "em breve", ver
-     data-toast no HTML). Mesmo padrão de transição do login (toast curto +
-     pequeno atraso antes de navegar), não um redirecionamento seco. */
+  /* Sair: navega pra fora do app (mesmo padrão de transição do login, toast
+     curto + pequeno atraso antes de navegar, não um redirecionamento seco).
+     Perfil, Dados da empresa e Configurações viraram telas reais em
+     2026-08-07 (seção 2.31 do progresso) — usam [data-nav], mesma
+     delegação global do resto do app. */
   var logoutBtn=$('#logoutBtn');
   if(logoutBtn)logoutBtn.addEventListener('click',function(e){
     e.preventDefault();
     toast('Saindo…');
     setTimeout(function(){window.location.href='index.html'},600);
+  });
+
+  /* ================= Perfil: salvar dados, senha, zona de risco ================= */
+  var pfSaveBtn=$('#pfSaveBtn');
+  if(pfSaveBtn)pfSaveBtn.addEventListener('click',function(){toast('Dados salvos. (demo)')});
+  var pfSenhaBtn=$('#pfSenhaBtn');
+  if(pfSenhaBtn)pfSenhaBtn.addEventListener('click',function(){
+    var atual=$('#pfSenhaAtual'),nova=$('#pfSenhaNova');
+    if(!atual.value||!nova.value){toast('Preencha a senha atual e a nova senha.');return}
+    if(nova.value.length<8){toast('A nova senha precisa ter pelo menos 8 caracteres.');return}
+    atual.value='';nova.value='';
+    toast('Senha alterada. (demo)');
+  });
+  /* Zona de risco no padrão GitHub: botão só habilita quando o texto digitado
+     bate exatamente com o nome fantasia da empresa — evita exclusão por
+     clique acidental num botão destrutivo. */
+  var pfDelConfirm=$('#pfDelConfirm'),pfDelBtn=$('#pfDelBtn');
+  if(pfDelConfirm&&pfDelBtn){
+    pfDelConfirm.addEventListener('input',function(){
+      pfDelBtn.disabled=pfDelConfirm.value.trim()!=='NovaTech Energia';
+    });
+    pfDelBtn.addEventListener('click',function(){
+      if(pfDelBtn.disabled)return;
+      toast('Conta marcada para exclusão. Você será desconectado. (demo)');
+      setTimeout(function(){window.location.href='index.html'},900);
+    });
+  }
+
+  /* ================= Dados da empresa: salvar ================= */
+  var empSaveBtn=$('#empSaveBtn');
+  if(empSaveBtn)empSaveBtn.addEventListener('click',function(){toast('Dados da empresa salvos. (demo)')});
+
+  /* ================= Configurações: notificações, equipe, LGPD ================= */
+  [['notifOportunidades','1'],['notifAprovacoes','1'],['notifPrazos','1'],['notifNovidades','0']].forEach(function(pair){
+    var el=$('#'+pair[0]);if(!el)return;
+    el.checked=store.get('notif-'+pair[0],pair[1])==='1';
+    el.addEventListener('change',function(){store.set('notif-'+pair[0],el.checked?'1':'0')});
+  });
+  var exportDataBtn=$('#exportDataBtn');
+  if(exportDataBtn)exportDataBtn.addEventListener('click',function(){toast('Exportação solicitada, você recebe um e-mail em até 48h. (demo)')});
+
+  /* Equipe: lista guardada em localStorage (JSON), separada do resto do
+     store porque é uma lista, não um valor único. "Você" (Evandro) nunca
+     aparece com select de papel nem botão de remover — é o admin logado. */
+  var TEAM_DEFAULT=[
+    {name:'Evandro Temperini',email:'evandro@novatechenergia.com.br',role:'Administrador',you:true},
+    {name:'Marina Alves',email:'marina@novatechenergia.com.br',role:'Editor'},
+    {name:'Diego Souza',email:'diego@novatechenergia.com.br',role:'Visualizador'}
+  ];
+  function teamGet(){
+    var raw=store.get('team-members','');
+    if(!raw)return TEAM_DEFAULT.slice();
+    try{var parsed=JSON.parse(raw);return Array.isArray(parsed)?parsed:TEAM_DEFAULT.slice()}catch(e){return TEAM_DEFAULT.slice()}
+  }
+  function teamSet(list){store.set('team-members',JSON.stringify(list))}
+  function teamInitials(name){
+    return name.split(' ').filter(Boolean).map(function(w){return w[0]}).slice(0,2).join('').toUpperCase();
+  }
+  function renderTeam(){
+    var body=$('#teamTableBody');if(!body)return;
+    var list=teamGet();
+    body.innerHTML=list.map(function(m,i){
+      var roleCell=m.you
+        ? '<span style="font-size:.78rem;font-weight:600">'+m.role+'</span>'
+        : '<select class="team-role-select" data-team-role="'+i+'">'+
+            ['Administrador','Editor','Visualizador'].map(function(r){return '<option'+(m.role===r?' selected':'')+'>'+r+'</option>'}).join('')+
+          '</select>';
+      var rmCell=m.you?'':'<button class="btn-ghost" style="font-size:.68rem;padding:.3rem .6rem" data-team-remove="'+i+'">Remover</button>';
+      return '<tr><td><div class="team-member"><span class="avatar" aria-hidden="true">'+teamInitials(m.name)+'</span>'+
+        '<div><b style="display:block">'+m.name+(m.you?' (você)':'')+'</b><span style="font-size:.72rem;color:var(--text-3)">'+m.email+'</span></div></div></td>'+
+        '<td>'+roleCell+'</td><td><span class="status-pill ok">Ativo</span></td><td>'+rmCell+'</td></tr>';
+    }).join('');
+    var hint=$('#teamCountHint');
+    if(hint)hint.textContent=list.length+' de 5 vagas do plano Starter';
+  }
+  renderTeam();
+  var teamInviteBtn=$('#teamInviteBtn');
+  if(teamInviteBtn)teamInviteBtn.addEventListener('click',function(){
+    var emailInput=$('#teamInviteEmail'),email=emailInput.value.trim();
+    if(!email||email.indexOf('@')===-1){toast('Digite um e-mail válido.');return}
+    var list=teamGet();
+    if(list.length>=5){toast('Limite de 5 membros do plano Starter atingido. Faça upgrade para convidar mais.');return}
+    if(list.some(function(m){return m.email.toLowerCase()===email.toLowerCase()})){toast('Esse e-mail já está na equipe.');return}
+    var name=email.split('@')[0].replace(/[.\-_]/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase()});
+    list.push({name:name,email:email,role:$('#teamInviteRole').value});
+    teamSet(list);renderTeam();
+    emailInput.value='';
+    toast('Convite enviado para '+email+'. (demo)');
+  });
+  document.addEventListener('click',function(e){
+    var rm=e.target.closest('[data-team-remove]');
+    if(rm){
+      var idx=parseInt(rm.getAttribute('data-team-remove'),10);
+      var list=teamGet(),removed=list[idx];
+      openConfirm(
+        'Remover '+(removed?removed.name:'membro')+' da equipe?',
+        (removed?removed.name+' ('+removed.email+')':'Este membro')+' perde o acesso a todos os projetos imediatamente. Você pode convidar de novo depois.',
+        function(){
+          var list2=teamGet();list2.splice(idx,1);teamSet(list2);renderTeam();
+          toast((removed?removed.name+' removido':'Membro removido')+' da equipe.');
+        }
+      );
+    }
+  });
+  document.addEventListener('change',function(e){
+    var sel=e.target.closest('[data-team-role]');
+    if(sel){
+      var idx=parseInt(sel.getAttribute('data-team-role'),10);
+      var list=teamGet();list[idx].role=sel.value;teamSet(list);
+      toast('Papel atualizado.');
+    }
   });
 
   /* ================= Banner dispensável ================= */
@@ -1197,6 +1311,22 @@
   });
   $$('.modal').forEach(function(m){
     m.addEventListener('click',function(e){if(e.target===m)close(m)});
+  });
+
+  /* Confirmação genérica pra ações críticas/destrutivas (2026-08-07) — 1
+     modal reaproveitado por qualquer fluxo, em vez de 1 modal por ação.
+     onOk só roda se o usuário confirmar; cancelar/fechar não faz nada. */
+  var confirmModal=$('#confirmModal'),confirmOkBtn=$('#confirmOkBtn'),confirmOnOk=null;
+  function openConfirm(title,body,onOk){
+    $('#confirmTitle').textContent=title;
+    $('#confirmBody').textContent=body;
+    confirmOnOk=onOk;
+    open(confirmModal);
+  }
+  if(confirmOkBtn)confirmOkBtn.addEventListener('click',function(){
+    close(confirmModal);
+    var fn=confirmOnOk;confirmOnOk=null;
+    if(fn)fn();
   });
 
   /* ================= Selecionar tudo ao focar campo de linha única (v29) =================
@@ -2554,6 +2684,10 @@
       icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2 9l10 5 10-5-10-5z"/><path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/></svg>',
       desc:'Trilhas práticas de capacitação para você dominar a captação de recursos: como funcionam os editais, o que os avaliadores esperam e como extrair o máximo de cada agente.',
       items:['Trilhas por nível: do primeiro edital à captação recorrente','Aulas curtas com casos reais de projetos aprovados','Certificado MonyU ao concluir cada trilha']},
+    carlito:{name:'Carlito',eta:'Previsto para out/2026',
+      icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2.5h6v3H9z"/><path d="m8.5 12 2 2 4-4"/></svg>',
+      desc:'Monta o checklist documental do edital escolhido e monitora suas certidões (CND Federal, Municipal, FGTS) até vencer, avisando antes de expirar, sem você caçar uma por uma.',
+      items:['Checklist automático por edital, direto em Dados da empresa','Monitoramento de validade com aviso antes de vencer','Busca automática das certidões, quando disponível na fonte oficial']},
     banca:{name:'A Banca',eta:'Previsto para nov/2026',
       icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M5 6h14M7 6l-3 6a3.5 3.5 0 0 0 7 0L8 6M17 6l-3 6a3.5 3.5 0 0 0 7 0l-3-6M12 6v13M8 21h8"/></svg>',
       desc:'Uma banca de avaliadores simulados, treinada nos critérios reais de cada edital, dá nota no seu projeto antes da banca oficial — para você submeter só quando estiver forte.',

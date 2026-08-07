@@ -796,8 +796,14 @@ html[data-theme="dark"] .auto-status-bar #autoPauseBtn{color:var(--monyu-yellow)
 .font-controls .fs-val{font-size:.78rem;font-weight:700;min-width:40px;text-align:center;font-variant-numeric:tabular-nums}
 .switch{position:relative;width:42px;height:24px;flex-shrink:0}
 .switch input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;margin:0}
-.switch .track-sw{position:absolute;inset:0;background:var(--surface-2);border:1px solid var(--border);border-radius:99px;transition:all var(--dur)}
-.switch .thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--text-3);transition:translate var(--dur) var(--ease),background var(--dur)}
+/* pointer-events:none nos dois: sem isso, eles ficam por cima do <input>
+   (mais tarde no DOM = pinta por cima, sem z-index nenhum dos dois lados)
+   e bloqueiam o clique na área inteira do switch — bug pré-existente,
+   achado em 2026-08-07 ao testar clique real (não só toggle programático)
+   nos switches novos de Configurações; afetava também os do painel de
+   acessibilidade, corrigido aqui pra valer nos dois lugares de uma vez. */
+.switch .track-sw{position:absolute;inset:0;background:var(--surface-2);border:1px solid var(--border);border-radius:99px;transition:all var(--dur);pointer-events:none}
+.switch .thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--text-3);transition:translate var(--dur) var(--ease),background var(--dur);pointer-events:none}
 .switch input:checked ~ .track-sw{background:var(--accent-soft);border-color:var(--accent)}
 .switch input:checked ~ .thumb{translate:18px 0;background:var(--accent)}
 .switch input:focus-visible ~ .track-sw{box-shadow:var(--glow)}
