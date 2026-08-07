@@ -394,7 +394,16 @@ html[data-theme="dark"] .promo-note{color:var(--monyu-yellow)}
   background:var(--surface-2);cursor:pointer;transition:border-color var(--dur),transform .15s var(--ease);text-align:left;width:100%}
 .project:hover{border-color:var(--accent);transform:translateX(3px)}
 .project .av{width:44px;height:44px}
-.project-body{flex:1;min-width:0}
+/* width:100% parece redundante com flex:1, mas não é: no mobile .project
+   vira flex-direction:column (regra abaixo, backstop <480px) e a largura
+   passa a ser o eixo cruzado, governado por align-items:stretch — só que
+   o <b> do título tem white-space:nowrap, e esse conteúdo "vence" o
+   stretch e força a caixa a crescer pro tamanho do texto inteiro (medido:
+   481px numa tela de 375px). width:100% fixo resolve porque no modo linha
+   (desktop) o flex-basis:0% do "flex:1" já manda no tamanho e ignora
+   width; só entra em ação mesmo no modo coluna. Achado em auditoria mobile
+   real, 2026-08-07. */
+.project-body{flex:1;min-width:0;width:100%}
 .project-body b{font-size:.96rem;display:block;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .project-sub{font-size:.78rem;color:var(--text-3);margin-top:.15rem;display:block}
 .mini-stepper{display:flex;gap:4px;margin-top:.55rem;max-width:340px}
@@ -1080,7 +1089,13 @@ html[data-theme="dark"] .auto-status-bar #autoPauseBtn{color:var(--monyu-yellow)
 .rel-row b{font-size:.74rem;display:block}
 .rel-row span{font-size:.66rem;color:var(--text-3);line-height:1.4;display:block}
 .rel-row .rel-go{margin-left:auto;color:var(--text-3);font-weight:800;align-self:center}
-@media (max-width:640px){.didyou{flex-wrap:wrap}.dy-ctrl{margin-left:auto}}
+/* .dy-ctrl tem flex-shrink:0 (nunca encolhe) — sem forçar ele pra própria
+   linha, o texto de .dy-body (flex-basis:0%, sem piso) é quem absorve todo
+   o aperto e desaba pra ~1 palavra por linha. flex-basis:100% quebra o
+   .dy-ctrl pra linha de baixo (flex-wrap:wrap já existia), sobra a largura
+   inteira pro texto na linha de cima. Achado em auditoria mobile real,
+   2026-08-07. */
+@media (max-width:640px){.didyou{flex-wrap:wrap}.dy-ctrl{flex-basis:100%;margin-left:auto;justify-content:flex-end}}
 /* ============ Fontes de pesquisa ============ */
 .src-row{display:flex;justify-content:space-between;align-items:center;gap:.7rem;padding:.55rem 0;border-bottom:1px solid var(--border);font-size:.74rem;color:var(--text-2);line-height:1.4}
 .src-row:last-of-type{border-bottom:none}
@@ -1088,6 +1103,13 @@ html[data-theme="dark"] .auto-status-bar #autoPauseBtn{color:var(--monyu-yellow)
 .src-warn{font-size:.68rem;color:var(--warn);margin-top:.5rem;line-height:1.5}
 /* ============ Memória 2 colunas + novo projeto ============ */
 .kb-layout{display:grid;grid-template-columns:262px 1fr;gap:1rem;align-items:start}
+/* Item de grid tem min-width:auto implícito (mesma lógica de flex item) —
+   sem min-width:0 aqui, o nome do projeto com white-space:nowrap dentro de
+   .kb-folder força o .card inteiro a crescer pro tamanho do texto (medido
+   no mobile: 533px de card numa coluna de 339px, texto cortado na borda
+   da tela). Escopado só ao .card desta grid, não em todo .card do app.
+   Achado em auditoria mobile real, 2026-08-07. */
+.kb-layout>.card{min-width:0}
 .kb-tree-label{font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);padding:.2rem .3rem .45rem}
 .kb-folder{display:flex;align-items:center;gap:.55rem;width:100%;padding:.55rem .6rem;border-radius:10px;color:var(--text-2);font-size:.76rem;font-weight:600;text-align:left;transition:all var(--dur)}
 .kb-folder:hover{background:var(--surface-2);color:var(--text)}
@@ -1499,8 +1521,27 @@ html[data-contrast="high"] ::-webkit-scrollbar-thumb{background:var(--text-3);bo
   .banner .av{width:38px;height:38px}
   .banner-actions{width:100%;flex-basis:auto}
   .project{flex-direction:column;align-items:stretch;gap:.6rem}
-  .project-right{flex-direction:row}
+  /* Existe OUTRO .project-right{flex-direction:row...} no tier de 640px
+     (linha ~1508) — ele continua valendo aqui embaixo de 480px também
+     (nada o desliga), e é ele quem forçava .stage-chip a disputar espaço
+     com .project-deadline (sem min-width/basis próprios), derrubando o
+     texto do prazo pra ~57px de largura — mesmo mecanismo do .stage-chip
+     em .proj-head logo abaixo. Essa regra aqui desfaz o tier de 640px só
+     na faixa mais estreita (<480px), voltando pra coluna (chip em cima,
+     prazo embaixo, cada um com a linha inteira pra si). Achado em
+     auditoria mobile real, 2026-08-07 — confirmado com medição, não só
+     leitura de código (a 1ª tentativa removeu a regra errada). */
+  .project-right{flex-direction:column;align-items:flex-end;width:auto}
   .proj-title,.proj-head .proj-title{min-width:0}
+  /* .stage-chip (badge "Ada · elaboração 68%" etc.) tem flex-basis:auto —
+     no card grande (.proj-head), isso faz ele reter quase toda a largura
+     de conteúdo dele, e como .proj-title acima ficou com min-width:0 (sem
+     piso), é o título que absorve o aperto e desaba pra ~1 palavra por
+     linha (medido: 38px de largura restante pro título, o badge ficando
+     com 172px). flex-basis:100% quebra o badge pra linha própria — o
+     .proj-head já tem flex-wrap:wrap. Achado em auditoria mobile real,
+     2026-08-07. */
+  .proj-head .stage-chip{flex-basis:100%}
   .eros-banner{flex-direction:column;align-items:stretch;text-align:left}
   .eros-banner p{min-width:0}
   .kb-row{gap:.5rem}
@@ -1508,6 +1549,16 @@ html[data-contrast="high"] ::-webkit-scrollbar-thumb{background:var(--text-3);bo
   .modal-box{padding:1.1rem}
   .cost-line{padding:.55rem 0}
   .aprov-row{flex-wrap:wrap}
+  /* Modal de oportunidade: a logomarca fixa de 110px comia quase metade da
+     largura da modal num telefone (medido: só 130px sobravam pro título,
+     que sem min-width nem flex:1 nunca conseguia crescer nem quebrar
+     direito — "FUNCAP — Inovafit Fase 2 (Ceará)" virava 4-5 linhas de
+     1 palavra). Logo menor + título com flex:1;min-width:0 no lugar certo.
+     Achado em auditoria mobile real, 2026-08-07. */
+  .omodal-logo{width:72px;height:44px}
+  .omodal-head{padding-right:2rem}
+  .omodal-head>div{flex:1;min-width:0}
+  .match-row .mr-name{min-width:0}
   .aprov-body{min-width:0;flex-basis:100%}
   .aprov-cost{flex-basis:100%;text-align:left}
   .aprov-row-nav .btn-ghost{flex-basis:100%}
