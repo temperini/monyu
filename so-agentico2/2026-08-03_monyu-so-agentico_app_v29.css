@@ -650,6 +650,9 @@ html[data-theme="light"] .step.done .step-dot{color:#0A7D48}
    destaque único — nada de 4 linhas de custo repetindo a mesma informação. */
 .run-label{display:block;font-size:.80rem;font-weight:700;margin-bottom:.5rem;color:var(--text-2)}
 .run-projfield{margin-bottom:1.1rem}
+.run-variant-select{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
+  padding:.7rem .8rem;color:var(--text);font:inherit;font-size:.85rem}
+.run-variant-select:focus{border-color:var(--accent);outline:none}
 .run-proj-items{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.5rem}
 .run-proj-filter{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
   padding:.5rem .8rem;color:var(--text);font-size:.85rem;outline:none;transition:border-color var(--dur);margin-bottom:.5rem}
@@ -1448,6 +1451,14 @@ html[data-contrast="high"] ::-webkit-scrollbar-thumb{background:var(--text-3);bo
 .ob-hero{display:flex;justify-content:center;margin:1rem 0 1.2rem}
 .ob-avrow{display:flex;justify-content:center;gap:.6rem;margin:.8rem 0 .4rem;flex-wrap:wrap}
 .ob-avrow .av{width:46px;height:46px}
+/* Amostra de 5 agentes com legenda (tela 1 do onboarding) — nowrap de
+   propósito: são sempre exatamente 5 itens, nunca 6, então não há cenário
+   de aperto que precise quebrar linha. */
+.ob-team{display:flex;justify-content:center;gap:.5rem;margin:.9rem 0 .3rem;flex-wrap:nowrap}
+.ob-team-item{display:flex;flex-direction:column;align-items:center;gap:.3rem;width:58px;flex-shrink:0}
+.ob-team-item .av{width:40px;height:40px}
+.ob-team-item span{font-size:.58rem;font-weight:700;color:var(--text-3);text-align:center;line-height:1.2;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .ob-cards{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.6rem}
 .ob-cards.tri{grid-template-columns:repeat(3,1fr)}
 .ob-agent{border:1px solid var(--border);border-top:3px solid var(--ac,var(--border));border-radius:13px;background:var(--surface-2);padding:.85rem;display:flex;flex-direction:column;gap:.4rem}
@@ -1461,7 +1472,18 @@ html[data-contrast="high"] ::-webkit-scrollbar-thumb{background:var(--text-3);bo
 .ob-state.on{color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,transparent)}
 .ob-state.soon{color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,transparent);cursor:pointer;border:1px dashed color-mix(in srgb,var(--warn) 50%,transparent)}
 .ob-foot{display:flex;align-items:center;gap:1rem;margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--border)}
-.ob-dots{flex:1;text-align:center;font-size:.68rem;color:var(--text-3);font-variant-numeric:tabular-nums}
+/* Tentativa 1 (min-width:0 + flex:1) trocou "quebra em 3 linhas" por
+   "sobrepõe o botão Avançar": com min-width:0 o flex-shrink pode encolher a
+   caixa ABAIXO da largura do texto, e white-space:nowrap só impede quebra —
+   não impede overlap, o texto vaza da caixa encolhida e o botão (que vem
+   depois no DOM) pinta por cima. .ob-dots é o único dos 3 itens do rodapé
+   com conteúdo curto e fixo ("1 de 14" no máximo) — não precisa disputar
+   espaço, precisa só do que o próprio texto pede. flex:0 0 auto tira ele da
+   disputa de encolhimento inteiramente. Confirmado por print, não só
+   medição — a 1ª tentativa "passava" nos números e ainda assim vazava
+   visualmente. Achado em auditoria mobile real, 2026-08-08. */
+.ob-dots{flex:0 0 auto;text-align:center;font-size:.68rem;color:var(--text-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ob-foot .btn-ghost,.ob-foot .btn-primary{flex-shrink:1;min-width:0;white-space:nowrap}
 .ob-mock-tray{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:.8rem;background:var(--surface)}
 .ob-mock-tray .tray-item .tray-prog i{animation:obbar 2.4s var(--ease) infinite alternate}
 .ob-mock-tray .tray-item:nth-child(2) .tray-prog i{animation-duration:3.1s}

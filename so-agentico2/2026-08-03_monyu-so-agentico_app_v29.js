@@ -33,7 +33,13 @@
     ada:{name:'Ada',cost:'20',desc:'Elabora o projeto para o edital selecionado. Todo output passa por revisão humana antes da submissão.'},
     aurora:{name:'Aurora',cost:'15',desc:'Mapa completo de oportunidades e tese de funding para o seu negócio. Entrega em PDF + HTML.'},
     kai:{name:'Kai',cost:'10',desc:'Sessão estruturada para validar o encaixe problema-solução antes de investir na escrita.'},
-    mike:{name:'Mike',cost:'20',desc:'Tese de funding do seu negócio: cruza o momento atual com o potencial de incentivos fiscais, investimento, capital de risco e fomento internacional — além da subvenção econômica. Entrega radar de aderência, roadmap e checklist de ações.'}
+    mike:{name:'Mike',cost:'20',desc:'Tese de funding do seu negócio: cruza o momento atual com o potencial de incentivos fiscais, investimento, capital de risco e fomento internacional — além da subvenção econômica. Entrega radar de aderência, roadmap e checklist de ações.'},
+    /* Laura entrou aqui em 2026-08-08, junto com a ativação dela. Este objeto
+       (AG) é o que o drawer de execução consulta — um agente que existe só no
+       catálogo (AGD) tem card e botão, mas o clique morre silencioso em
+       openRun(). Faixa "5–25" porque são produtos distintos (Canvas/roteiro a
+       partir de 5, apresentação completa 25), lida por agentUnitRange(). */
+    laura:{name:'Laura',cost:'5–25',desc:'Transforma o projeto em material que convence quem lê: Lean Canvas, sumário executivo, roteiro e pitch deck — para um edital específico ou para investidor.'}
   };
 
   /* ================= Campanha promocional sazonal =================
@@ -1397,7 +1403,31 @@
   /* Regra de precificação por volume (aprovada 2026-07-08):
      Rico tem preço de lote (1 projeto = 1 ficha; 2–5 projetos = 3 fichas, tarifa única de lote).
      Todos os demais agentes cobram o preço unitário do agente multiplicado pela quantidade de projetos selecionados. */
+  /* Agentes que entregam PRODUTOS distintos, com preços distintos — não é
+     faixa de preço do mesmo trabalho. O usuário escolhe o material antes de
+     confirmar, e o custo passa a ser exato (regra do doc 06 §3.1: custo
+     estimado sempre visível ANTES de executar). Mesma lógica de produto que a
+     Ada já tem (elaboração 20 ≠ adaptação 5), só que resolvida dentro do
+     drawer em vez de por pontos de entrada diferentes. */
+  var AG_VARIANTS={
+    laura:[
+      {id:'canvas',label:'Lean Canvas (1 página)',cost:5},
+      {id:'sumario',label:'Sumário executivo / one-pager',cost:5},
+      {id:'roteiro',label:'Roteiro do pitch (TXT/PDF)',cost:5},
+      {id:'bmc',label:'Business Model Canvas',cost:5},
+      {id:'deck',label:'Apresentação completa (PPTX + PDF + PNGs)',cost:25}
+    ]
+  };
+  var pendVariant=null;
+  function variantCost(key){
+    var vs=AG_VARIANTS[key];if(!vs)return null;
+    var chosen=vs.filter(function(v){return v.id===pendVariant})[0]||vs[0];
+    return chosen.cost;
+  }
   function agentUnitRange(key){
+    /* Com material escolhido, o preço deixa de ser faixa e vira exato. */
+    var vc=variantCost(key);
+    if(vc!=null)return [vc,vc];
     var c=String(AG[key].cost);
     if(c.indexOf('–')>-1){var parts=c.split('–');return [parseInt(parts[0],10),parseInt(parts[1],10)]}
     var n=parseInt(c,10)||0;return [n,n];
@@ -1504,6 +1534,19 @@
     $('#runAvatar').querySelector('use').setAttribute('href','#av-'+key);
     $('#runDesc').textContent=a.desc;
     $('#runSaldo').textContent=saldo;
+    /* Seletor de material: montado a cada abertura e sempre resetado no
+       primeiro item — nunca herda a escolha da execução anterior (regra de
+       nenhuma pré-seleção silenciosa, doc 06 §3.2). */
+    var vField=$('#runVariantField'),vSel=$('#runVariant'),vs=AG_VARIANTS[key];
+    if(vs){
+      pendVariant=vs[0].id;
+      vSel.innerHTML=vs.map(function(v){return '<option value="'+v.id+'">'+v.label+' · '+v.cost+' fichas</option>'}).join('');
+      vSel.value=pendVariant;
+      vField.style.display='';
+    }else{
+      pendVariant=null;
+      vField.style.display='none';
+    }
     $('#runProjList').innerHTML=runProjItems(key,ctxProj);
     wireRunProjEvents();
     updateRunState();
@@ -1513,6 +1556,10 @@
   document.addEventListener('click',function(e){
     var t=e.target.closest('[data-agent]');
     if(t&&!t.disabled){openRun(t.getAttribute('data-agent'),t.getAttribute('data-proj')||'')}
+  });
+  $('#runVariant').addEventListener('change',function(){
+    pendVariant=this.value;
+    updateRunState(); /* recalcula custo e saldo projetado na hora */
   });
   $('#runCancel').addEventListener('click',function(){pendOppMatch=null;closeRunDrawer()});
   $('#runConfirm').addEventListener('click',function(){
@@ -2491,12 +2538,22 @@
       does:['Simula os critérios de avaliação do edital','Nota por quesito + parecer detalhado','Sugestões de melhoria priorizadas'],
       nots:['Não substitui a avaliação oficial do órgão'],hist:[],
       faq:[['Quando chega?','Previsto para nov/2026.']]},
-    {k:'laura',name:'Laura',role:'Roteiro e pitch deck do projeto',badge:'soon',badgeTxt:'Em especificação',cost:'5 fichas o roteiro · 25 fichas a apresentação',time:'A calibrar',soon:true,
-      benefit:'Escreve o roteiro e monta a apresentação do seu projeto — genérica, para investidor, ou adaptada a um edital específico.',
-      does:['Roteiro do pitch em TXT/PDF','Apresentação completa em PPTX, PDF e ZIP de imagens em alta resolução, um arquivo por slide','Adapta a mesma história para investidor ou para um edital específico'],
-      nots:['Não edita a apresentação dentro da plataforma nesta fase — o ajuste fino é feito no seu editor preferido','Roteiro e apresentação completa são dois produtos com preços distintos, não uma versão básica da mesma entrega'],
+    /* Laura ativada em 2026-08-08 (decisão do Evandro: "demanda latente e menos
+       complexa de resolver, lançaremos já com ela"). Junto com a ativação, o
+       escopo dela cresce de "roteiro + pitch deck" para a FAMÍLIA de material
+       de apresentação do projeto — Lean Canvas, sumário executivo, BMC e
+       teaser entram aqui. Fronteira que define a família: a Laura cuida de
+       COMO O PROJETO SE APRESENTA a um terceiro (narrativa e artefato), nunca
+       do conteúdo técnico — mercado continua com a Aurora, orçamento com
+       Ada/Carlito, prestação de contas com a Clara. Cada artefato tem preço
+       próprio: são produtos distintos, não upsell um do outro. */
+    {k:'laura',name:'Laura',role:'Material de apresentação do projeto',badge:'on',badgeTxt:'Disponível',cost:'a partir de 5 fichas',time:'~20 min',
+      benefit:'Transforma o seu projeto em material que convence quem lê: Lean Canvas, sumário executivo, roteiro e pitch deck — para edital ou para investidor.',
+      action:'Gerar material · a partir de 5 fichas',
+      does:['Lean Canvas e Business Model Canvas gerados a partir do próprio projeto, não de uma folha em branco','Sumário executivo e teaser de uma página para investidor','Roteiro do pitch em TXT/PDF','Apresentação completa em PPTX, PDF e ZIP de imagens em alta resolução, um arquivo por slide','Adapta a mesma história para investidor ou para um edital específico'],
+      nots:['Não edita a apresentação dentro da plataforma nesta fase — o ajuste fino é feito no seu editor preferido','Não produz o conteúdo técnico: mercado é da Aurora, orçamento é da Ada e do Carlito','Cada material é um produto com preço próprio, não uma versão básica do outro'],
       hist:[],
-      faq:[['Roteiro e apresentação são a mesma coisa?','Não — são dois produtos distintos, com preços distintos. O roteiro (5 fichas) é o texto em TXT/PDF; a apresentação completa (25 fichas) inclui os slides.'],['Quando chega?','Em especificação. Clique em Avisar-me para ser notificado no lançamento.']]},
+      faq:[['Roteiro e apresentação são a mesma coisa?','Não — são dois produtos distintos, com preços distintos. O roteiro (5 fichas) é o texto em TXT/PDF; a apresentação completa (25 fichas) inclui os slides.'],['De onde vem o conteúdo do Lean Canvas?','Do que a plataforma já sabe do seu projeto: diagnóstico da Íris, Problem-Solution Fit do Kai e viabilidade do Bartô. Se o projeto mudar, o Canvas acompanha.'],['Serve para investidor ou só para edital?','Os dois. A mesma história é adaptada para a banca de um edital específico ou para uma rodada de investimento privado.']]},
     {k:'clara',name:'Clara',role:'Prestação de contas pós-aprovação',badge:'soon',badgeTxt:'Em breve · 2027',cost:'20 fichas por prestação',time:'—',soon:true,
       benefit:'Vai cuidar da prestação de contas do recurso aprovado, no padrão de cada financiador e sem sustos.',
       does:['Cronograma de prestação por financiador','Checagem de notas fiscais e rubricas','Relatórios no formato exigido pelo órgão'],
@@ -2528,6 +2585,15 @@
       if(!lo.discounted)return '1 a 3 fichas por rodada';
       return '<s class="promo-strike">1 a 3</s> <b class="promo-final">'+lo.final+' a '+hi.final+'</b> fichas por rodada <span class="promo-tag">-'+PROMO.pct+'%</span>';
     }
+    /* Laura, como o Rico, tem faixa de preço em vez de preço único (são vários
+       produtos distintos: Canvas/roteiro a partir de 5, apresentação completa
+       25). Sem este caso especial ela ficaria fora do desconto de campanha —
+       o card mostraria o preço cheio enquanto a promoção corre. */
+    if(a.k==='laura'){
+      var lauraLo=applyPromo('laura',5);
+      if(!lauraLo.discounted)return a.cost;
+      return 'a partir de <s class="promo-strike">5</s> <b class="promo-final">'+lauraLo.final+'</b> fichas <span class="promo-tag">-'+PROMO.pct+'%</span>';
+    }
     var base=AGD_BASECOST[a.k];
     if(base==null)return a.cost;
     var html=costBadgeHTML(a.k,base,{suffix:AGD_SUFFIX[a.k]||''});
@@ -2545,6 +2611,11 @@
       var lo=applyPromo('rico',1),hi=applyPromo('rico',3);
       if(!lo.discounted)return a.action;
       return a.action.replace('1 a 3 fichas','<s class="promo-strike">1 a 3</s> <b class="promo-final">'+lo.final+' a '+hi.final+'</b> fichas <span class="promo-tag">-'+PROMO.pct+'%</span>');
+    }
+    if(a.k==='laura'){
+      var lauraAct=applyPromo('laura',5);
+      if(!lauraAct.discounted)return a.action;
+      return a.action.replace('5 fichas','<s class="promo-strike">5</s> <b class="promo-final">'+lauraAct.final+'</b> fichas <span class="promo-tag">-'+PROMO.pct+'%</span>');
     }
     var base=AGD_BASECOST[a.k];
     if(base==null)return a.action;
@@ -3108,7 +3179,8 @@
     banca:[{k:'ada',w:'refina o projeto com base no parecer dos avaliadores'}],
     carlito:[{k:'ada',w:'com a documentação em dia, o projeto segue direto para a submissão'}],
     clara:[{k:'ada',w:'depois da aprovação, Clara presta contas do que a Ada ajudou a captar'}],
-    eros:[{k:'ada',w:'executores certos fortalecem a equipe descrita no projeto'}]
+    eros:[{k:'ada',w:'executores certos fortalecem a equipe descrita no projeto'}],
+    laura:[{k:'iris',w:'o diagnóstico dela vira o conteúdo do Lean Canvas'},{k:'kai',w:'o Problem-Solution Fit alimenta os blocos de problema e solução'},{k:'ada',w:'o projeto escrito vira a história que a apresentação conta'}]
   };
   function relSec(a){
     var rels=REL[a.k]||[];
@@ -3656,7 +3728,7 @@
     {h:'Você acaba de ganhar uma equipe 👋',
      b:'<div class="ob-hero"><svg width="84" height="84" aria-hidden="true"><use href="#monyu-symbol"/></svg></div>'+
        '<p>A <b>MonyU</b> é um time de <b>14 agentes de IA</b> que trabalha a sua captação de recursos — de achar a oportunidade certa a deixar o projeto escrito e pronto para você enviar. <b>Você comanda; eles executam.</b></p>'+
-       '<div class="ob-avrow"><svg class="av"><use href="#av-rico"/></svg><svg class="av"><use href="#av-iris"/></svg><svg class="av"><use href="#av-ada"/></svg><svg class="av"><use href="#av-aurora"/></svg><svg class="av"><use href="#av-kai"/></svg><svg class="av"><use href="#monyu-symbol"/></svg></div>'},
+       '<div class="ob-team" id="obTeamRow"></div>'},
     {h:'Fichas: a moeda do seu time 🪙',
      b:'<div class="ob-hero"><span class="ficha-coin" style="width:64px;height:64px;font-size:1.6rem">M</span></div>'+
        '<p>Cada ação de um agente consome <b>fichas</b> do seu plano. As regras são simples:</p>'+
@@ -3685,7 +3757,7 @@
        obAgent('ada','Ada','Escreve o projeto inteiro no formato exato do edital, seção por seção, em blocos prontos para copiar.','De semanas de escrita para horas de revisão.','20 fichas · adaptação 5','beta')+
        obAgent('carlito','Carlito','Checklist documental do edital + monitoramento das suas certidões.','A parte chata, resolvida sem sustos.','5 fichas','out/2026')+
        obAgent('banca','A Banca','Conselho de avaliadores simulados dá nota antes da banca real.','Você envia só quando o projeto está forte.','10 fichas','nov/2026')+
-       obAgent('laura','Laura','Roteiro e pitch deck do projeto — genérico, para investidor ou colado num edital.','A mesma história, contada para quem decide.','5 fichas o roteiro · 25 a apresentação','em desenvolvimento')+
+       obAgent('laura','Laura','Lean Canvas, sumário executivo, roteiro e pitch deck — gerados do seu projeto, para edital ou para investidor.','A mesma história, contada para quem decide.','a partir de 5 fichas','on')+
        '</div>'},
     {h:'Depois da submissão — porque não acaba no envio 🏁',
      b:'<p>Dois agentes cuidam do que vem depois: quando aprova, e quando não aprova.</p>'+
@@ -3747,11 +3819,25 @@
        '<button class="btn-ghost" id="obZeroBtn" style="flex:1">Começar do zero</button>'+
        '<button class="btn-ghost" id="obFreeBtn" style="flex:1">Explorar sozinho</button></div>'}
   ];
+  /* Amostra de 5 agentes por render (pedido do usuário, 2026-08-08): em vez
+     dos mesmos 5 fixos + o símbolo da MonyU sobrando como 6º item (que
+     quebrava linha no mobile — .ob-avrow tinha flex-wrap e "sobrava" 1 no
+     375px), sempre 5 aleatórios entre os 14, com legenda. Sem quebra de
+     linha porque o número é sempre exatamente 5 — nunca 6. */
+  function renderObTeamRow(){
+    var row=$('#obTeamRow');if(!row)return;
+    var pool=AGD.slice();
+    for(var i=pool.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=pool[i];pool[i]=pool[j];pool[j]=t}
+    row.innerHTML=pool.slice(0,5).map(function(a){
+      return '<span class="ob-team-item"><svg class="av" aria-hidden="true"><use href="'+avatarHref(a.k)+'"/></svg><span>'+a.name+'</span></span>';
+    }).join('');
+  }
   var obOv=$('#obOv'),obIdx=0,obImport=false,obLvlTimer=null;
   function renderOb(){
     if(obLvlTimer){clearInterval(obLvlTimer);obLvlTimer=null}
     var s=OB_STEPS[obIdx];
     $('#obBody').innerHTML='<h2>'+s.h+'</h2>'+s.b;
+    if(obIdx===0)renderObTeamRow();
     $('#obDots').textContent=(obIdx+1)+' de '+OB_STEPS.length;
     $('#obProg').style.width=Math.round((obIdx+1)/OB_STEPS.length*100)+'%';
     $('#obPrev').style.visibility=obIdx===0?'hidden':'visible';
@@ -3958,7 +4044,7 @@
     eros:['buscar parceiros compatíveis','buscar parceiros e enviar convite'],
     carlito:['montar o checklist documental'],
     banca:['avaliar o projeto antes da submissão'],
-    laura:['criar o roteiro do pitch','montar a apresentação completa'],
+    laura:['gerar o Lean Canvas','criar o roteiro do pitch','montar a apresentação completa'],
     clara:['organizar a prestação de contas'],
     rui:['redigir o recurso administrativo']
   };
