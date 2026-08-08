@@ -1214,9 +1214,11 @@
             ['Administrador','Editor','Visualizador'].map(function(r){return '<option'+(m.role===r?' selected':'')+'>'+r+'</option>'}).join('')+
           '</select>';
       var rmCell=m.you?'':'<button class="btn-ghost" style="font-size:.68rem;padding:.3rem .6rem" data-team-remove="'+i+'">Remover</button>';
-      return '<tr><td><div class="team-member"><span class="avatar" aria-hidden="true">'+teamInitials(m.name)+'</span>'+
+      /* data-rot alimenta o rótulo por célula quando a tabela vira lista de
+         cartões no celular (ver .team-table td::before no CSS) */
+      return '<tr><td data-rot="Membro"><div class="team-member"><span class="avatar" aria-hidden="true">'+teamInitials(m.name)+'</span>'+
         '<div><b style="display:block">'+m.name+(m.you?' (você)':'')+'</b><span style="font-size:.72rem;color:var(--text-3)">'+m.email+'</span></div></div></td>'+
-        '<td>'+roleCell+'</td><td><span class="status-pill ok">Ativo</span></td><td>'+rmCell+'</td></tr>';
+        '<td data-rot="Papel">'+roleCell+'</td><td data-rot="Status"><span class="status-pill ok">Ativo</span></td><td>'+rmCell+'</td></tr>';
     }).join('');
     var hint=$('#teamCountHint');
     if(hint)hint.textContent=list.length+' de 5 vagas do plano Starter';
@@ -2597,7 +2599,10 @@
       '<div class="drawer-body">'+
         '<div class="dsec"><p style="font-size:.86rem;color:var(--text);font-weight:600;line-height:1.55">'+a.benefit+'</p></div>'+
         (a.warn?'<div class="dsec"><div class="dwarn"><b>Revisão humana obrigatória.</b> Todo projeto elaborado pela Ada passa por revisão antes da submissão. A MonyU não garante aprovação em editais via self-service.</div></div>':'')+
-        '<div class="key-stats" style="grid-template-columns:1fr 1fr;margin-bottom:1.15rem">'+
+        /* classe em vez de style inline: grid-template-columns inline vence
+   qualquer media query (especificidade de atributo style), e por isso
+   estas duas grades continuavam com 2 colunas mesmo a 320px */
+'<div class="key-stats ks2" style="margin-bottom:1.15rem">'+
           '<div class="kstat"><small>Custo</small><b>'+agentCostHTML(a)+'</b></div>'+
           '<div class="kstat"><small>Tempo médio</small><b>'+a.time+'</b></div>'+
         '</div>'+
@@ -3203,7 +3208,10 @@
       '</div>'+
       '<div class="drawer-body">'+
         '<div class="dsec"><p style="font-size:.84rem;color:var(--text);font-weight:600;line-height:1.55">'+pr.bio+'</p></div>'+
-        '<div class="key-stats" style="grid-template-columns:1fr 1fr;margin-bottom:1.15rem">'+
+        /* classe em vez de style inline: grid-template-columns inline vence
+   qualquer media query (especificidade de atributo style), e por isso
+   estas duas grades continuavam com 2 colunas mesmo a 320px */
+'<div class="key-stats ks2" style="margin-bottom:1.15rem">'+
           '<div class="kstat"><small>Resultados</small><b style="font-size:.78rem">'+pr.stats.replace(/<[^>]+>/g,'')+'</b></div>'+
           '<div class="kstat"><small>Avaliação · resposta</small><b style="font-size:.78rem">'+pr.rating+' · '+pr.resp+'</b></div>'+
         '</div>'+

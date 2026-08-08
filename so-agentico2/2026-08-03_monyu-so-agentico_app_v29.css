@@ -136,7 +136,12 @@ a{color:var(--accent-text);text-decoration:none}
    é o MESMO usuário/conta, só com mais recursos liberados — por isso o selo
    vive no próprio avatar de perfil, não numa persona separada. */
 .avatar.giga-member{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--giga-gold)}
-.user-meta{text-align:left;white-space:nowrap;overflow:hidden}
+/* text-overflow:ellipsis — antes era clip (padrão), então "NovaTech Energia ·
+   Starter" era cortado no meio da palavra sem nenhum sinal de que continuava.
+   Reticências avisam. Achado pela auditoria de layout de 2026-08-08. */
+.user-meta{text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-meta b,.user-meta>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.nit-label{text-overflow:ellipsis}
 .user-meta b{display:block;font-size:.91rem}
 .user-meta span{font-size:.73rem;color:var(--text-3)}
 .giga-badge-row{display:flex;align-items:center;gap:.35rem;margin-top:.1rem;white-space:nowrap}
@@ -512,6 +517,12 @@ html[data-theme="light"] .step.done .step-dot{color:#0A7D48}
 /* ============ Agentes ============ */
 .agents-pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:.8rem}
 .agents-support{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+/* Item de grid tem min-width:auto implícito: se o conteúdo (nome longo do
+   agente + selo de status) for maior que a trilha, o card ESTOURA a trilha
+   em vez de encolher. Some no desktop porque a trilha é larga; aparece no
+   celular. Mesma família do .kb-layout>.card. Achado pela auditoria de
+   layout de 2026-08-08 (ver _mockups/audit-layout.js). */
+.agent,.agent-big{min-width:0}
 .agent{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--ac,var(--border));border-radius:var(--radius-m);
   padding:1rem;display:flex;flex-direction:column;gap:.6rem;position:relative;
   transition:transform var(--dur) var(--ease),box-shadow var(--dur),border-color var(--dur);animation:rise .5s var(--ease) backwards}
@@ -527,7 +538,11 @@ html[data-theme="light"] .step.done .step-dot{color:#0A7D48}
 .agent .av{width:42px;height:42px}
 .agent-name{font-weight:700;font-size:.98rem;line-height:1.2}
 .agent-role{font-size:.75rem;color:var(--text-3);margin-top:.1rem;line-height:1.35}
-.agent-cost{display:flex;align-items:center;gap:.4rem;font-size:.80rem;font-weight:600;color:var(--text-2)}
+/* flex-wrap: com campanha promocional o custo vira "a partir de 20 10 fichas
+   -50%" e a linha fica maior que o card num celular — sem wrap, o preço final
+   (justo o que importa) era o que ficava pra fora. Achado pela auditoria de
+   layout de 2026-08-08. */
+.agent-cost{display:flex;align-items:center;gap:.4rem;font-size:.80rem;font-weight:600;color:var(--text-2);flex-wrap:wrap}
 .agent-cost .ficha-coin{width:15px;height:15px;font-size:.48rem}
 .badge{font-size:.66rem;font-weight:700;padding:.18rem .55rem;border-radius:99px;display:inline-flex;align-items:center;gap:.3rem;width:fit-content}
 .badge.on{color:var(--ok-text);background:color-mix(in srgb,var(--ok) 12%,transparent)}
@@ -680,6 +695,7 @@ html[data-theme="light"] .step.done .step-dot{color:#0A7D48}
 .kstat small{display:block;font-size:.64rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:.25rem}
 .kstat b{font-size:.98rem;line-height:1.2;display:block}
 .kstat .urgent{color:var(--warn)}
+.key-stats.ks2{grid-template-columns:1fr 1fr}
 .osec{margin-bottom:1rem}
 .osec h4{font-size:.78rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);margin-bottom:.4rem}
 .osec p{font-size:.89rem;color:var(--text-2);line-height:1.55}
@@ -1304,7 +1320,10 @@ html[data-theme="light"] .tr-video{background:linear-gradient(140deg,#e8e8e8,#f2
 .tr-card-body .trail-meta{font-size:.64rem;color:var(--text-3)}
 .tr-card-body .trail-prog{display:flex;align-items:center;gap:.5rem;font-size:.62rem;color:var(--text-3)}
 .tr-card-body .trail-prog .fichas-bar{flex:1;margin:0;height:6px}
-.tr-card-foot{display:flex;align-items:center;gap:.5rem;margin-top:auto}
+/* flex-wrap + min-width:0: sem eles o botão do card de certificado vazava
+   ~10px pra fora do próprio card, em QUALQUER largura (inclusive desktop). */
+.tr-card-foot{display:flex;align-items:center;gap:.5rem;margin-top:auto;flex-wrap:wrap;min-width:0}
+.tr-card-foot>*{min-width:0}
 .tr-card-foot .btn-primary{flex:1;font-size:.72rem;padding:.55rem .7rem}
 .tr-rate{display:flex;gap:.3rem;flex-shrink:0}
 .tr-like,.tr-dislike{width:30px;height:30px;border-radius:9px;border:1px solid var(--border);background:var(--surface-2);display:grid;place-items:center;font-size:.78rem;color:var(--text-3);transition:all var(--dur)}
@@ -1511,12 +1530,52 @@ html[data-contrast="high"] ::-webkit-scrollbar-thumb{background:var(--text-3);bo
   .banner{flex-wrap:wrap}
   .banner-actions{flex-basis:100%;justify-content:flex-end}
   .proj-meta{gap:.9rem}
+  /* A topbar é flex sem wrap: com prazo urgente + promoção + nível + fichas +
+     3 ícones ela fica muito mais larga que um celular e o final simplesmente
+     sumia fora da tela (o usuário via "🔥 -50%..." cortado na borda, sem
+     jeito de alcançar). Vira faixa rolável na horizontal: nada é escondido e
+     tudo continua alcançável. Achado pela auditoria de layout de 2026-08-08. */
+  .topbar-right{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    flex:1;justify-content:flex-end;padding-bottom:2px;
+    -webkit-mask-image:linear-gradient(to right,transparent 0,#000 14px);mask-image:linear-gradient(to right,transparent 0,#000 14px)}
+  .topbar-right::-webkit-scrollbar{display:none}
+  .topbar-right>*{flex-shrink:0}
+  /* Aula: <b> com min-width:150px + <span> nowrap somavam mais que a linha
+     inteira no celular, e a duração vazava pra fora do card. */
+  .lesson{flex-wrap:wrap}
+  .lesson b{min-width:0;flex-basis:60%}
+  .lesson span{white-space:normal}
 }
 /* ============ Backstop mobile (telas muito estreitas, celulares 320-480px) ============
    Regra do projeto: nenhum container flex-row pode forçar overflow horizontal —
    abaixo de 480px, empilha em coluna em vez de confiar só em flex-wrap. */
 @media (max-width:480px){
   .search-label{display:none}
+  /* .act-chip é inline-flex de linha única. Com campanha promocional ativa ele
+     ganha preço riscado + selo "-50%" + selo "Recomendado" e fica MUITO mais
+     largo que sem promoção - foi exatamente isso que vazou 62px pra fora da
+     tela no print de 2026-08-07. Sem promoção o mesmo chip cabia, e por isso
+     a auditoria anterior (feita com a campanha já expirada) não pegou.
+     Lição: testar o estado "promoção ativa", não só o estado padrão. */
+  .act-chip{flex-wrap:wrap;max-width:100%}
+  /* .omodal-foot usa margem negativa de -1.5rem pra sangrar até a borda do
+     .modal-box - mas no celular o .modal-box tem padding de 1.1rem, então a
+     sangria estourava 0,4rem de cada lado. */
+  .omodal-foot{margin-left:-1.1rem;margin-right:-1.1rem;padding-left:1.1rem;padding-right:1.1rem}
+  /* Link de convite é monoespaçado e longo: quebra em vez de empurrar o botão. */
+  .refer-link{flex-wrap:wrap}
+  .refer-link b{flex-basis:100%;word-break:break-all}
+  /* Tabela de equipe vira lista de cartões: no celular ela só cabia com
+     rolagem lateral, o que esconde justo a coluna de ação (Remover).
+     Cabeçalho some e cada célula ganha o próprio rótulo via data-rot. */
+  .team-table thead{display:none}
+  .team-table,.team-table tbody,.team-table tr,.team-table td{display:block;width:100%}
+  .team-table tr{border:1px solid var(--border);border-radius:var(--radius-s);padding:.6rem .7rem;margin-bottom:.6rem;background:var(--surface-2)}
+  .team-table td{border:none;padding:.3rem 0;display:flex;align-items:center;gap:.6rem}
+  .team-table td::before{content:attr(data-rot);font-size:.62rem;font-weight:800;text-transform:uppercase;
+    letter-spacing:.05em;color:var(--text-3);min-width:64px;flex-shrink:0}
+  .team-table td:first-child::before{display:none}
+  .team-table td:empty{display:none}
   .banner{flex-direction:column;align-items:stretch;text-align:left}
   .banner .av{width:38px;height:38px}
   .banner-actions{width:100%;flex-basis:auto}
@@ -1558,13 +1617,43 @@ html[data-contrast="high"] ::-webkit-scrollbar-thumb{background:var(--text-3);bo
   .omodal-logo{width:72px;height:44px}
   .omodal-head{padding-right:2rem}
   .omodal-head>div{flex:1;min-width:0}
-  .match-row .mr-name{min-width:0}
+  /* .match-row: checkbox + avatar + nome + % numa linha só sobra ~139px pro
+     nome do projeto num celular, e o título fica em coluna estreita com
+     espaço morto ao lado. Aqui o % sobe pra primeira linha (junto do
+     checkbox) e o nome ganha a largura inteira na linha de baixo. */
+  .match-row{flex-wrap:wrap}
+  .match-row .mr-pct{margin-left:auto;order:-1}
+  .match-row .mr-name{min-width:0;flex-basis:100%;order:1}
   .aprov-body{min-width:0;flex-basis:100%}
   .aprov-cost{flex-basis:100%;text-align:left}
   .aprov-row-nav .btn-ghost{flex-basis:100%}
   .run-proj-item{align-items:flex-start}
   .omq-item{flex-wrap:wrap}
   .omq-rec{flex-basis:100%}
+}
+
+/* ============ Contenção final (celulares muito estreitos, 320-380px) ============
+   O que ainda quebrava a 320px depois de tudo acima. Regra que se repete e
+   vale internalizar: TODO item de grid precisa de min-width:0 explícito, e
+   TODA grade de 2 colunas precisa virar 1 coluna aqui embaixo — a largura
+   restante por coluna (~140px) não cabe nem um nome de agente.
+   Achado pela auditoria de layout de 2026-08-08 (_mockups/audit-layout.js),
+   rodada a 320 / 375 / 414px. */
+@media (max-width:380px){
+  .agents-pipeline,.agents-support{grid-template-columns:1fr}
+  .key-stats,.key-stats.ks2,.sum-stats{grid-template-columns:1fr}
+  .packs{grid-template-columns:1fr}
+  .settings-grid,.settings-side,.settings-grid>*{min-width:0}
+  .team-member{min-width:0}
+  .team-member .avatar{flex-shrink:0}
+  .team-member>div{min-width:0}
+  .team-member b,.team-member span{overflow-wrap:anywhere}
+  /* .stage-chip é nowrap por design (fica bonito numa linha), mas
+     "✓ Submetido · aguardando resultado" não cabe em 236px de card. Aqui
+     embaixo ele quebra em vez de esticar o card pra fora da tela. */
+  .project-right{align-items:flex-start;min-width:0;width:100%}
+  .stage-chip{white-space:normal}
+  .field-row{grid-template-columns:1fr}
 }
 
 /* ============================================================
@@ -1648,6 +1737,11 @@ html[data-theme="light"] .rot-switch.on .rot-switch-lbl{color:#0A7D48}
 .v29-ev{display:grid;grid-template-columns:auto 1fr auto;gap:var(--sp-4);padding:var(--sp-4) 0;
   border-bottom:1px solid var(--border);align-items:start}
 .v29-ev:last-child{border-bottom:none}
+/* .av base não define width/height — quem usa é que dá o tamanho (ex.:
+   .tray-item .av{width:34px}). Aqui faltava, então o <svg> caía no tamanho
+   PADRÃO de SVG (300x150px): avatar gigante engolindo o texto do evento, em
+   qualquer largura de tela. Achado pela auditoria de layout de 2026-08-08. */
+.v29-ev .av{width:38px;height:38px;border-radius:11px}
 /* .v29-ev-txt e .v29-ev-why são <span> (inline) no HTML gerado pelo JS —
    margin-top não tem efeito em elemento inline, então o "porquê" corria
    colado no fim do texto principal, na mesma linha (visto em Atividade,
