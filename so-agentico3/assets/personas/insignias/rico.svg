@@ -1,0 +1,14 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Rico opportunity radar insignia">
+<defs>
+  <linearGradient id="terracotta" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B4436"/><stop offset="1" stop-color="#7A2B1F"/></linearGradient>
+  <linearGradient id="copper" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E29A72"/><stop offset="1" stop-color="#C97854"/></linearGradient>
+</defs>
+<g fill="none" stroke-linecap="round">
+  <circle cx="256" cy="256" r="190" stroke="url(#terracotta)" stroke-width="42" stroke-dasharray="970 224" transform="rotate(-32 256 256)"/>
+  <circle cx="256" cy="256" r="132" stroke="#2B2523" stroke-width="36" stroke-dasharray="650 180" transform="rotate(18 256 256)"/>
+  <circle cx="256" cy="256" r="76" stroke="url(#copper)" stroke-width="30" stroke-dasharray="342 136" transform="rotate(64 256 256)"/>
+</g>
+<path d="M256 256 L365 115 L392 142 L277 275 Z" fill="#F7F1E8" stroke="#C97854" stroke-width="10" stroke-linejoin="round"/>
+<circle cx="256" cy="256" r="24" fill="#C97854" stroke="#7A2B1F" stroke-width="10"/>
+<circle cx="404" cy="105" r="22" fill="#C97854" stroke="#F7F1E8" stroke-width="10"/>
+</svg>

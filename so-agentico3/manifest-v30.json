@@ -1,0 +1,87 @@
+{
+  "name": "MonyU SO Agêntico v30",
+  "created_at": "2026-08-09",
+  "entrypoint": "index.html",
+  "deploy_target_recommended": "/so-agentico3/",
+  "preserves_current_version": true,
+  "current_version_untouched": "/so-agentico2/",
+  "files": {
+    "core": [
+      {
+        "name": "index.html",
+        "bytes": 32818,
+        "source_deploy_equal": true
+      },
+      {
+        "name": "2026-08-09_monyu-so-agentico_app_v30.html",
+        "bytes": 144965,
+        "source_deploy_equal": true
+      },
+      {
+        "name": "2026-08-09_monyu-so-agentico_app_v30.css",
+        "bytes": 164515,
+        "source_deploy_equal": true
+      },
+      {
+        "name": "2026-08-09_monyu-so-agentico_app_v30.js",
+        "bytes": 303067,
+        "source_deploy_equal": true
+      },
+      {
+        "name": "2026-08-09_monyu-so-agentico_tokens_v30.css",
+        "bytes": 8227,
+        "source_deploy_equal": true
+      }
+    ],
+    "favicon": "2026-08-09_monyu-so-agentico_favicon_v30.svg",
+    "people": "2026-08-09_monyu-so-agentico_people_v30.png",
+    "partners": [
+      "aws-activate.png",
+      "capital-empreendedor.webp",
+      "dates-cesar.png",
+      "empreenda-senac.jpg",
+      "founders-club.jpeg",
+      "global-eawards.png",
+      "sebrae.png",
+      "simbora.png",
+      "voe-sem-asas.jpg"
+    ],
+    "insignias": [
+      "ada.svg",
+      "aurora.svg",
+      "banca.svg",
+      "barto.svg",
+      "carlito.svg",
+      "clara.svg",
+      "eros.svg",
+      "iris.svg",
+      "kai.svg",
+      "laura.svg",
+      "mike.svg",
+      "rico.svg",
+      "romeu.svg",
+      "rui.svg"
+    ],
+    "avatars": [
+      "ada.png",
+      "aurora.png",
+      "banca.png",
+      "barto.png",
+      "carlito.png",
+      "clara.png",
+      "eros.png",
+      "iris.png",
+      "kai.png",
+      "laura.png",
+      "mike.png",
+      "rico.png",
+      "romeu.png",
+      "rui.png"
+    ]
+  },
+  "identity_rules": {
+    "compact_operational": "SVG insignia",
+    "onboarding_agent_detail_execution_handoff": "human avatar",
+    "project_folders": "project initials and theme color"
+  }
+}

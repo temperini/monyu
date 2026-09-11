@@ -1,0 +1,10 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Romeu three horizons insignia">
+<defs><linearGradient id="rp" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#5B176E"/><stop offset="1" stop-color="#8A1FAD"/></linearGradient><linearGradient id="rl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E7C6F1"/><stop offset="1" stop-color="#B85AD3"/></linearGradient></defs>
+<g fill="none" stroke-linecap="round">
+<path d="M118 374 Q256 236 394 374" stroke="#5B176E" stroke-width="24"/>
+<path d="M82 392 Q256 190 430 392" stroke="#8A1FAD" stroke-width="34"/>
+<path d="M46 414 Q256 128 466 414" stroke="url(#rl)" stroke-width="46"/>
+</g>
+<path d="M386 166 C414 144 435 120 452 88" fill="none" stroke="#8A1FAD" stroke-width="14" stroke-linecap="round" stroke-dasharray="20 20"/>
+<circle cx="458" cy="76" r="24" fill="#F7F1E8" stroke="url(#rp)" stroke-width="12"/>
+</svg>

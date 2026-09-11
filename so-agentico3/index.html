@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar - MonyU</title>
+<link rel="icon" type="image/svg+xml" href="2026-08-09_monyu-so-agentico_favicon_v30.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="2026-08-09_monyu-so-agentico_tokens_v30.css?v=1">
+<style>
+/* Login v30 - usa os tokens compartilhados (tokens_v29.css). Antes da v30 este
+   arquivo tinha seu próprio :root com nomes divergentes (--pink vs --monyu-pink),
+   o que fazia login e app derivarem visualmente a cada ajuste de marca.
+   Superfícies próprias do login: --login-panel (fundo do card) e --brand-veil. */
+html[data-theme="dark"]{--login-panel:#0C0C0C;--brand-dot:#222;--brand-veil-1:rgba(255,0,85,.22);--brand-veil-2:rgba(255,115,0,.16);--brand-bg:#000}
+html[data-theme="light"]{--login-panel:#FFF;--brand-dot:#D2D2D2;--brand-veil-1:rgba(255,0,85,.10);--brand-veil-2:rgba(255,115,0,.08);--brand-bg:#F5F5F5}
+/* O painel de marca tem fundo próprio (--brand-bg), mais escuro que --surface no
+   tema claro; --text-3 é calibrado para --surface e cai a 4.2:1 aqui. Redefinido
+   localmente para manter AA sem escurecer a legenda no app inteiro. */
+html[data-theme="light"] .brand{--text-3:#6E6E6E}
+*{box-sizing:border-box;margin:0;padding:0;scrollbar-width:thin;scrollbar-color:rgba(255,0,85,.45) transparent}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:var(--radius-full)}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,var(--monyu-pink),var(--monyu-orange))}
+body{font-family:'Montserrat',-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;
+  transition:background var(--dur) var(--ease),color var(--dur) var(--ease)}
+.wrap{display:grid;grid-template-columns:1.15fr 1fr;min-height:100vh}
+/* -------- alternador de tema (paridade claro/escuro desde a 1ª tela) -------- */
+.theme-toggle{position:fixed;top:var(--sp-4);right:var(--sp-4);z-index:50;display:grid;place-items:center;
+  width:42px;height:42px;border-radius:var(--radius-full);background:var(--surface);border:1px solid var(--border);
+  color:var(--text-2);cursor:pointer;transition:border-color .2s,color .2s,transform .15s var(--ease)}
+.theme-toggle:hover{border-color:var(--accent);color:var(--text);transform:translateY(-2px)}
+.theme-toggle:focus-visible{outline:none;box-shadow:var(--glow)}
+.theme-toggle svg{width:19px;height:19px}
+/* -------- painel da marca -------- */
+.brand{position:relative;padding:var(--sp-12) 3.4rem var(--sp-8);display:flex;flex-direction:column;overflow:hidden;
+  background:radial-gradient(1200px 700px at -10% -10%,var(--brand-veil-1),transparent 55%),radial-gradient(900px 600px at 110% 110%,var(--brand-veil-2),transparent 55%),var(--brand-bg)}
+.brand::after{content:"";position:absolute;inset:0;opacity:.35;pointer-events:none;
+  background-image:radial-gradient(currentColor 1px,transparent 1px);background-size:120px 120px;color:var(--brand-dot)}
+.brand>*{position:relative;z-index:1}
+.b-logo{display:flex;align-items:center;gap:.9rem;margin-bottom:2.6rem}
+.b-logo svg{width:52px;height:52px;filter:drop-shadow(0 8px 20px rgba(255,0,85,.5))}
+.b-logo b{font-size:var(--fs-xl);font-weight:var(--fw-black);letter-spacing:-.02em}
+.b-logo small{display:block;font-size:.72rem;font-weight:var(--fw-bold);color:var(--text-3);letter-spacing:.18em;text-transform:uppercase}
+.tagline{font-size:var(--fs-2xl);font-weight:var(--fw-black);line-height:1.32;letter-spacing:-.02em;max-width:600px;margin-bottom:1.1rem}
+.tagline em{font-style:normal;background:var(--grad-brand);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.tagsub{font-size:var(--fs-base);color:var(--text-2);line-height:var(--lh-relaxed);max-width:540px;margin-bottom:var(--sp-8)}
+.values{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:1.1rem 1.4rem;margin-bottom:var(--sp-8);max-width:620px}
+.values li{display:flex;gap:.75rem;align-items:flex-start;font-size:.92rem;color:var(--text-2);line-height:var(--lh-normal);
+  opacity:0;animation:vin .5s var(--ease) forwards}
+.values li:nth-child(1){animation-delay:.08s}.values li:nth-child(2){animation-delay:.16s}.values li:nth-child(3){animation-delay:.24s}
+.values li:nth-child(4){animation-delay:.32s}.values li:nth-child(5){animation-delay:.4s}.values li:nth-child(6){animation-delay:.48s}
+.values li:nth-child(7){animation-delay:.56s}.values li:nth-child(8){animation-delay:.64s}
+@keyframes vin{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+.values .vi{width:30px;height:30px;border-radius:var(--radius-xs);background:var(--grad-brand);display:grid;place-items:center;
+  font-size:.95rem;flex-shrink:0;box-shadow:0 5px 14px -5px rgba(255,0,85,.6)}
+.values b{color:var(--text);display:block;margin-bottom:.1rem}
+/* -------- vídeo "como funciona" -------- */
+/* Sem arquivo de vídeo real neste piloto: o componente (thumb + modal) é
+   real e funcional, mas abre um estado de placeholder honesto - mesmo
+   padrão dos outros "em breve" do app, nunca um vídeo fingindo tocar. */
+.video-card{display:block;width:100%;max-width:560px;text-align:left;border:1px solid var(--border);
+  border-radius:var(--radius-m);overflow:hidden;background:var(--surface);cursor:pointer;
+  margin-bottom:var(--sp-8);transition:border-color .2s,transform .15s var(--ease)}
+.video-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.video-card:focus-visible{outline:none;box-shadow:var(--glow)}
+.video-frame{aspect-ratio:16/9;position:relative;display:grid;place-items:center;
+  background:radial-gradient(120% 140% at 20% 15%,rgba(255,0,85,.35),transparent 60%),
+    radial-gradient(120% 140% at 85% 90%,rgba(255,115,0,.28),transparent 60%),#0A0A0A}
+.video-play{width:58px;height:58px;border-radius:50%;background:var(--grad-brand);color:#fff;
+  display:grid;place-items:center;font-size:1.25rem;box-shadow:0 10px 26px -8px rgba(255,0,85,.65)}
+.video-dur{position:absolute;bottom:.7rem;right:.7rem;background:rgba(0,0,0,.72);color:#fff;
+  font-size:.7rem;font-weight:var(--fw-bold);padding:.2rem .5rem;border-radius:5px}
+.video-cap{display:block;padding:1rem 1.15rem}
+.video-cap b{display:block;font-size:.98rem;color:var(--text);margin-bottom:.2rem}
+.video-cap span{display:block;font-size:.84rem;color:var(--text-3);line-height:1.5}
+.video-modal-scrim{position:fixed;inset:0;background:rgba(0,0,0,.7);opacity:0;pointer-events:none;
+  transition:opacity var(--dur) var(--ease);z-index:90}
+.video-modal-scrim.show{opacity:1;pointer-events:auto}
+.video-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-48%);width:min(520px,92vw);
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);padding:1.6rem;
+  opacity:0;pointer-events:none;transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease);z-index:91}
+.video-modal.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+.video-modal-close{position:absolute;top:.9rem;right:.9rem;width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);cursor:pointer;font-size:.9rem}
+.video-modal-close:hover{border-color:var(--accent);color:var(--text)}
+.video-modal-frame{aspect-ratio:16/9;border-radius:var(--radius-s);display:grid;place-items:center;margin-bottom:1.1rem;
+  background:radial-gradient(120% 140% at 20% 15%,rgba(255,0,85,.35),transparent 60%),
+    radial-gradient(120% 140% at 85% 90%,rgba(255,115,0,.28),transparent 60%),#0A0A0A}
+.video-modal h3{font-size:1.05rem;font-weight:var(--fw-black);margin-bottom:.4rem;color:var(--text)}
+.video-modal p{font-size:.86rem;color:var(--text-3);line-height:1.55;margin-bottom:1.2rem}
+.proof{display:flex;gap:var(--sp-10);flex-wrap:wrap;padding:1.3rem 0;border-top:1px solid var(--border);margin-top:auto}
+/* --text-2 (não --text-3): prova social é argumento de venda, não legenda
+   acessória - e o painel de marca é levemente cinza, onde --text-3 cai a 4.2:1 */
+.proof div{font-size:.8rem;color:var(--text-2)}
+.proof b{display:block;font-size:var(--fs-xl);color:var(--text);font-weight:var(--fw-black);margin-bottom:.15rem}
+.b-foot{display:flex;flex-direction:column;align-items:flex-start;gap:var(--sp-2);padding-top:var(--sp-5);color:var(--text)}
+.b-foot svg{height:44px;width:auto}
+.b-foot span{font-size:.72rem;color:var(--text-3)}
+/* -------- card de login -------- */
+/* align-items:flex-start (não center): o painel de marca ficou bem mais
+   alto depois do vídeo + 8 diferenciais, então centralizar o card
+   verticalmente na coluna toda fazia "Bem-vindo de volta" flutuar bem
+   abaixo do logo da MonyU, sem alinhar com nada do lado esquerdo.
+   padding-top igual ao --sp-12 do .brand alinha os dois topos. */
+.login{display:flex;align-items:flex-start;justify-content:center;padding:var(--sp-12) var(--sp-8) var(--sp-10);
+  background:var(--login-panel);border-left:1px solid var(--border)}
+/* sticky: o painel de marca é bem mais alto que o card (vídeo + 8
+   diferenciais + prova + rodapé) - sem isso o card rolaria junto com a
+   página e sumiria de vista enquanto o usuário ainda está lendo o resto
+   do painel esquerdo. position:sticky some naturalmente ao chegar no fim
+   de .login (que estica pra bater a altura do .brand no grid), então
+   "para" sozinho antes de vazar por cima do rodapé, sem precisar de JS. */
+.card{width:min(440px,100%);position:sticky;top:var(--sp-12)}
+.card h1{font-size:var(--fs-2xl);font-weight:var(--fw-black);letter-spacing:-.02em;margin-bottom:var(--sp-2)}
+.card>p{font-size:var(--fs-base);color:var(--text-3);margin-bottom:var(--sp-8)}
+.field{margin-bottom:var(--sp-5)}
+.field label{display:block;font-size:.82rem;font-weight:var(--fw-bold);color:var(--text-2);margin-bottom:.4rem}
+.field input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-s);
+  padding:1rem var(--sp-4);color:var(--text);font:inherit;font-size:var(--fs-base);outline:none;transition:border-color .2s}
+.field input:focus{border-color:var(--accent);box-shadow:var(--glow)}
+.row{display:flex;justify-content:space-between;align-items:center;margin:-.2rem 0 var(--sp-6)}
+.row label{font-size:.92rem;color:var(--text-3);display:flex;align-items:center;gap:.45rem;cursor:pointer}
+.row input{accent-color:var(--accent);width:16px;height:16px}
+.row a{font-size:.92rem;font-weight:var(--fw-bold);color:var(--accent-text);text-decoration:none}
+.row a:hover{text-decoration:underline}
+.btn-enter{width:100%;background:var(--grad-brand);color:#fff;border:none;border-radius:var(--radius-s);padding:1.05rem;font:inherit;
+  font-size:var(--fs-lg);font-weight:var(--fw-black);cursor:pointer;box-shadow:0 10px 26px -10px rgba(255,0,85,.65);
+  transition:transform .15s var(--ease)}
+.btn-enter:hover{transform:translateY(-2px)}
+.btn-enter:active{transform:scale(.98)}
+.btn-enter:focus-visible{outline:none;box-shadow:var(--glow),0 10px 26px -10px rgba(255,0,85,.65)}
+.divider{display:flex;align-items:center;gap:.9rem;margin:var(--sp-6) 0;font-size:.78rem;color:var(--text-3)}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--border)}
+.socials{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-3);margin-bottom:var(--sp-6)}
+.soc{display:grid;place-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-s);
+  padding:.9rem var(--sp-3);cursor:pointer;color:var(--text);transition:border-color .2s,transform .15s var(--ease)}
+.soc:hover{border-color:var(--accent);transform:translateY(-2px)}
+.soc:focus-visible{outline:none;box-shadow:var(--glow)}
+.soc svg{width:20px;height:20px}
+.signup{text-align:center;font-size:.9rem;color:var(--text-3)}
+.signup a{color:var(--accent-text);font-weight:var(--fw-black);text-decoration:none}
+.signup a:hover{text-decoration:underline}
+/* -------- acesso sem cadastro (piloto): 1 CTA visível + 1 link discreto, -------- */
+/* não 2 botões de peso igual competindo com "Entrar na plataforma" acima  */
+.demo-box{margin-top:var(--sp-7);padding-top:var(--sp-6);border-top:1px solid var(--border);text-align:center}
+.demo-box>span{display:block;font-size:.72rem;font-weight:var(--fw-bold);color:var(--text-3);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:.9rem}
+.demo-link{display:block;text-align:center;font-size:1rem;font-weight:var(--fw-bold);color:var(--text-2);
+  border:1px solid var(--border);border-radius:var(--radius-s);padding:.9rem;cursor:pointer;transition:all .2s;text-decoration:none}
+.demo-link:hover{color:var(--text);border-color:var(--accent);background:var(--accent-soft)}
+.demo-link:focus-visible{outline:none;box-shadow:var(--glow)}
+.demo-alt{display:block;text-align:center;margin-top:.75rem;font-size:.88rem;font-weight:var(--fw-medium);color:var(--text-3);
+  text-decoration:none;cursor:pointer}
+.demo-alt:hover{color:var(--accent-text);text-decoration:underline}
+.demo-alt:focus-visible{outline:none;box-shadow:var(--glow);border-radius:4px}
+.lgpd{margin-top:var(--sp-6);font-size:.7rem;color:var(--text-3);text-align:center;line-height:var(--lh-relaxed)}
+.toast{position:fixed;bottom:var(--sp-6);left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);
+  font-size:var(--fs-sm);font-weight:var(--fw-semibold);padding:.75rem var(--sp-5);border-radius:var(--radius-s);opacity:0;
+  pointer-events:none;transition:all var(--dur) var(--ease);z-index:99}
+.toast.show{opacity:1;transform:translateX(-50%)}
+/* Breakpoint lg (900px) - mesma escala oficial do app */
+@media (max-width:900px){.wrap{grid-template-columns:1fr}.brand{padding:var(--sp-8) var(--sp-6) var(--sp-5)}
+  .tagline{font-size:var(--fs-lg)}.values{grid-template-columns:1fr}.proof{gap:var(--sp-5)}.login{border-left:none;border-top:1px solid var(--border)}
+  .theme-toggle{top:var(--sp-3);right:var(--sp-3)}
+  /* Mobile: form de login primeiro, painel de marca depois - quem já tem
+     conta não deveria rolar ~1,4 tela de discurso de venda pra encontrar o
+     campo de e-mail. Ordem visual só (grid item), a leitura linear/leitor
+     de tela continua na ordem do HTML (marca → login). */
+  .login{order:-1}}
+</style>
+</head>
+<body data-app-version="30">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="monyu-symbol" viewBox="0 0 48 48">
+      <rect width="48" height="48" rx="11" fill="#FF0055"/>
+      <g transform="translate(-119.01,-22.40) scale(0.1169)" fill="#fff">
+        <path transform="translate(1171,306)" d="m0 0h8l15 3 11 6 9 8 7 11 4 11 1 6v11l-3 12-7 14-16 27-12 21v7l1 2h7l4-4 15-26 17-29 9-10 11-7 11-4 5-1h13l12 3 11 6 8 7 7 11 4 10 1 5v17l-3 10-7 14-9 15-14 24-12 20-11 13-11 10-14 9-18 8-16 4-8 1h-23l-15-3-15-5-14-7-12-9-8-7-9-11-7-10-8-17-5-18-1-7v-28l4-18 7-17 14-24 17-29 9-15 5-6 13-9 12-4z"/>
+        <path transform="translate(1255,243)" d="m0 0 5 1 14 8-3 3-22 11h-2v2l5 2 8 5-2 2-57 18-3-1 23-15 10-7-10-6 3-3 22-14z"/>
+        <path transform="translate(1346,295)" d="m0 0 12 6 5 3v2l-26 13 13 8-1 2-56 18-4-1 30-20h2l-3-3-7-4v-2l16-10z"/>
+      </g>
+    </symbol></defs></svg>
+<div class="wrap">
+  <section class="brand" aria-label="MonyU">
+    <div class="b-logo">
+      <svg aria-hidden="true"><use href="#monyu-symbol"/></svg>
+      <div><b>MonyU</b><small>Inovação financiada</small></div>
+    </div>
+    <h1 class="tagline">O 1º <em>Sistema Operacional Agêntico Full-Service</em> especializado na captação de recursos nacionais e internacionais para Pesquisa, Desenvolvimento e Inovação (PD&amp;I).</h1>
+    <p class="tagsub">Uma equipe de 14 agentes de IA trabalha a sua captação, do radar de oportunidades ao acompanhamento dos resultados depois de submetido. Você comanda; eles executam.</p>
+    <button class="video-card" id="videoBtn" aria-haspopup="dialog" aria-label="Assistir: como a MonyU funciona, em 90 segundos">
+      <span class="video-frame"><span class="video-play" aria-hidden="true">▶</span><span class="video-dur">1:30</span></span>
+      <span class="video-cap"><b>Veja como funciona em 90 segundos</b><span>Do radar de oportunidades às rotinas automáticas: sua equipe de agentes em ação.</span></span>
+    </button>
+    <ul class="values">
+      <li><span class="vi">🎯</span><span><b>Radar 24/7:</b> agentes vigiam centenas de fontes de fomento e avisam quando surge edital com a cara do seu projeto.</span></li>
+      <li><span class="vi">🧭</span><span><b>Diagnóstico antes do esforço:</b> saiba se vale a pena competir antes de investir semanas no edital errado.</span></li>
+      <li><span class="vi">✍️</span><span><b>Projeto pronto pro edital:</b> elaborado seção por seção, sempre com revisão humana antes de submeter.</span></li>
+      <li><span class="vi">🔁</span><span><b>Rotinas que rodam sozinhas:</b> defina a sequência uma vez e ela se repete na frequência que você escolher, sempre com teto de fichas sob seu controle.</span></li>
+      <li><span class="vi">📊</span><span><b>Resultados sempre à vista:</b> acompanhe quanto já foi captado, o que está em análise e o retorno de cada ficha investida.</span></li>
+      <li><span class="vi">🎓</span><span><b>Aprenda e ganhe fichas:</b> trilhas de treinamento e recompensas rendem fichas e outros benefícios enquanto você usa a plataforma.</span></li>
+      <li><span class="vi">📚</span><span><b>Memória que nunca se perde:</b> documentos organizados por projeto deixam cada entrega mais precisa, sem se misturar entre projetos.</span></li>
+      <li><span class="vi">🎚</span><span><b>Autonomia sob seu comando:</b> do modo guiado ao automático, um clique pausa tudo.</span></li>
+    </ul>
+    <div class="proof">
+      <div><b>+R$ 35 mi</b>captados pela MonyU</div>
+      <div><b>664%</b>ROI médio do portfólio</div>
+      <div><b>+R$ 5 Bi</b>mapeados em oportunidades</div>
+    </div>
+    <div class="b-foot">
+      <svg viewBox="0 0 1563 938" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo MonyU">
+<path transform="translate(164,311)" d="m0 0h17l13 4 11 7 7 7 10 13 14 18 10 13 4-2 11-14 13-16 11-14 9-8 12-6 8-2h17l13 4 9 5 10 9 6 9 4 9 2 10v141l-3 12-6 11-10 11-13 8-9 3-7 1-17-1-12-4-10-6-7-7-6-12-2-10 14-19 13-18 4-5 1-3-6 5-9 11-14 14-13 9-11 4h-10l-11-4-11-8-13-12-9-11-6-7-1 1 12 17 14 19 5 7-2 10-6 12-8 8-14 7-16 3h-8l-11-2-14-7-11-10-7-11-4-11-1-5v-142l3-12 5-10 9-10 8-6 11-5z" fill="#FE0058"/>
+<path transform="translate(674,308)" d="m0 0h19l13 4 10 6 10 9 10 10 8 7 34 34 3-1-13-19-6-9 2-9 6-11 11-11 12-7 10-3h20l14 5 10 7 8 8 7 12 3 11 1 10v128l-2 16-5 12-8 10-11 8-12 5-5 1h-19l-13-4-10-6-8-8-8-7-45-45h-2l1 5 16 25 1 2-4 11-6 9-10 10-14 7-8 2h-19l-15-5-10-7-7-7-6-10-4-11-1-6v-143l3-12 6-11 9-10 9-6 12-5z" fill="#FE0058"/>
+<path transform="translate(491,305)" d="m0 0h23l14 2 20 6 21 11 14 11 13 13 10 14 10 21 5 17 2 14v24l-4 20-6 16-8 15-11 14-14 14-10 7-14 8-12 5-13 4-11 2-11 1h-12l-21-3-16-5-17-8-13-9-12-11-8-8-9-13-8-15-6-18-3-17v-27l4-19 6-16 9-16 10-13 13-13 14-10 12-7 19-7z" fill="#FE0058"/>
+<path transform="translate(1171,306)" d="m0 0h8l15 3 11 6 9 8 7 11 4 11 1 6v11l-3 12-7 14-16 27-12 21v7l1 2h7l4-4 15-26 17-29 9-10 11-7 11-4 5-1h13l12 3 11 6 8 7 7 11 4 10 1 5v17l-3 10-7 14-9 15-14 24-12 20-11 13-11 10-14 9-18 8-16 4-8 1h-23l-15-3-15-5-14-7-12-9-8-7-9-11-7-10-8-17-5-18-1-7v-28l4-18 7-17 14-24 17-29 9-15 5-6 13-9 12-4z" fill="#FF7300"/>
+<path transform="translate(920,307)" d="m0 0h9l12 3 12 6 16 15 12 13 5 4 23-23 4-5 10-7 13-5 7-1h9l13 3 10 5 12 11 7 11 4 13v19l-4 13-6 10-11 12-27 27-7 8-4 4-1 55-4 13-7 11-8 8-11 7-13 4h-17l-13-4-11-6-10-10-7-12-3-11-1-55-8-8-7-8-31-31-7-10-5-13-1-4v-19l5-15 7-10 7-7 9-6 12-4z" fill="#FE0058"/>
+<path transform="translate(1327,112)" d="m0 0 14 1 17 6 10 7 10 10 8 14 3 9 1 6v17l-4 14-6 12-11 12-10 7-12 5-9 2h-20l-19-7-11-8-9-10-8-16-2-7-1-8v-11l3-13 8-16 9-10 9-7 10-5 11-3z" fill="#FFCB00"/>
+<path transform="translate(1449,146)" d="m0 0h9l11 4 8 6 7 8 4 9 1 6v10l-3 11-6 8-5 5-5 4-8 3-6 1h-11l-13-5-10-9-6-10-2-10v-8l2-8 5-10 8-8 10-5z" fill="#fc0"/>
+<path transform="translate(1399,226)" d="m0 0h14l9 4 8 6 5 9 2 7v10l-4 11-8 9-10 5-4 1h-10l-10-3-6-4-8-11-2-7v-13l4-10 7-8 10-5z" fill="#fc0"/>
+<path transform="translate(734,626)" d="m0 0h26l9 4 3 5v10l-4 5-2 2 6 5 2 6-1 7-3 5-9 4h-27l-2-1-1-3v-45zm7 8v14h18l4-4v-6l-4-4zm0 22v15h19l4-3v-8l-3-3-2-1z" fill="currentColor"/>
+<path transform="translate(989,626)" d="m0 0h23l11 4 7 8 3 8v13l-4 10-8 7-9 3h-24l-2-3v-47zm7 8v37h15l8-4 4-7v-15l-5-8-7-3z" fill="currentColor"/>
+<path transform="translate(599,626)" d="m0 0h23l11 4 7 8 3 8v13l-4 10-8 7-9 3h-24l-2-3v-47zm7 8v37h15l8-4 4-7v-15l-5-8-7-3z" fill="currentColor"/>
+<path transform="translate(542,626)" d="m0 0h5l7 8 12 16 8 10v2h2v-35l1-1h6l2 3v47l-2 3h-6l-12-15-15-20-1 33-2 2h-5l-2-2v-49z" fill="currentColor"/>
+<path transform="translate(358,626)" d="m0 0h6l11 14 10 13 6 8 1-33 2-2h5l2 2v49l-2 2h-5l-7-8-13-17-7-9v-2h-2v35l-1 1h-6l-2-4v-45z" fill="currentColor"/>
+<path transform="translate(247,626)" d="m0 0h5l9 11 13 17 5 7 1-32 2-3h5l2 2v50l-1 1h-6l-10-12-9-12-8-11-1 32-2 3h-6l-1-1v-50z" fill="currentColor"/>
+<path transform="translate(805,625)" d="m0 0 12 2 6 4 6 7 2 6v17l-4 9-8 7-4 2-12 1-10-3-7-6-4-8-1-5v-11l3-10 6-7 8-4zm-2 8-8 4-4 8v15l4 8 7 4h8l6-3 4-5 2-7v-9l-3-9-6-5-3-1z" fill="currentColor"/>
+<path transform="translate(675,625)" d="m0 0 12 2 6 4 6 7 2 6v17l-4 9-8 7-4 2-12 1-10-3-7-6-4-8-1-5v-11l3-10 6-7 8-4zm-2 8-8 4-4 8v15l4 8 7 4h8l6-3 4-5 2-7v-9l-3-9-6-5-3-1z" fill="currentColor"/>
+<path transform="translate(1255,243)" d="m0 0 5 1 14 8-3 3-22 11h-2v2l5 2 8 5-2 2-57 18-3-1 23-15 10-7-10-6 3-3 22-14z" fill="#fc0"/>
+<path transform="translate(1346,295)" d="m0 0 12 6 5 3v2l-26 13 13 8-1 2-56 18-4-1 30-20h2l-3-3-7-4v-2l16-10z" fill="#fc0"/>
+<path transform="translate(860,626)" d="m0 0h6l3 3 17 36 4 9-2 5h-5l-5-8-1-4-27 1-5 10-1 1h-5l-2-2 1-6 18-38 3-6zm3 11-9 20v2h19l-2-6-7-16z" fill="currentColor"/>
+<path transform="translate(1045,626)" d="m0 0h32l2 2-1 5-2 1h-24v14h22l3 1v6l-2 1h-23v15h24l3 2-1 5-1 1h-32l-2-2v-49z" fill="currentColor"/>
+<path transform="translate(1127,626)" d="m0 0h6l5 8 18 38v6l-7 1-5-10v-2l-27 1-5 10-1 1h-5l-2-2 1-6 14-30 7-14zm2 12-8 18v3h19l-7-17-2-4z" fill="currentColor"/>
+<path transform="translate(320,626)" d="m0 0h6l5 8 14 30 4 9-1 5-1 1h-5l-5-9v-3h-28l-3 9-2 3h-5l-2-2 1-7 18-38 3-5zm2 12-9 21h20l-9-21z" fill="currentColor"/>
+<path transform="translate(504,626)" d="m0 0h6l9 17 13 28 1 6-2 2h-5l-3-4-3-7-27-1-2 6-4 6h-5l-2-5 16-34 6-13zm2 11-9 20v2h19l-3-9-6-13z" fill="currentColor"/>
+<path transform="translate(1181,625)" d="m0 0 10 1 10 5 1 6-4 2-11-5h-8l-5 2-1 2v6l9 4 13 4 6 5 2 5-1 8-5 6-7 3-5 1-13-1-10-5-1-6 1-1 7 1 8 3h9l5-2 1-7-5-3-15-4-6-4-3-3-1-9 4-8 6-4z" fill="currentColor"/>
+<path transform="translate(914,625)" d="m0 0 10 1 9 4 2 2v5l-4 2-7-4-4-1h-8l-6 2v7l3 3 17 5 6 4 3 3 1 9-3 6-5 4-9 3-13-1-8-3-4-4 1-5 3-1 8 4 4 1h10l5-3v-6l-5-3-14-4-6-3-4-5-1-6 2-7 8-7z" fill="currentColor"/>
+<path transform="translate(1340,137)" d="m0 0 5 1 1 3-1 5 8 7 1 6-2 2-4-1-5-6-8-3-7 1v7l5 5 11 8 2 4v8l-4 6-5 3h-10l-2 6h-5l-1-1 1-8-5-2-7-8 1-4 5-1 4 5 7 4 7 1 3-1 1-6-5-5-8-6-5-6-1-5 3-8 5-4 12-2z" fill="currentColor"/>
+<path transform="translate(435,625)" d="m0 0 12 2 7 4 1 5-3 3-13-5-9 1-5 3-3 7v15l4 8 7 3h7l9-4h5l1 5-4 4-7 3-11 1-10-3-8-7-4-10v-15l4-10 8-7 5-2z" fill="currentColor"/>
+<path transform="translate(183,626)" d="m0 0h31l2 1v6l-2 1h-24v14h22l3 2-1 5-1 1h-23v22l-1 1h-6l-2-2v-49z" fill="currentColor"/>
+<path transform="translate(1089,626)" d="m0 0h6l2 3v47l-2 3h-6l-2-2v-49z" fill="currentColor"/>
+<path transform="translate(967,626)" d="m0 0h6l2 3v47l-2 3h-6l-2-2v-49z" fill="currentColor"/>
+<path transform="translate(465,626)" d="m0 0h6l2 2v49l-2 2h-6l-2-3v-47z" fill="currentColor"/>
+<path transform="translate(225,626)" d="m0 0h6l2 2v49l-2 2h-6l-2-4v-45z" fill="currentColor"/>
+<path transform="translate(1448,159)" d="m0 0 4 2v3l7 1 2 2v3h-15v6l13 2 5 5v6l-5 5h-2v5h-4l-1-4h-7l-3-2v-4l11 1 4-2v-4l-13-3-4-4v-7l5-5h2v-5z" fill="currentColor"/>
+<path transform="translate(1400,239)" d="m0 0 7 3 4 2-1 3h-7l-3 1v4l11 1 4 3v7l-4 4-1 4-3-1v-2h-6l-3-2 1-3h8l3-2-1-3-11-1-3-2-1-6 4-5z" fill="currentColor"/>
+<path transform="translate(1287,347)" d="m0 0 2 1z" fill="#fc0"/>
+<path transform="translate(1197,295)" d="m0 0" fill="#fc0"/>
+
+</svg>
+      <span>© 2026 MonyU - Conectar inovadores ao financiamento certo, no tempo certo, da forma certa.</span>
+    </div>
+  </section>
+
+  <section class="login" aria-label="Acesso">
+    <div class="card">
+      <h1>Bem-vindo de volta 👋</h1>
+      <p>Seu time de agentes está pronto para trabalhar.</p>
+      <form id="loginForm">
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" placeholder="voce@suaempresa.com.br" autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="senha">Senha</label>
+          <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <div class="row">
+          <label><input type="checkbox" checked> Manter conectado</label>
+          <a href="#" id="forgot">Esqueci minha senha</a>
+        </div>
+        <button type="submit" class="btn-enter">Entrar na plataforma</button>
+      </form>
+      <div class="divider">ou continue com</div>
+      <div class="socials">
+        <button class="soc" data-soc="Google" aria-label="Entrar com Google"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.5 12.3c0-.9-.1-1.5-.3-2.2H12v4.1h6.5c-.1 1.1-.8 2.7-2.4 3.8l3.7 2.9c2.3-2.1 3.7-5.1 3.7-8.6z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.8-3c-1 .7-2.4 1.2-4.2 1.2-3.2 0-6-2.2-6.9-5.1l-3.9 3C3.1 21.3 7.2 24 12 24z"/><path fill="#FBBC05" d="M5.1 14.2c-.2-.7-.4-1.4-.4-2.2s.1-1.5.4-2.2l-4-3C.4 8.4 0 10.2 0 12s.4 3.6 1.2 5.2l3.9-3z"/><path fill="#EA4335" d="M12 4.7c1.8 0 3 .8 3.7 1.4L19.1 3C17 1.1 14.7 0 12 0 7.2 0 3.1 2.7 1.2 6.8l4 3c.9-2.9 3.6-5.1 6.8-5.1z"/></svg></button>
+        <button class="soc" data-soc="Meta" aria-label="Entrar com Meta"><svg viewBox="0 0 36 24"><path fill="#0081FB" d="M25.7 0c-3 0-5.4 2.3-7.6 5.2C15.8 2.4 13.7 0 10.6 0 5 0 0 7.3 0 15c0 4.8 2.3 7.9 6.2 7.9 2.8 0 4.8-1.3 8.4-7.5l2.5-4.4 1.2 2 1.7 3c3.4 5.7 5.3 6.9 8.2 6.9 3.8 0 7-3.1 7-8.1C35.2 6.9 30.7 0 25.7 0zM12 12.5c-2.9 4.9-3.9 6-5.5 6-1.7 0-2.7-1.5-2.7-4.1 0-5.6 2.8-11.3 6.1-11.3 1.8 0 3.3 1 5.6 4.3-2.2 3.3-3.5 5.1-3.5 5.1zm16.3 5.9c-1.7 0-2.5-1.1-5.4-5.8l-2.2-3.7c2-3.2 3.7-4.9 5.6-4.9 3 0 5.5 4.5 5.5 10.1 0 2.7-1 4.3-3.5 4.3z"/></svg></button>
+        <button class="soc" data-soc="Microsoft" aria-label="Entrar com Microsoft"><svg viewBox="0 0 24 24"><rect x="1" y="1" width="10.4" height="10.4" fill="#F25022"/><rect x="12.6" y="1" width="10.4" height="10.4" fill="#7FBA00"/><rect x="1" y="12.6" width="10.4" height="10.4" fill="#00A4EF"/><rect x="12.6" y="12.6" width="10.4" height="10.4" fill="#FFB900"/></svg></button>
+        <button class="soc" data-soc="Apple" aria-label="Entrar com Apple"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.7 12.9c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 2.9-.4 7.3 1.2 9.7.8 1.2 1.8 2.5 3.1 2.4 1.2-.1 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.6-1-2.7-3.8zM14.4 5.6c.7-.8 1.1-1.9 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4z"/></svg></button>
+      </div>
+      <p class="signup">Ainda não tem conta? <a href="#" id="signup">Crie grátis e ganhe 30 fichas</a></p>
+      <div class="demo-box">
+        <span>Prefere só olhar primeiro?</span>
+        <a class="demo-link" href="2026-08-09_monyu-so-agentico_app_v30.html">▶ Explorar em modo demonstração</a>
+        <a class="demo-alt" href="2026-08-09_monyu-so-agentico_app_v30.html?mode=zero">ou comece do zero, como conta nova →</a>
+      <a class="demo-alt" href="2026-08-09_monyu-so-agentico_app_v30.html?mode=mvp">Acesso Beta Antecipado: Rico, Íris e Ada →</a>
+      </div>
+      <p class="lgpd">Protegido por criptografia. Seus dados são tratados conforme a LGPD -<br>arquivos de projetos permanecem na sua nuvem; indexamos apenas o conteúdo autorizado.</p>
+    </div>
+  </section>
+</div>
+<div class="video-modal-scrim" id="videoScrim"></div>
+<div class="video-modal" id="videoModal" role="dialog" aria-modal="true" aria-label="Vídeo: como a MonyU funciona">
+  <button class="video-modal-close" id="videoClose" aria-label="Fechar vídeo">✕</button>
+  <div class="video-modal-frame"><span class="video-play" aria-hidden="true">▶</span></div>
+  <h3>O vídeo de 90 segundos está em produção</h3>
+  <p>Enquanto isso, veja a plataforma de verdade funcionando, sem precisar de cadastro.</p>
+  <a class="btn-enter" href="2026-08-09_monyu-so-agentico_app_v30.html" style="display:block;text-align:center;text-decoration:none">▶ Explorar em modo demonstração</a>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<button class="theme-toggle" id="themeBtn" aria-label="Alternar entre tema escuro e claro" data-tip="Alternar tema">
+  <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="display:none">
+    <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+  </svg>
+  <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+  </svg>
+</button>
+<script>
+(function(){
+  var APP='2026-08-09_monyu-so-agentico_app_v30.html';
+
+  /* Tema - mesma chave de armazenamento do app ('monyu-so:theme'), então a
+     escolha feita aqui já entra valendo lá dentro, e vice-versa. */
+  var root=document.documentElement,themeBtn=document.getElementById('themeBtn'),
+      iconSun=document.getElementById('iconSun'),iconMoon=document.getElementById('iconMoon');
+  function store(k,v){try{if(v===undefined)return localStorage.getItem('monyu-so:'+k);localStorage.setItem('monyu-so:'+k,v)}catch(e){return null}}
+  function applyTheme(t){
+    root.setAttribute('data-theme',t);
+    iconSun.style.display=t==='dark'?'none':'block';
+    iconMoon.style.display=t==='dark'?'block':'none';
+    themeBtn.setAttribute('aria-label',t==='dark'?'Mudar para o tema claro':'Mudar para o tema escuro');
+    store('theme',t);
+  }
+  applyTheme(store('theme')||'dark');
+  themeBtn.addEventListener('click',function(){applyTheme(root.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+  function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2400)}
+  function go(){window.location.href=APP}
+  document.getElementById('loginForm').addEventListener('submit',function(e){e.preventDefault();toast('Entrando… (demo, sem validação)');setTimeout(go,700)});
+  document.querySelectorAll('.soc').forEach(function(b){
+    b.addEventListener('click',function(){toast('Login com '+b.getAttribute('data-soc')+', simulado no piloto');setTimeout(go,700)});
+  });
+  document.getElementById('forgot').addEventListener('click',function(e){e.preventDefault();toast('Enviaríamos o link de recuperação para o seu e-mail. (demo)')});
+  document.getElementById('signup').addEventListener('click',function(e){e.preventDefault();toast('Cadastro Freemium: 30 fichas/mês, todos os agentes. (demo)');setTimeout(go,900)});
+
+  /* Vídeo "como funciona" - sem arquivo real neste piloto (seção 2.17 do
+     handoff); o modal abre um estado honesto de placeholder, com saída
+     direta pra demo ao vivo em vez de deixar o lead num beco sem saída. */
+  var videoBtn=document.getElementById('videoBtn'),videoScrim=document.getElementById('videoScrim'),
+      videoModal=document.getElementById('videoModal'),videoClose=document.getElementById('videoClose');
+  function openVideo(){videoScrim.classList.add('show');videoModal.classList.add('show');videoClose.focus()}
+  function closeVideo(){videoScrim.classList.remove('show');videoModal.classList.remove('show');videoBtn.focus()}
+  videoBtn.addEventListener('click',openVideo);
+  videoClose.addEventListener('click',closeVideo);
+  videoScrim.addEventListener('click',closeVideo);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&videoModal.classList.contains('show'))closeVideo()});
+})();
+</script>
+</body>
+</html>             

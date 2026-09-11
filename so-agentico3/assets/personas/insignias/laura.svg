@@ -1,0 +1,11 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Laura continuous thread insignia">
+<defs><linearGradient id="lm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#D455BA"/><stop offset="1" stop-color="#AD1F91"/></linearGradient></defs>
+<g fill="#2F2130" stroke="#AD1F91" stroke-width="12">
+<rect x="70" y="120" width="112" height="112" rx="18" transform="rotate(-12 126 176)"/>
+<rect x="200" y="210" width="112" height="112" rx="18" transform="rotate(8 256 266)"/>
+<rect x="330" y="138" width="112" height="112" rx="18" transform="rotate(-7 386 194)"/>
+</g>
+<path d="M42 314 C92 314 90 176 126 176 S201 266 256 266 S328 194 386 194 S430 118 474 104" fill="none" stroke="#F7F1E8" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M42 314 C92 314 90 176 126 176 S201 266 256 266 S328 194 386 194 S430 118 474 104" fill="none" stroke="url(#lm)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="42" cy="314" r="16" fill="#AD1F91"/><circle cx="474" cy="104" r="16" fill="#D455BA"/>
+</svg>

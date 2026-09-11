@@ -1,0 +1,7 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Rui slit of light insignia">
+<defs><linearGradient id="ro" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#565A0D"/><stop offset="1" stop-color="#8A8F14"/></linearGradient><linearGradient id="rg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F7F1E8"/><stop offset="0.5" stop-color="#F4E58D"/><stop offset="1" stop-color="#F7F1E8"/></linearGradient></defs>
+<rect x="70" y="76" width="372" height="360" rx="52" fill="url(#ro)"/>
+<path d="M292 76 L350 76 L228 436 L170 436 Z" fill="url(#rg)"/>
+<path d="M307 76 L326 76 L213 436 L194 436 Z" fill="#FFFFFF" opacity="0.9"/>
+<circle cx="362" cy="111" r="13" fill="#F4E58D"/>
+</svg>
