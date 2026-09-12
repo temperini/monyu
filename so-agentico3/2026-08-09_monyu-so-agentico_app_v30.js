@@ -34,7 +34,7 @@
 
   /* ================= Dados (demo) ================= */
   var AG={
-    rico:{name:'Rico',cost:'1',desc:'Varre centenas de fontes de fomento, calcula o match e mostra o checklist de premissas do edital para os seus projetos.'},
+    rico:{name:'Rico',cost:'1',desc:'Vigia milhares de fontes de fomento do país e avisa quando surge um edital com a cara dos seus projetos.'},
     iris:{name:'Íris',cost:'5',desc:'Avalia o potencial de captação do projeto - de forma avulsa ou para uma oportunidade específica.'},
     ada:{name:'Ada',cost:'20',desc:'Elabora o projeto para o edital selecionado. Todo output passa por revisão humana antes da submissão.'},
     aurora:{name:'Aurora',cost:'15',desc:'Mapa completo de oportunidades e tese de funding para o seu negócio. Entrega em PDF + HTML.'},
@@ -515,7 +515,11 @@
   /* O que já rodou em cada projeto. No piloto é demonstração; na plataforma real
      vem do histórico de execuções. Serve para não recomendar o que já foi feito. */
   var PROJ_RAN={p1:['rico','iris','ada'],p2:['rico','iris'],p3:['rico','iris','ada','banca'],p4:[]};
+  /* Fichas consumidas por ideia/projeto. Mantém a leitura de investimento
+     vinculada à jornada, em vez de exibir só o saldo geral da conta. */
+  var PROJ_SPENT={p1:24,p2:6,p3:31,p4:0};
   if(isFreshAccountMode)Object.keys(PROJ_RAN).forEach(function(k){PROJ_RAN[k]=[]});
+  if(isFreshAccountMode)Object.keys(PROJ_SPENT).forEach(function(k){PROJ_SPENT[k]=0});
   function jaRodou(pid,agent){return (PROJ_RAN[pid]||[]).indexOf(agent)!==-1}
 
   /* Perfil de exigência do edital, derivado dos dados que o próprio edital já
@@ -716,8 +720,27 @@
       '<button class="'+j.btnClass+'"'+btnAttrs+' style="font-size:.76rem">'+actionHtml+'</button>'+
     '</div>';
   }
+  function flowProjectCard(items,idx){
+    var first=items[0],tier=urgencyTier(first.days),daysLabel=first.days==null?'sem prazo definido':'⏱ '+first.days+' dias';
+    return '<div class="flow-step'+(items.some(function(j){return j.here})?' here':'')+'" style="animation-delay:.'+(3+idx*6)+'s">'+
+      (items.some(function(j){return j.here})?'<span class="flow-here">você está aqui</span>':'')+
+      '<span class="flow-num">'+(idx+1)+'</span><span class="flow-days tier-'+tier+'">'+daysLabel+'</span>'+ 
+      '<b class="flow-proj">'+PROJECTS[first.proj].short+'</b>'+ 
+      '<div class="flow-project-agents">'+items.map(function(j){
+        var attrs=(j.dataAgent?' data-agent="'+j.dataAgent+'" data-proj="'+j.dataProj+'"':'')+(j.dataOpp?' data-opp="'+j.dataOpp+'"':'')+(j.dataAgKey?' data-agkey="'+j.dataAgKey+'"':'');
+        var action=j.dataAgent?(j.actionLabel+' · '+costBadgeHTML(j.dataAgent,j.actionCost)):j.action;
+        return '<div class="flow-project-agent"><span class="flow-agent-line">'+j.label+'</span><p>'+j.detail+'</p><button class="'+j.btnClass+'"'+attrs+' style="font-size:.76rem">'+action+'</button></div>';
+      }).join('')+'</div></div>';
+  }
   function renderJornada(){
-    var fl=$('#flowList');if(fl)fl.innerHTML=JORNADA.map(flowCard).join('');
+    var fl=$('#flowList');
+    if(fl){
+      if(isMvpMode){
+        var grouped=[],byProject={};
+        JORNADA.forEach(function(j){if(!byProject[j.proj]){byProject[j.proj]=[];grouped.push(byProject[j.proj])}byProject[j.proj].push(j)});
+        fl.innerHTML=grouped.map(flowProjectCard).join('');
+      }else fl.innerHTML=JORNADA.map(flowCard).join('');
+    }
     var fe=$('#flowEmpty');if(fe)fe.style.display=JORNADA.length?'none':'';
     var urgentes=JORNADA.filter(function(j){return j.days!=null&&j.days<=30});
     var chip=$('#urgentChipBtn');
@@ -878,7 +901,7 @@
      usuário - continua igual em qualquer estado de conta. */
   function syncNavBadges(){
     var pt=$('#navProjTag');if(pt)pt.textContent=Object.keys(PROJECTS).length;
-    var ot=$('#navOppTag');if(ot)ot.textContent=(isMvpMode&&typeof visibleOpps==='function'?PREMIUM_OPPS.length+visibleOpps().length:(typeof oppMatched==='function'?oppMatched().length:0));
+    var ot=$('#navOppTag');if(ot)ot.textContent=(typeof visibleOpps==='function'?PREMIUM_OPPS.length+visibleOpps().length:(typeof oppMatched==='function'?PREMIUM_OPPS.length+oppMatched().length:PREMIUM_OPPS.length));
     var dt=$('#navDocsTag');if(dt)dt.textContent=DOCS.length;
   }
   function syncSaldo(){
@@ -943,7 +966,7 @@
        tela. Um SO que fabrica urgência perde a confiança que ele existe para ganhar. */
     if(!rec.agent){
       box.className='nba nba-idle';box.hidden=false;box.removeAttribute('style');box.style.display='grid';
-      box.innerHTML='<svg class="nba-av" aria-hidden="true"><use href="#monyu-symbol"/></svg>'+
+      box.innerHTML='<a href="https://www.monyu.com.br" target="_blank" rel="noopener noreferrer" aria-label="Abrir o site oficial da MonyU em nova janela"><svg class="nba-av" aria-hidden="true"><use href="#monyu-symbol"/></svg></a>'+
         '<div class="nba-body"><div class="nba-tag">'+rec.tag+'</div>'+
         '<p class="nba-why" id="nbaTitle">'+rec.why+'</p></div>';
       return;
@@ -1009,6 +1032,10 @@
   document.addEventListener('click',function(e){
     var t=e.target.closest('[data-nav]');
     if(t){e.preventDefault();showView(t.getAttribute('data-nav'))}
+  });
+  document.addEventListener('click',function(e){
+    var t=e.target.closest('[data-navlink]');
+    if(t){e.preventDefault();showView(t.getAttribute('data-navlink'))}
   });
 
   /* ================= Tema ================= */
@@ -1107,6 +1134,18 @@
     appEl.classList.toggle('sidebar-collapsed',v);
     store.set('sidebarCollapsed',v?'1':'0');
     syncMenuBtn();
+    syncSidebarBrandControls();
+  }
+  function syncSidebarBrandControls(){
+    var collapsed=isDesktopSidebar()&&appEl.classList.contains('sidebar-collapsed');
+    if(logoBtn){
+      logoBtn.setAttribute('aria-label',collapsed?'Expandir menu e abrir Início':'Abrir Início e recolher menu');
+      logoBtn.setAttribute('data-tip',collapsed?'Expandir menu':'Início e recolher menu');
+    }
+    if(sidebarCollapseBtn){
+      sidebarCollapseBtn.setAttribute('aria-label','Recolher menu lateral');
+      sidebarCollapseBtn.setAttribute('data-tip','Recolher menu');
+    }
   }
   function syncMenuBtn(){
     var hidden=isDesktopSidebar()?appEl.classList.contains('sidebar-collapsed'):!sidebar.classList.contains('open');
@@ -1139,14 +1178,21 @@
   }
   setSidebarCollapsed(store.get('sidebarCollapsed','0')==='1');
 
-  /* ================= Sidebar: chevron de recolher + logo vira botão de expandir ================= */
+  /* ================= Sidebar: chevron recolhe; logo abre Início e alterna a navegação ================= */
   var sidebarCollapseBtn=$('#sidebarCollapseBtn'),logoBtn=$('#logoBtn');
-  if(sidebarCollapseBtn)sidebarCollapseBtn.addEventListener('click',function(){setSidebarCollapsed(true)});
+  syncSidebarBrandControls();
+  if(sidebarCollapseBtn)sidebarCollapseBtn.addEventListener('click',function(e){
+    e.preventDefault();e.stopPropagation();
+    if(isDesktopSidebar())setSidebarCollapsed(true);
+    else closeSidebar();
+  });
   if(logoBtn)logoBtn.addEventListener('click',function(e){
-    if(isDesktopSidebar()&&appEl.classList.contains('sidebar-collapsed')){
-      e.preventDefault();e.stopPropagation();
-      setSidebarCollapsed(false);
+    e.preventDefault();e.stopPropagation();
+    if(isDesktopSidebar()){
+      var collapsed=appEl.classList.contains('sidebar-collapsed');
+      setSidebarCollapsed(!collapsed);
     }
+    showView('inicio');
   });
 
   /* ================= Perfil: flyout no rodapé da sidebar ================= */
@@ -1348,8 +1394,25 @@
   renderPromo();
 
   /* ================= Modais genéricos ================= */
-  function open(m){m.classList.add('open')}
-  function close(m){m.classList.remove('open')}
+  /* Uma única fonte de verdade para o fundo inerte: evita a página rolando
+     atrás de drawers e modais longos, inclusive quando um abre sobre outro. */
+  var pageScrollLocks=0,pageScrollY=0,pageScrollPad='';
+  function lockPageScroll(){
+    if(pageScrollLocks++>0)return;
+    pageScrollY=window.scrollY||window.pageYOffset||0;
+    pageScrollPad=document.body.style.paddingRight;
+    var gutter=Math.max(0,window.innerWidth-document.documentElement.clientWidth);
+    document.body.style.position='fixed';document.body.style.top=(-pageScrollY)+'px';document.body.style.left='0';document.body.style.right='0';document.body.style.width='100%';
+    if(gutter)document.body.style.paddingRight=gutter+'px';
+    document.documentElement.style.overflow='hidden';
+  }
+  function unlockPageScroll(){
+    if(pageScrollLocks===0||--pageScrollLocks>0)return;
+    document.body.style.position='';document.body.style.top='';document.body.style.left='';document.body.style.right='';document.body.style.width='';document.body.style.paddingRight=pageScrollPad;
+    document.documentElement.style.overflow='';window.scrollTo(0,pageScrollY);
+  }
+  function open(m){if(!m.classList.contains('open')){m.classList.add('open');lockPageScroll()}}
+  function close(m){if(m.classList.contains('open')){m.classList.remove('open');unlockPageScroll()}}
   $$('[data-close]').forEach(function(b){
     b.addEventListener('click',function(){close($('#'+b.getAttribute('data-close')))});
   });
@@ -1422,8 +1485,25 @@
      .open do próprio painel. */
   var runModal=$('#runModal'),runScrim=$('#runScrim'),pendAgent='',pendKey='';
   var pendingRunAgent=null;
-  function openRunDrawer(){open(runModal);runScrim.classList.add('show')}
-  function closeRunDrawer(){close(runModal);runScrim.classList.remove('show')}
+  /* A escolha de projeto é uma etapa do drawer canônico do agente, nunca uma
+     segunda gaveta. O markup de execução é reaproveitado dentro dele. */
+  var runHost=runModal,runSurfaceInCanonical=false;
+  function moveRunSurfaceToCanonical(){
+    if(runSurfaceInCanonical)return;
+    agInner.innerHTML='';
+    while(runModal.firstChild)agInner.appendChild(runModal.firstChild);
+    runHost=agInner;runSurfaceInCanonical=true;
+  }
+  function restoreRunSurface(){
+    if(!runSurfaceInCanonical)return;
+    while(agInner.firstChild)runModal.appendChild(agInner.firstChild);
+    runHost=runModal;runSurfaceInCanonical=false;
+  }
+  function openRunDrawer(){
+    if(!agDrawer.classList.contains('open'))lockPageScroll();
+    agDrawer.classList.add('open');agScrim.classList.add('show');
+  }
+  function closeRunDrawer(){restoreRunSurface();closeDrawer()}
   runScrim.addEventListener('click',closeRunDrawer);
   $('#runClose').addEventListener('click',closeRunDrawer);
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&runModal.classList.contains('open'))closeRunDrawer()});
@@ -1508,11 +1588,11 @@
     });
     html+='</div>';
     if(pids.length>1)html+='<button type="button" class="run-proj-selall" id="runProjSelAll">Selecionar todos</button>';
-    html+='<button type="button" class="run-proj-new" id="runProjNew">+ Cadastrar novo projeto…</button>';
+    html+='<button type="button" class="run-proj-new '+(pids.length?'free-project-cta-context':'free-project-cta-empty')+'" id="runProjNew">+ Cadastrar nova ideia/projeto <span class="free-action-badge">GRÁTIS</span></button>';
     return html;
   }
   function selectedIds(){
-    return Array.prototype.slice.call(runModal.querySelectorAll('[data-runp]:checked')).map(function(cb){return cb.getAttribute('data-runp')});
+    return Array.prototype.slice.call(runHost.querySelectorAll('[data-runp]:checked')).map(function(cb){return cb.getAttribute('data-runp')});
   }
   function updateRunState(){
     var ids=selectedIds();
@@ -1541,13 +1621,13 @@
     decorateSingleAgentCta(rc,pendKey);
   }
   function wireRunProjEvents(){
-    runModal.querySelectorAll('[data-runp]').forEach(function(cb){
+    runHost.querySelectorAll('[data-runp]').forEach(function(cb){
       cb.addEventListener('change',updateRunState);
     });
     var filterInput=$('#runProjFilter');
     if(filterInput)filterInput.addEventListener('input',function(){
       var q=filterInput.value.trim().toLowerCase();
-      runModal.querySelectorAll('.run-proj-item').forEach(function(item){
+      runHost.querySelectorAll('.run-proj-item').forEach(function(item){
         var name=item.getAttribute('data-pname')||'';
         item.style.display=(!q||name.indexOf(q)>-1)?'':'none';
       });
@@ -1571,6 +1651,8 @@
       return;
     }
     var a=AG[key];if(!a)return;
+    var detailIndex=agentIndexByKey(key);
+    if(detailIndex>-1){openDrawer(detailIndex,ctxProj);return}
     pendAgent=a.name;pendKey=key;
     $('#runAgent').textContent=a.name;
     $('#runAvatar').src=avatarSrc(key);
@@ -1598,14 +1680,21 @@
   }
   document.addEventListener('click',function(e){
     var t=e.target.closest('[data-agent]');
-    if(t&&!t.disabled){openRun(t.getAttribute('data-agent'),t.getAttribute('data-proj')||'')}
+    if(!t||t.disabled)return;
+    /* Toda entrada externa de agente abre o mesmo detalhe canônico.
+       Só o CTA de execução que vive dentro dele chega à próxima etapa. */
+    if(!t.hasAttribute('data-agent-execute')){
+      var detailIndex=agentIndexByKey(t.getAttribute('data-agent'));
+      if(detailIndex>-1){openDrawer(detailIndex,t.getAttribute('data-proj')||'');return}
+    }
+    openRun(t.getAttribute('data-agent'),t.getAttribute('data-proj')||'');
   });
   $('#runVariant').addEventListener('change',function(){
     pendVariant=this.value;
     updateRunState(); /* recalcula custo e saldo projetado na hora */
   });
   $('#runCancel').addEventListener('click',function(){pendOppMatch=null;closeRunDrawer()});
-  $('#runConfirm').addEventListener('click',function(){
+  function confirmRun(){
     var ids=selectedIds();
     if(ids.length===0)return;
     var buyGap=this.getAttribute('data-buy');
@@ -1614,6 +1703,13 @@
     var pname=ids.length===1?PROJECTS[ids[0]].name:(ids.length+' projetos selecionados');
     saldo=Math.max(0,saldo-cost);
     syncSaldo();
+    /* No MVP, mvpRefreshJourney registra o custo quando a execução termina,
+       para manter o card alinhado à sua timeline. Nas demais versões,
+       registra aqui, no instante em que a execução é confirmada. */
+    if(!isMvpMode){
+      var perProject=cost/ids.length;
+      ids.forEach(function(pid){PROJ_SPENT[pid]=(PROJ_SPENT[pid]||0)+perProject;if(typeof refreshProjectSpent==='function')refreshProjectSpent(pid)});
+    }
     closeRunDrawer();
     /* Recompensas: XP por qualquer execução + selos por primeira vez em cada agente */
     if(typeof rwAddXp==='function'){
@@ -1633,7 +1729,7 @@
     startTask(pendKey,AG[pendKey].name+' - '+AGLABEL[pendKey]+' · '+pname.substring(0,36)+(pname.length>36?'…':''),AG[pendKey].name+' concluiu: '+AGLABEL[pendKey]+' ('+pname.substring(0,26)+(pname.length>26?'…':'')+')',8000+Math.random()*6000,ids);
     var promoNoteTxt=promoAppliesTo(pendKey)?(' · desconto de campanha aplicado (-'+PROMO.pct+'%)'):'';
     toast(pendAgent+' começou a trabalhar para "'+pname+'" - acompanhe no canto da tela.'+promoNoteTxt+' (demo)');
-  });
+  }
 
   /* ================= Logos com fallback ================= */
   window.logoFail=function(img){
@@ -1745,9 +1841,9 @@
   function visibleOpps(){return isMvpMode?OPPS.slice(0,MVP_OPP_UNLOCKED):OPPS}
   function mvpHasRicoRun(){return Object.keys(PROJ_RAN).some(function(pid){return jaRodou(pid,'rico')})}
   function premiumOppCard(o,idx){
-    return '<a class="opp opp-premium" href="'+o.url+'" target="_blank" rel="noopener noreferrer" style="animation:rise .5s var(--ease) '+(0.05+idx*0.05)+'s backwards">'+
+    return '<button type="button" class="opp opp-premium" data-premium-opp="'+idx+'" style="animation:rise .5s var(--ease) '+(0.05+idx*0.05)+'s backwards" aria-label="Abrir detalhes de '+o.name+'">'+
       '<span class="premium-badge">PREMIUM</span><span class="opp-top"><span class="opp-logo premium-logo" style="background:'+o.logoBg+'"><img src="'+o.logo+'" alt="Logo '+o.org+'"></span><span class="premium-partner">parceiro em potencial</span></span>'+
-      '<span class="opp-cat">'+o.kind+'</span><h3>'+o.name+'</h3><span class="opp-fonte">'+o.org+'</span><span class="premium-desc">'+o.desc+'</span><span class="premium-link">Conhecer oportunidade ↗</span></a>';
+      '<span class="opp-cat">'+o.kind+'</span><h3>'+o.name+'</h3><span class="opp-fonte">'+o.org+'</span><span class="premium-desc">'+o.desc+'</span><span class="premium-link">Ver detalhes ↗</span></button>';
   }
   function mvpOpportunityCta(){
     if(mvpHasRicoRun())return '';
@@ -1767,18 +1863,21 @@
       :'<p style="font-size:.82rem;color:var(--text-3);padding:.4rem 0">Nenhum match ainda - rode o Rico para cruzar seus projetos com os editais abertos.</p>';
     var regularNew=mh.filter(isNewOpp).map(function(o,i){return oppCard(o,i,true)}).join('');
     var regularSeen=mh.filter(function(o){return !isNewOpp(o)}).map(function(o,i){return oppCard(o,i,false)}).join('');
-    var premiumHtml=isMvpMode?PREMIUM_OPPS.map(premiumOppCard).join('')+mvpOpportunityCta():'';
+    var premiumHtml=PREMIUM_OPPS.map(premiumOppCard).join('')+(isMvpMode?mvpOpportunityCta():'');
     $('#oppsFull').innerHTML=regularNew+premiumHtml+regularSeen;
     var um=orderOppsBySeen(oppUnmatched(),seenBefore);
     var umSection=$('#oppsUnmatchedSection');
     if(umSection)umSection.style.display=um.length?'':'none';
     $('#oppsUnmatched').innerHTML=um.map(function(o,i){return oppCardUnmatched(o,i,isNewOpp(o))}).join('');
-    var cnt=$('#oppsTotalCount');if(cnt)cnt.textContent=(isMvpMode?PREMIUM_OPPS.length:0)+visibleOpps().length;
+    var cnt=$('#oppsTotalCount');if(cnt)cnt.textContent=PREMIUM_OPPS.length+visibleOpps().length;
     if(isMvpMode){
       var sub=$('#oppPageSub');
       if(sub)sub.textContent=MVP_OPP_UNLOCKED===0?'4 oportunidades PREMIUM de parceiros em potencial · execute o Rico para buscar oportunidades personalizadas':'4 oportunidades PREMIUM + '+MVP_OPP_UNLOCKED+' encontradas pelo Rico para suas ideias/projetos';
       var sec=$('#oppsUnmatchedSection');
       if(sec){var h=sec.querySelector('h2'),hint=sec.querySelector('.hint');if(h)h.textContent='Outras oportunidades encontradas';if(hint)hint.textContent='Execute o Rico novamente para atualizar e ampliar esta lista.'}
+    }else{
+      var fullSub=$('#oppPageSub');
+      if(fullSub)fullSub.textContent='Oportunidades novas, parceiros PREMIUM e oportunidades já abertas.';
     }
     applyOppFilters();
   }
@@ -1827,7 +1926,7 @@
       if(pStaticWrap)pStaticWrap.style.display='none';
       if(pEmpty)pEmpty.style.display=hasProj?'none':'';
       var psub=$('#projSub');
-      if(psub)psub.textContent=Object.keys(PROJECTS).length+' de '+(typeof PROJ_LIMIT!=='undefined'?PROJ_LIMIT:5)+' ideias/projetos do plano '+(isMvpMode?'Acesso Antecipado · cadastro gratuito':'Freemium · cadastro e importação gratuitos');
+      if(psub)psub.textContent=Object.keys(PROJECTS).length+' ideias/projetos cadastrados · '+(isMvpMode?'cadastro gratuito':'cadastro e importação gratuitos');
       var toolbar=document.querySelector('#view-projetos .toolbar');
       if(toolbar){
         var allChip=toolbar.querySelector('[data-pfilter="todos"]');
@@ -1840,8 +1939,13 @@
   /* Delegado (não addEventListener direto): o botão de Início é recriado via innerHTML
      toda vez que renderInicioZero() roda, então um listener direto se perderia. */
   document.addEventListener('click',function(e){
-    if(e.target.closest('[data-inicio-newproj]')){npSetMode('zero');open($('#newProjModal'))}
+    if(e.target.closest('[data-inicio-newproj]')){
+      if(typeof agDrawer!=='undefined'&&agDrawer.classList.contains('open'))closeDrawer();
+      npSetMode('zero');open($('#newProjModal'));
+    }
   });
+  var legacyRunConfirm=$('#runConfirm');
+  if(legacyRunConfirm)legacyRunConfirm.addEventListener('click',confirmRun);
   var projListEmptyBtn=$('#projListEmptyNewProj');
   if(projListEmptyBtn)projListEmptyBtn.addEventListener('click',function(){npSetMode('zero');open($('#newProjModal'))});
   /* Regra de produto (2026-07-14): a "Próxima ação recomendada" nunca é só um texto - sempre tem
@@ -1998,13 +2102,24 @@
     }
   }
   var autoModeBtn=$('#autoModeBtn');
+  function setMvpAutomaticComingSoon(){
+    if(!isMvpMode||!autoModeBtn)return;
+    AUTO_MODE.active=false;
+    autoModeBtn.disabled=true;
+    autoModeBtn.setAttribute('aria-disabled','true');
+    autoModeBtn.classList.add('coming-soon-control');
+    autoModeBtn.innerHTML='⚡ Modo automático <span class="coming-soon-badge">EM BREVE</span>';
+  }
+  setMvpAutomaticComingSoon();
   if(autoModeBtn)autoModeBtn.addEventListener('click',function(){
+    if(isMvpMode)return;
     var inp=$('#autoLimitInput');if(inp)inp.value=AUTO_MODE.limit||50;
     $$('#autoModal [data-auto-agent]').forEach(function(cb){cb.checked=AUTO_MODE.agents.indexOf(cb.getAttribute('data-auto-agent'))>-1});
     open($('#autoModal'));
   });
   var autoConfirmBtn2=$('#autoConfirm');
   if(autoConfirmBtn2)autoConfirmBtn2.addEventListener('click',function(){
+    if(isMvpMode)return;
     if(AUTO_MODE.active)return;
     var v=parseInt($('#autoLimitInput').value,10);
     if(!v||v<1){toast('Informe um limite de fichas válido para continuar.');return}
@@ -2026,6 +2141,14 @@
   });
   function syncAutoModeUi(){
     var bar=$('#autoStatusBar'),activate=$('#autoModeBtn'),selectAll=$('#aprovSelAllBtn'),title=$('#aprovActionsTitle');
+    if(isMvpMode){
+      AUTO_MODE.active=false;
+      if(bar)bar.style.display='none';
+      if(activate){activate.style.display='';setMvpAutomaticComingSoon()}
+      if(selectAll)selectAll.style.display='';
+      if(title)title.textContent='Ações recomendadas';
+      return;
+    }
     if(bar)bar.style.display=AUTO_MODE.active?'':'none';
     if(activate)activate.style.display=AUTO_MODE.active?'none':'';
     if(selectAll)selectAll.style.display=AUTO_MODE.active?'none':'';
@@ -2358,7 +2481,20 @@
       toast(started+' atividade(s) iniciada(s) - '+total+' fichas. Acompanhe no canto da tela. (demo)');
     });
   }
+  function openPremiumOpp(index){
+    var o=PREMIUM_OPPS[index];if(!o)return;
+    oppBox.innerHTML='<button class="modal-close" id="oppClose" aria-label="Fechar">✕</button>'+
+      '<div class="omodal-head"><span class="omodal-logo premium-logo" style="background:'+o.logoBg+'"><img src="'+o.logo+'" alt="Logo '+o.org+'"></span><div><span class="premium-badge">PREMIUM</span><h3>'+o.name+'</h3><span class="fonte">'+o.org+'</span></div></div>'+
+      '<div class="osec"><h4>'+o.kind+'</h4><p>'+o.desc+'</p></div>'+
+      '<div class="osec"><h4>Oportunidade de parceiro estratégico</h4><p>Conheça os detalhes diretamente no canal oficial do parceiro. A presença nesta vitrine não representa parceria formal vigente.</p></div>'+
+      '<div class="omodal-foot"><div class="modal-actions"><button class="btn-ghost" id="oppCancel">Fechar</button><a class="btn-primary" href="'+o.url+'" target="_blank" rel="noopener noreferrer">Conhecer oportunidade ↗</a></div></div>';
+    open(oppModal);
+    oppBox.querySelector('#oppClose').addEventListener('click',function(){close(oppModal)});
+    oppBox.querySelector('#oppCancel').addEventListener('click',function(){close(oppModal)});
+  }
   document.addEventListener('click',function(e){
+    var premium=e.target.closest('[data-premium-opp]');
+    if(premium){e.preventDefault();openPremiumOpp(parseInt(premium.getAttribute('data-premium-opp'),10));return}
     var t=e.target.closest('[data-opp]');
     if(t)openOpp(t.getAttribute('data-opp'));
   });
@@ -2411,7 +2547,12 @@
   function mvpRefreshJourney(pid,trigger,completedAgent){
     if(!isMvpMode||!PROJECTS[pid])return;
     var p=PROJECTS[pid],ran=PROJ_RAN[pid]||(PROJ_RAN[pid]=[]);
-    if(completedAgent&&ran.indexOf(completedAgent)===-1)ran.push(completedAgent);
+    var completedNow=completedAgent&&ran.indexOf(completedAgent)===-1;
+    if(completedNow){
+      ran.push(completedAgent);
+      var consumed={rico:1,iris:5,ada:20}[completedAgent]||0;
+      PROJ_SPENT[pid]=(PROJ_SPENT[pid]||0)+consumed;
+    }
     mvpRemoveProjectRecommendations(pid);
     if(trigger==='created'||trigger==='updated'){
       mvpRecommendation(pid,'rico','Rico · mapear oportunidades','A ideia/projeto foi '+(trigger==='created'?'cadastrada':'atualizada')+'. O Rico pode buscar oportunidades aderentes e transformar o ponto de partida em opções concretas.',1);
@@ -2431,6 +2572,10 @@
       mvpHomeEvent({ag:'ada',txt:'<b>Escrita concluída:</b> '+p.short,why:'A ideia/projeto foi reanalisada. O próximo passo agora é sua revisão humana antes de qualquer submissão externa.',org:'auto',orgTxt:'análise automática',custo:'0 fichas',quando:'agora'});
       addNotif('ada','<b>'+p.short+' está pronta para sua revisão.</b> Nada será submetido automaticamente.','projetos');
     }
+    if(typeof refreshProjectTimeline==='function')refreshProjectTimeline(pid);
+    if(typeof refreshProjectActions==='function')refreshProjectActions(pid);
+    if(typeof refreshProjectSpent==='function')refreshProjectSpent(pid);
+    refreshFreeProjectCtas();
     renderJornada();renderAprov();renderInicioZero();renderHomeV29();renderOpps();syncNavBadges();
     if(AUTO_MODE.active)setTimeout(runAutomaticApprovals,450);
   }
@@ -2563,19 +2708,18 @@
   $('#linkPlans2').addEventListener('click',function(e){e.preventDefault();openPlans()});
 
   /* ================= Cadastrar projeto (com importação) ================= */
-  /* Teto de projetos ativos por plano (decisão de 2026-07-14): Freemium 3, Starter 10 - ainda usado
-     como gatilho de upgrade - Pro e Scale ilimitados (não geram este bloqueio). O piloto só simula
-     2 contas (Freemium em modo zero, Starter na demo populada), por isso o teto é resolvido aqui a
-     partir de isFreshAccountMode em vez de existir uma seleção de plano de verdade. */
-  var PROJ_LIMIT=(isFreshAccountMode?3:10),npMode='zero',NP_TYPES=['Projeto completo','Pitch deck','Roteiro de pitch','Lean canvas','Orçamento','Outro'];
+  /* Ideias/projetos são ilimitados em todos os planos. A conversão é estimulada
+     pelo uso dos agentes e de outros recursos, não por um bloqueio de cadastro. */
+  var npMode='zero',NP_TYPES=['Projeto completo','Pitch deck','Roteiro de pitch','Lean canvas','Orçamento','Outro'];
   function npSetMode(m){
-    if(isMvpMode)m='zero';
     npMode=m;
     $$('.np-mode').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-npmode')===m)});
     $('#npTitle').textContent=m==='import'?'Importar ideia/projeto existente':'Nova ideia/projeto';
     $('#npSave').textContent=m==='import'?'Importar projeto':'Salvar projeto';
     decorateFreeProjectCtas($('#npSave'));
     $('#npDocsHint').textContent=m==='import'?'- envie a ideia/projeto estruturada, pitch e materiais de apoio':'- opcional, melhora os outputs dos agentes';
+    var docsField=$('#npDrop')&&$('#npDrop').closest('.form-field');
+    if(isMvpMode&&docsField)docsField.style.display=m==='import'?'':'none';
   }
   document.addEventListener('click',function(e){
     var mb=e.target.closest('[data-npmode]');
@@ -2612,15 +2756,10 @@
     }
   });
   function syncNpSlotsLabel(){
-    var maxEl=$('#npSlotsMax');if(maxEl)maxEl.textContent=PROJ_LIMIT;
     var planEl=$('#npPlanName');if(planEl)planEl.textContent=isMvpMode?'Acesso Antecipado':(isFreshAccountMode?'Freemium':'Starter');
     var slotsEl=$('#npSlots');if(slotsEl)slotsEl.textContent=Object.keys(PROJECTS).length;
   }
   $('#btnNewProj').addEventListener('click',function(){
-    if(Object.keys(PROJECTS).length>=PROJ_LIMIT){
-      toast('Seu plano '+(isMvpMode?'Acesso Antecipado':(isFreshAccountMode?'Freemium':'Starter'))+' comporta '+PROJ_LIMIT+' projetos ativos. Faça upgrade para adicionar mais.');
-      openPlans();return;
-    }
     npSetMode('zero');
     syncNpSlotsLabel();
     open($('#newProjModal'));
@@ -2633,7 +2772,8 @@
     var pid='p'+projSeq,tema=$('#npTema').value,hoje='06 jul 2026';
     PROJECTS[pid]={name:nome,short:nome.length>28?nome.substring(0,26)+'…':nome,complete:false,stage:'new',tema:tema};
     PROJ_RAN[pid]=[];
-    var docRows=isMvpMode?[]:$$('#npDocList .np-doc'),nDocs=docRows.length;
+    PROJ_SPENT[pid]=0;
+    var docRows=$$('#npDocList .np-doc'),nDocs=docRows.length;
     docRows.forEach(function(row){
       DOCS.push({
         n:row.querySelector('.nd-name').textContent,
@@ -2647,27 +2787,27 @@
     var card=document.createElement('article');
     card.className='proj-card';
     card.setAttribute('data-pstatus','rascunho');
+    card.setAttribute('data-project-id',pid);
     card.innerHTML=
       '<div class="proj-head">'+
         projIconHTML(nome,tema)+
         '<div class="proj-title"><b></b><span>'+(imported?'Importado':'Rascunho')+' · Tema: '+tema+' · criado em '+hoje+(nDocs?' · '+nDocs+' documento(s) na Memória':'')+'</span></div>'+
         '<span class="stage-chip draft-chip">'+(imported?'Importado':'Rascunho')+'</span>'+
-      '</div>'+
+      '</div>'+ 
+      projectJourneyHTML(pid)+
       '<div class="proj-meta">'+
-        '<div>Próximo passo<b>Revisar recomendações em Aprovações</b></div>'+
         (isMvpMode?'':'<div>Memória do projeto<b>'+nDocs+' doc(s)</b></div>')+
-        '<div>Fichas investidas<b>0</b></div>'+
+        '<div data-project-spent="'+pid+'" title="Total de fichas consumidas pelos agentes nesta ideia/projeto">Fichas usadas no projeto<b>0</b></div>'+
       '</div>'+
-      '<div class="proj-actions">'+
-        '<button class="btn-primary" data-agent="rico" data-proj="'+pid+'" style="font-size:.74rem">Buscar oportunidades · '+costBadgeHTML('rico',1)+'</button>'+
-        '<button class="btn-ghost" data-agent="iris" data-proj="'+pid+'">Testar aderência com a Íris · '+costBadgeHTML('iris',5)+'</button>'+
-      '</div>';
+      '<div class="proj-actions project-next-actions" data-project-actions="'+pid+'">'+projectNextActionsHTML(pid)+'</div>';
     card.querySelector('b').textContent=nome;
     $('#projList').appendChild(card);
+    wireProjectTitleEditors(card);
     decorateAgentCtas(card);
+    refreshFreeProjectCtas();
     var slots=Object.keys(PROJECTS).length;
     var slotsEl=$('#npSlots');if(slotsEl)slotsEl.textContent=slots;
-    var psub=$('#projSub');if(psub)psub.textContent=slots+' de '+PROJ_LIMIT+' ideias/projetos do plano '+(isMvpMode?'Acesso Antecipado':(isFreshAccountMode?'Freemium':'Starter'))+(isMvpMode?' · cadastro gratuito':' · cadastro e importação gratuitos');
+    var psub=$('#projSub');if(psub)psub.textContent=slots+' ideias/projetos cadastrados · '+(isMvpMode?'cadastro gratuito':'cadastro e importação gratuitos');
     syncNavBadges();
     $('#npNome').value='';$('#npDesc').value='';$('#npDocList').innerHTML='';
     close($('#newProjModal'));
@@ -2718,20 +2858,30 @@
       btn.appendChild(badge);
     });
   }
+  function refreshFreeProjectCtas(scope){
+    scope=scope||document;
+    var hasProjects=Object.keys(PROJECTS).length>0;
+    var nodes=[];
+    if(scope.matches&&scope.matches('[data-inicio-newproj],#runProjNew,#obZeroBtn,#btnNewProj,#inicioEmptyNewProj,#projListEmptyNewProj'))nodes.push(scope);
+    if(scope.querySelectorAll)nodes=nodes.concat(Array.from(scope.querySelectorAll('[data-inicio-newproj],#runProjNew,#obZeroBtn,#btnNewProj,#inicioEmptyNewProj,#projListEmptyNewProj')));
+    nodes.forEach(function(btn){btn.classList.toggle('free-project-cta-empty',!hasProjects);btn.classList.toggle('free-project-cta-context',hasProjects)});
+  }
   decorateAgentCtas();decorateFreeProjectCtas();
+  refreshFreeProjectCtas();
   decorateSingleAgentCta($('#sumCta'),'ada');
   decorateSingleAgentCta($('#ksNext'),isFreshAccountMode?'rico':'ada');
   new MutationObserver(function(changes){
     changes.forEach(function(change){
       decorateAgentCtas(change.target);decorateFreeProjectCtas(change.target);
+      refreshFreeProjectCtas(change.target);
       Array.from(change.addedNodes||[]).forEach(function(node){if(node.nodeType===1){decorateAgentCtas(node);decorateFreeProjectCtas(node)}});
     });
   }).observe(document.body,{childList:true,subtree:true});
   var AGD=[
     {k:'rico',name:'Rico',role:'Radar + matching de oportunidades',badge:'on',badgeTxt:'Disponível',cost:'1 a 3 fichas por rodada',time:'~2 min',
-      benefit:'Vigia centenas de fontes de fomento do país e avisa quando surge um edital com a cara dos seus projetos.',
+      benefit:'Vigia milhares de fontes de fomento do país e avisa quando surge um edital com a cara dos seus projetos.',
       action:'Executar scan · 1 a 3 fichas',
-      does:['Varre FINEP, EMBRAPII, FAPs estaduais, CNPq e Sistema S','Calcula o score de match para cada projeto seu','Roda um checklist objetivo de premissas do edital: [x] o que o projeto já cumpre, [ ] o que falta - com dica simples de como resolver','Monitora prazos e alerta antes de os editais fecharem'],
+      does:['Busca milhares de oportunidades nacionais e internacionais alinhadas ao seu projeto','Calcula o score de match para cada projeto seu','Roda um checklist objetivo de premissas do edital: [x] o que o projeto já cumpre, [ ] o que falta - com dica simples de como resolver','Monitora prazos e alerta antes de os editais fecharem'],
       nots:['Não avalia a qualidade do projeto nem critérios qualitativos - isso é com a Íris (e Ada, na elaboração)','Não executa nada sem a sua confirmação'],
       hist:[{d:'hoje 08:12',t:'Scan semanal: 3 oportunidades novas (melhor match: FINEP 92%)'},{d:'29 jun',t:'Scan: 2 oportunidades para a Plataforma IoT'}],
       faq:[['Posso agendar scans automáticos?','Sim - semanais ou quinzenais, sempre com aviso prévio.'],['Por que o custo varia entre 1 e 3 fichas?','1 ficha roda o radar para um único projeto. 3 fichas rodam o lote completo - até 5 projetos numa única varredura, o que sai mais barato por projeto.'],['De onde vêm as oportunidades?','De fontes oficiais monitoradas continuamente pelo Núcleo de Memória MonyU.']]},
@@ -2852,8 +3002,7 @@
     });
     var mvpJourneyHint=document.querySelector('#view-inicio .home-agentes .hint');if(mvpJourneyHint)mvpJourneyHint.textContent='Rico encontra, Íris diagnostica e Ada elabora para sua revisão';
     $$('#view-inicio .consume-row').forEach(function(row){var use=row.querySelector('use');if(use&&use.getAttribute('href')==='#ins-kai')row.style.display='none'});
-    var mvpModes=document.querySelector('#newProjModal .np-modes');if(mvpModes)mvpModes.style.display='none';
-    var mvpDrop=$('#npDrop');if(mvpDrop&&mvpDrop.closest('.form-field'))mvpDrop.closest('.form-field').style.display='none';
+    var mvpModes=document.querySelector('#newProjModal .np-modes');if(mvpModes)mvpModes.style.display='grid';
     var mvpPlanBadge=document.querySelector('#view-inicio .plan-badge');if(mvpPlanBadge){mvpPlanBadge.textContent='Acesso Antecipado';mvpPlanBadge.setAttribute('data-tip','30 fichas gratuitas por mês e 50% de desconto na compra de fichas durante o lançamento')}
     var mvpUserPlan=document.querySelector('.user-meta > span:not(.giga-badge-row)');if(mvpUserPlan)mvpUserPlan.textContent='NovaTech Energia · Acesso Antecipado';
     var mvpFichaSmall=$('#fichasChip small');if(mvpFichaSmall)mvpFichaSmall.textContent='· 30 grátis por mês';
@@ -2865,9 +3014,9 @@
     $$('#packsGrid .pack').forEach(function(pack,index){var d=mvpPackData[index];if(!d)return;pack.setAttribute('data-price',d[1]);var price=pack.querySelector('.price'),per=pack.querySelector('.per');if(price)price.textContent='R$ '+d[1].toFixed(2).replace('.',',');if(per)per.textContent='R$ 1,75/ficha'});
     packPrice=87.5;
     var mvpBuyNote=document.querySelector('#buyModal .modal-note');if(mvpBuyNote)mvpBuyNote.innerHTML='Benefício especial de lançamento: 50% de desconto aplicado automaticamente a todas as compras de fichas adicionais.';
-    var mvpPlans=$('#plansModal');if(mvpPlans){var plansTitle=$('#plansTitle'),plansSub=mvpPlans.querySelector('.sub'),plans=mvpPlans.querySelectorAll('.plan');if(plansTitle)plansTitle.textContent='Acesso Antecipado';if(plansSub)plansSub.innerHTML='Condição especial de lançamento para participantes selecionados do Acesso Beta Antecipado.';plans.forEach(function(plan){plan.style.display=plan.classList.contains('current')?'':'none'});var current=mvpPlans.querySelector('.plan.current');if(current){current.querySelector('h4').textContent='Acesso Antecipado';current.querySelector('.p-price').textContent='Grátis no lançamento';current.querySelector('.p-fichas').innerHTML='<span class="ficha-coin" aria-hidden="true">M</span>30 fichas grátis/mês';current.querySelector('ul').innerHTML='<li>30 fichas gratuitas todos os meses</li><li>50% de desconto em fichas adicionais</li><li>Acesso a Rico, Íris e Ada</li><li>Até 3 ideias/projetos ativos</li><li>Suporte pela Ajuda & FAQ</li>'}var planNote=mvpPlans.querySelector('.modal-note');if(planNote)planNote.textContent='Benefícios especiais válidos durante o período de lançamento do Acesso Antecipado.';var refer=mvpPlans.querySelector('.refer-card');if(refer)refer.style.display='none'}
-    var mvpNpSub=document.querySelector('#newProjModal .sub');if(mvpNpSub)mvpNpSub.innerHTML='Você usa <b><span id="npSlots">0</span> de <span id="npSlotsMax">3</span> ideias/projetos</b> do plano <span id="npPlanName">Acesso Antecipado</span>. O cadastro é gratuito - as fichas só entram quando Rico, Íris ou Ada trabalham.';
-    var mvpProjSub=$('#projSub');if(mvpProjSub)mvpProjSub.textContent='0 de '+PROJ_LIMIT+' ideias/projetos do plano Acesso Antecipado · cadastro gratuito';
+    var mvpPlans=$('#plansModal');if(mvpPlans){var plansTitle=$('#plansTitle'),plansSub=mvpPlans.querySelector('.sub'),plans=mvpPlans.querySelectorAll('.plan');if(plansTitle)plansTitle.textContent='Acesso Antecipado';if(plansSub)plansSub.innerHTML='Condição especial de lançamento para participantes selecionados do Acesso Beta Antecipado.';plans.forEach(function(plan){plan.style.display=plan.classList.contains('current')?'':'none'});var current=mvpPlans.querySelector('.plan.current');if(current){current.querySelector('h4').textContent='Acesso Antecipado';current.querySelector('.p-price').textContent='Grátis no lançamento';current.querySelector('.p-fichas').innerHTML='<span class="ficha-coin" aria-hidden="true">M</span>30 fichas grátis/mês';current.querySelector('ul').innerHTML='<li>30 fichas gratuitas todos os meses</li><li>50% de desconto em fichas adicionais</li><li>Acesso a Rico, Íris e Ada</li><li>Ideias/projetos ilimitados</li><li>Suporte pela Ajuda & FAQ</li>'}var planNote=mvpPlans.querySelector('.modal-note');if(planNote)planNote.textContent='Benefícios especiais válidos durante o período de lançamento do Acesso Antecipado.';var refer=mvpPlans.querySelector('.refer-card');if(refer)refer.style.display='none'}
+    var mvpNpSub=document.querySelector('#newProjModal .sub');if(mvpNpSub)mvpNpSub.innerHTML='Você tem <b><span id="npSlots">0</span> ideias/projetos cadastrados</b>. Não há limite por plano. O cadastro é gratuito - as fichas só entram quando Rico, Íris ou Ada trabalham.';
+    var mvpProjSub=$('#projSub');if(mvpProjSub)mvpProjSub.textContent='0 ideias/projetos cadastrados · cadastro gratuito';
     var mvpNotif=$('#notifList');if(mvpNotif){mvpNotif.innerHTML='<button class="notif-item" data-nav="projetos"><svg class="av" aria-hidden="true"><use href="#ins-rico"/></svg><p><b>Rico</b> está pronto. Cadastre sua primeira ideia/projeto para começar.<span class="ntime">agora</span></p><span class="undot" aria-hidden="true"></span></button>';syncNotifBadge()}
     var mvpWsSpec=$('#wsSpecBtn');
     if(mvpWsSpec){
@@ -2876,6 +3025,7 @@
       if(mvpWsTip){var mvpWsTitle=mvpWsTip.querySelector('h4'),mvpWsText=mvpWsTip.querySelector('p'),mvpBancaBtn=mvpWsTip.querySelector('[data-soonmod="banca"]');if(mvpWsTitle)mvpWsTitle.textContent='Quer apoio especializado?';if(mvpWsText)mvpWsText.textContent='Converse com a equipe MonyU para conhecer o serviço de assessoria especializada em captação de recursos.';if(mvpBancaBtn)mvpBancaBtn.style.display='none'}
       var mvpWsStatus=mvpWsSpec.closest('.ws-side').querySelector('.ws-card:not(.ws-tip) p:nth-of-type(2)');if(mvpWsStatus)mvpWsStatus.style.display='none';
     }
+    npSetMode('zero');
   }
   function badgeHtml(a){
     var cls=a.badge==='on'?'on':a.badge==='beta'?'beta':'soon-b';
@@ -2937,7 +3087,7 @@
   agGrid.innerHTML=AGD.map(function(a,i){
     var actBtn=a.soon
       ? '<button class="btn-ghost" data-toast="Anotado! Vamos te avisar quando '+a.name+' for lançado. (demo)" style="width:100%;font-size:.76rem">🔔 Avisar-me quando chegar</button>'
-      : '<button class="btn-primary" data-agent="'+a.k+'" style="width:100%;font-size:.78rem">'+agentActionHTML(a)+'</button>';
+      : '<button class="btn-primary" data-agent="'+a.k+'" data-agent-detail-cta style="width:100%;font-size:.78rem">Conhecer '+a.name+'</button>';
     var hist=a.hist.length
       ? '<div class="ag-hist"><small>Última atividade</small>'+a.hist[0].t+' <span class="hd">· '+a.hist[0].d+'</span></div>'
       : '<div class="ag-hist muted">Ainda sem atividades com você</div>';
@@ -2964,10 +3114,207 @@
     agentesPageSub.textContent='Sua equipe de IA trabalhando pela sua captação, '+agAtivos+' ativos e '+agCaminho+' a caminho';
   }
 
+  function projectJourneyHTML(pid){
+    var ran=PROJ_RAN[pid]||[], mvp=isMvpMode;
+    var steps=mvp
+      ? [{k:'rico',n:'Rico',d:'Radar de oportunidades'},{k:'iris',n:'Íris',d:'Diagnóstico de elegibilidade'},{k:'ada',n:'Ada',d:'Elaboração do projeto'},{k:'review',n:'Revisão humana',d:'Pronto para a próxima decisão'}]
+      : [{k:'rico',n:'Rico',d:'Radar de oportunidades'},{k:'iris',n:'Íris',d:'Diagnóstico de elegibilidade'},{k:'docs',n:'Documentação',d:'Informações do projeto'},{k:'ada',n:'Ada',d:'Elaboração do projeto'},{k:'banca',n:'A Banca',d:'Avaliação simulada'},{k:'submission',n:'Submissão',d:'Revisão humana'}];
+    var next=steps.findIndex(function(s){return s.k!=='review'&&s.k!=='docs'&&s.k!=='submission'&&ran.indexOf(s.k)<0});
+    if(next<0)next=Math.min(steps.length-1,ran.indexOf('ada')>-1?steps.length-1:0);
+    return '<div class="stepper project-stepper" data-project-timeline="'+pid+'" role="list" aria-label="Jornada da ideia/projeto">'+steps.map(function(s,i){
+      var done=ran.indexOf(s.k)>-1,cl=done?'done':(i===next?'current':'');
+      return '<div class="step '+cl+'" role="listitem"><span class="step-dot">'+(done?'✓':(i+1))+'</span><span class="step-name">'+s.n+'</span><span class="step-desc">'+(i===next&&!done?'Próximo recomendado':s.d)+'</span></div>';
+    }).join('')+'</div>';
+  }
+  function refreshProjectTimeline(pid){
+    $$('.project-stepper[data-project-timeline="'+pid+'"]').forEach(function(el){el.outerHTML=projectJourneyHTML(pid)});
+  }
+  function projectNextActionsHTML(pid){
+    var ran=PROJ_RAN[pid]||[],hasRico=ran.indexOf('rico')>-1,hasIris=ran.indexOf('iris')>-1,hasAda=ran.indexOf('ada')>-1;
+    if(hasAda)return '<div class="project-next-intro"><b>Próxima etapa: sua revisão humana</b><span>A escrita foi concluída. Revise e copie o material antes de qualquer submissão.</span></div><button class="btn-primary project-agent-action project-agent-primary" data-ws-project="'+pid+'"><span><strong>Revisar e copiar projeto elaborado</strong><small>Abrir o workspace da Ada, seção por seção</small></span></button>';
+    if(hasRico||hasIris)return '<div class="project-next-intro"><b>Próximo agente recomendado: Ada</b><span>Rico e/ou Íris já incrementaram esta ideia/projeto. Agora a Ada transforma essas informações em uma primeira versão para sua revisão.</span></div><button class="btn-primary project-agent-action project-agent-primary" data-agent="ada" data-agent-detail-cta data-proj="'+pid+'"><span><strong>Conhecer a Ada para elaborar o projeto</strong><small>Veja como ela estrutura a escrita a partir das análises já concluídas</small></span><em>'+costBadgeHTML('ada',20)+'</em></button>';
+    return '<div class="project-next-intro"><b>Próximos agentes recomendados</b><span>Conheça os agentes indicados para concluir as etapas pendentes. A execução é confirmada no detalhe de cada agente.</span></div><button class="btn-primary project-agent-action project-agent-primary" data-agent="rico" data-agent-detail-cta data-proj="'+pid+'"><span><strong>Conhecer Rico</strong><small>Buscar oportunidades aderentes</small></span><em>'+costBadgeHTML('rico',1)+'</em></button><button class="btn-ghost project-agent-action" data-agent="iris" data-agent-detail-cta data-proj="'+pid+'"><span><strong>Conhecer Íris</strong><small>Diagnosticar a elegibilidade da ideia/projeto</small></span><em>'+costBadgeHTML('iris',5)+'</em></button>';
+  }
+  function refreshProjectActions(pid){
+    $$('[data-project-actions="'+pid+'"]').forEach(function(el){el.innerHTML=projectNextActionsHTML(pid);decorateAgentCtas(el)});
+  }
+  function refreshProjectSpent(pid){
+    var spent=PROJ_SPENT[pid]||0;
+    $$('[data-project-spent="'+pid+'"]').forEach(function(el){
+      el.innerHTML='Fichas usadas no projeto<b>'+spent+'</b>';
+    });
+  }
+
+  /* Edição inline de baixo impacto: mantém o contexto do card, com confirmação
+     explícita, Escape para cancelar e feedback local de salvamento. */
+  function projectTitleInitials(name){
+    return name.trim().split(/\s+/).slice(0,2).map(function(part){return part.charAt(0)}).join('').toUpperCase();
+  }
+  function projectTitleDisplay(pid,name){
+    var title=document.createElement('b');
+    title.textContent=name;
+    title.setAttribute('data-project-title',pid);
+    title.setAttribute('role','button');title.setAttribute('tabindex','0');
+    title.setAttribute('aria-label','Editar título do projeto '+name);
+    title.setAttribute('title','Clique para editar o título');
+    return title;
+  }
+  function wireProjectTitleEditors(scope){
+    var rootScope=scope||document;
+    rootScope.querySelectorAll('.proj-card[data-project-id]').forEach(function(card){
+      var title=card.querySelector('.proj-title>b:not([data-project-title])');
+      if(title)title.replaceWith(projectTitleDisplay(card.getAttribute('data-project-id'),title.textContent.trim()));
+    });
+  }
+  function syncProjectTitleEverywhere(pid,name){
+    if(!PROJECTS[pid])return;
+    PROJECTS[pid].name=name;PROJECTS[pid].short=name;
+    $$('[data-project-id="'+pid+'"]').forEach(function(card){
+      var current=card.querySelector('[data-project-title],.project-title-inline');
+      if(current)current.replaceWith(projectTitleDisplay(pid,name));
+      var icon=card.querySelector('.proj-ico');if(icon)icon.textContent=projectTitleInitials(name);
+    });
+    renderJornada();renderAprov();renderHomeV29();renderOpps();
+    if(typeof renderInicioZero==='function')renderInicioZero();
+    wireProjectTitleEditors();
+  }
+  function beginProjectTitleEdit(trigger){
+    if(!trigger||trigger.closest('.project-title-inline'))return;
+    var pid=trigger.getAttribute('data-project-title'),original=PROJECTS[pid]&&PROJECTS[pid].name||trigger.textContent.trim();
+    var form=document.createElement('form');form.className='project-title-inline';form.setAttribute('novalidate','');
+    form.innerHTML='<label class="sr-only" for="projectTitleInput-'+pid+'">Título do projeto</label><input id="projectTitleInput-'+pid+'" maxlength="120" autocomplete="off"><button type="submit" class="project-title-ok" aria-label="Salvar título">✓</button><button type="button" class="project-title-cancel" aria-label="Cancelar edição">×</button><span class="project-title-feedback" role="status" aria-live="polite"></span>';
+    trigger.replaceWith(form);
+    var input=form.querySelector('input'),feedback=form.querySelector('.project-title-feedback');input.value=original;input.focus();input.select();
+    function cancel(){form.replaceWith(projectTitleDisplay(pid,original))}
+    form.querySelector('.project-title-cancel').addEventListener('click',cancel);
+    input.addEventListener('keydown',function(e){if(e.key==='Escape'){e.preventDefault();cancel()}});
+    form.addEventListener('submit',function(e){
+      e.preventDefault();var value=input.value.trim();
+      if(!value){feedback.textContent='Digite um título para salvar.';input.setAttribute('aria-invalid','true');input.focus();return}
+      syncProjectTitleEverywhere(pid,value);
+      var saved=document.querySelector('[data-project-id="'+pid+'"] [data-project-title]');
+      if(saved){saved.classList.add('project-title-saved');saved.focus();setTimeout(function(){saved.classList.remove('project-title-saved')},1600)}
+    });
+  }
+  (function prepareProjectTitleEditing(){
+    var ids=Object.keys(PROJECTS);
+    $$('#projListStaticWrap .proj-card').forEach(function(card,index){if(ids[index])card.setAttribute('data-project-id',ids[index])});
+    wireProjectTitleEditors();
+  })();
+  document.addEventListener('click',function(e){var title=e.target.closest('[data-project-title]');if(title)beginProjectTitleEdit(title)});
+  document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-project-title]')){e.preventDefault();beginProjectTitleEdit(e.target)}});
+
+  /* Laboratório de resultado: uma amostra navegável, não uma promessa abstrata. */
+  var resultLab=$('#resultLab'),resultLabScrim=$('#resultLabScrim'),resultLabInner=$('#resultLabInner'),resultLabReturn=null;
+  function resultExampleConfig(a){
+    var cfg={
+      rico:{title:'Radar de oportunidades aderentes',lead:'Uma leitura priorizada de oportunidades, prazo e aderência ao seu projeto.',kpis:[['Melhor match','92%'],['Oportunidades','3'],['Prazo mais próximo','25 dias']],rows:[['FINEP Mais Inovação','92%','25 dias'],['EMBRAPII - Energia','78%','42 dias'],['Sebrae Capital Empreendedor','71%','Aberto']]},
+      iris:{title:'Diagnóstico de elegibilidade',lead:'O que já sustenta a candidatura e o que vale fortalecer antes de avançar.',kpis:[['Elegibilidade','Alta'],['Critérios atendidos','8 de 10'],['Prioridade','2 ajustes']],rows:[['Problema e solução','Atende','Consolidar evidência'],['Impacto','Atende','Quantificar meta'],['Equipe','Parcial','Incluir competências']]},
+      ada:{title:'Projeto estruturado para submissão',lead:'Uma primeira versão organizada para revisão humana, com lacunas claramente sinalizadas.',kpis:[['Seções estruturadas','7'],['Campos a revisar','4'],['Prontidão','68%']],rows:[['Resumo executivo','Estruturado','Revisar números'],['Metodologia','Estruturado','Adicionar cronograma'],['Orçamento','Pendente','Validar custos']]}
+    };
+    return cfg[a.k]||{title:'Resultado de '+a.name,lead:a.benefit,kpis:[['Status','Concluído'],['Foco',a.role],['Próximo passo','Revisar']],rows:[['Leitura principal','Mapeada','Validar com você'],['Evidências','Organizadas','Aprofundar'],['Recomendação','Disponível','Decidir próximo passo']]};
+  }
+  function closeResultLab(){
+    if(resultLab.classList.contains('open'))unlockPageScroll();
+    resultLab.classList.remove('open');resultLab.setAttribute('aria-hidden','true');resultLabScrim.classList.remove('show');
+    if(resultLabReturn&&resultLabReturn.focus)resultLabReturn.focus();
+  }
+  function openResultLab(i,source){
+    var a=AGD[i],c=resultExampleConfig(a),hasProjects=Object.keys(PROJECTS).length>0;
+    resultLabReturn=source||document.activeElement;
+    resultLabInner.innerHTML='<div class="result-lab-shell" style="--accent:var(--c-'+a.k+')">'+
+      '<main class="result-lab-main" id="resultLabScroll"><div class="result-lab-head"><div><span class="result-eyebrow">Exemplo navegável - '+a.name+'</span><h2 id="resultLabTitle">'+c.title+'</h2><p>Simulação de como o resultado chega para você.</p></div><button class="result-lab-close" data-result-lab-close aria-label="Fechar exemplo">✕</button></div>'+ 
+      '<article class="result-document"><section class="result-doc-hero" data-result-chapter="resumo"><span class="result-eyebrow">Visão executiva</span><h3>'+c.title+'</h3><p>'+c.lead+'</p></section>'+ 
+      '<div class="result-kpis">'+c.kpis.map(function(k){return '<div class="result-kpi"><small>'+k[0]+'</small><b>'+k[1]+'</b></div>'}).join('')+'</div>'+ 
+      '<section class="result-section" data-result-chapter="evidencias"><span class="result-eyebrow">Evidências e análise</span><h3>O que sustenta esta leitura</h3><p>O resultado reúne dados úteis para a sua decisão, sem esconder os pontos que ainda precisam evoluir.</p><table class="result-table"><thead><tr><th>Item</th><th>Status</th><th>Próxima leitura</th></tr></thead><tbody>'+c.rows.map(function(r){return '<tr><td>'+r[0]+'</td><td class="result-score">'+r[1]+'</td><td>'+r[2]+'</td></tr>'}).join('')+'</tbody></table></section>'+ 
+      '<section class="result-section" data-result-chapter="proximo"><span class="result-eyebrow">Próximo passo</span><h3>Como transformar a análise em avanço</h3><div class="result-next"><strong>Recomendação personalizada</strong><p>Use esta leitura para escolher o próximo agente ou revisar o ponto pendente antes de seguir na jornada.</p></div><ul><li>Salve a leitura no histórico da ideia/projeto.</li><li>Revise os pontos pendentes antes da submissão.</li><li>Avance somente quando fizer sentido para você.</li></ul></section></article></main>'+ 
+      '<aside class="result-lab-aside"><h3>Guia desta amostra</h3><div class="result-legend" id="resultLegend"><b>Visão executiva</b><p>Comece pelo que importa para decidir se vale avançar.</p></div><nav class="result-lab-nav" aria-label="Navegar pelo exemplo"><button class="active" data-result-go="resumo">1. Visão executiva</button><button data-result-go="evidencias">2. Evidências e análise</button><button data-result-go="proximo">3. Próximo passo</button></nav>'+ 
+      (hasProjects?'<button class="btn-primary result-lab-cta" data-result-run="'+a.k+'">'+agentActionHTML(a)+'</button>':'<button class="btn-primary result-lab-cta free-project-cta-empty" data-result-register>Cadastrar ideia/projeto <span class="free-action-badge">Grátis</span></button>')+'</aside></div>';
+    if(!resultLab.classList.contains('open'))lockPageScroll();
+    resultLab.classList.add('open');resultLab.setAttribute('aria-hidden','false');resultLabScrim.classList.add('show');
+    var scroll=$('#resultLabScroll'),legend=$('#resultLegend');
+    var notes={resumo:['Visão executiva','Comece pelo que importa para decidir se vale avançar.'],evidencias:['Evidências e análise','Veja o que sustenta a leitura e os pontos que precisam de atenção.'],proximo:['Próximo passo','Converta a análise em uma ação objetiva para a sua ideia/projeto.']};
+    function setChapter(key){legend.innerHTML='<b>'+notes[key][0]+'</b><p>'+notes[key][1]+'</p>';$$('[data-result-go]').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-result-go')===key)})}
+    $$('.result-lab [data-result-go]').forEach(function(b){b.addEventListener('click',function(){var key=b.getAttribute('data-result-go');var target=resultLab.querySelector('[data-result-chapter="'+key+'"]');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});setChapter(key)})});
+    if(window.IntersectionObserver){var io=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting)setChapter(entry.target.getAttribute('data-result-chapter'))})},{root:scroll,threshold:.55});$$('.result-lab [data-result-chapter]').forEach(function(el){io.observe(el)})}
+    resultLab.querySelector('[data-result-lab-close]').addEventListener('click',closeResultLab);
+    var register=resultLab.querySelector('[data-result-register]');if(register)register.addEventListener('click',function(){closeResultLab();npSetMode('zero');syncNpSlotsLabel();open($('#newProjModal'))});
+    var run=resultLab.querySelector('[data-result-run]');if(run)run.addEventListener('click',function(){closeResultLab();openRun(a.k)});
+    setTimeout(function(){resultLab.querySelector('.result-lab-close').focus()},0);
+  }
+  resultLabScrim.addEventListener('click',closeResultLab);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&resultLab.classList.contains('open'))closeResultLab()});
+
   var agDrawer=$('#agDrawer'),agScrim=$('#agScrim'),agInner=$('#agDrawerInner');
-  function closeDrawer(){agDrawer.classList.remove('open');agScrim.classList.remove('show')}
-  function openDrawer(i){
+  function agentIndexByKey(key){return AGD.findIndex(function(a){return a.k===key})}
+  function faqForMode(a){
+    if(!isMvpMode)return a.faq;
+    var betaFaqs={
+      rico:[
+        ['Como uso o Rico no Acesso Beta Antecipado?','Cadastre uma ideia/projeto e escolha quando executar o scan. Antes da confirmação, você sempre vê o custo em fichas.'],
+        ['Por que o custo varia entre 1 e 3 fichas?','1 ficha busca oportunidades para uma ideia/projeto. O custo pode chegar a 3 fichas quando você escolhe analisar um lote de projetos.'],
+        ['O que acontece depois do scan?','As oportunidades encontradas aparecem na área de Oportunidades e o próximo passo recomendado é atualizado nas Aprovações.']
+      ],
+      iris:[
+        ['O diagnóstico garante aprovação?','Não. A Íris mostra forças, riscos e o que vale reforçar antes de investir na escrita. A decisão final é sempre humana.'],
+        ['Quando devo rodar a Íris?','Depois de cadastrar uma ideia/projeto, para entender seu potencial de captação e orientar os próximos passos.'],
+        ['O que acontece depois do diagnóstico?','Com as informações da Íris, a MonyU reanalisa a jornada e pode recomendar a Ada para estruturar a escrita do projeto.']
+      ],
+      ada:[
+        ['Por que a revisão humana é obrigatória?','A Ada estrutura a primeira versão, mas você revisa cada trecho antes de qualquer submissão. Nada é enviado automaticamente.'],
+        ['O que recebo ao concluir a elaboração?','Um workspace interno do projeto, organizado por seções, para revisar, editar e copiar os trechos para o formulário oficial.'],
+        ['Posso ajustar o texto antes de submeter?','Sim. Você pode revisar e editar o material no workspace. Mudanças relevantes pedem uma nova análise antes do envio.']
+      ]
+    };
+    return betaFaqs[a.k]||a.faq;
+  }
+  function wireAgentDetailCards(scope){
+    (scope||document).querySelectorAll('.agent').forEach(function(card){
+      var action=card.querySelector('[data-agent]');
+      if(!action||card.hasAttribute('data-agent-detail'))return;
+      card.setAttribute('data-agent-detail',action.getAttribute('data-agent'));
+      action.setAttribute('data-agent-detail-cta','');
+      var key=action.getAttribute('data-agent'),agent=AG[key];
+      if(agent){
+        action.innerHTML='Conhecer '+agent.name;
+        decorateSingleAgentCta(action,key);
+      }
+      card.setAttribute('tabindex','0');card.setAttribute('role','button');
+      card.setAttribute('aria-label','Ver detalhes de '+action.getAttribute('data-agent'));
+    });
+  }
+  wireAgentDetailCards();
+  document.addEventListener('click',function(e){
+    var card=e.target.closest('[data-agent-detail]');
+    if(!card||e.target.closest('button,a,input,label'))return;
+    var idx=agentIndexByKey(card.getAttribute('data-agent-detail'));
+    if(idx>-1)openDrawer(idx);
+  });
+  document.addEventListener('keydown',function(e){
+    if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-agent-detail]')){
+      e.preventDefault();var idx=agentIndexByKey(e.target.getAttribute('data-agent-detail'));if(idx>-1)openDrawer(idx);
+    }
+  });
+  function closeDrawer(){if(agDrawer.classList.contains('open'))unlockPageScroll();agDrawer.classList.remove('open');agScrim.classList.remove('show')}
+  function canonicalRunSection(a,ctxProj){
+    if(a.soon)return '';
+    var variants=AG_VARIANTS[a.k],variantHtml='';
+    if(variants){
+      var options=variants.map(function(v){return '<option value="'+v.id+'">'+v.label+' · '+v.cost+' fichas</option>'}).join('');
+      variantHtml='<div class="form-field" id="runVariantField"><label for="runVariant">Qual entrega você quer?</label><select id="runVariant">'+options+'</select></div>';
+    }
+    return '<section class="dsec canonical-run-config" aria-labelledby="canonicalRunTitle">'+
+      '<h4 id="canonicalRunTitle">Rodar para quais projetos?</h4>'+variantHtml+
+      '<div class="run-proj-list" id="runProjList">'+runProjItems(a.k,ctxProj||'')+'</div>'+ 
+      '<div class="canonical-run-cost"><div class="canonical-run-cost-head"><b>Custo desta execução</b><strong><span class="ficha-coin" aria-hidden="true">M</span> <span id="runCost">-</span></strong></div>'+ 
+        '<p id="runPricingNote"></p><div class="canonical-run-balance"><span>Saldo: <b id="runSaldo">'+saldo+'</b> → <b id="runAfter">-</b> fichas</span><span id="runSources"></span></div></div>'+ 
+    '</section>';
+  }
+  function openDrawer(i,ctxProj){
     var a=AGD[i];
+    pendAgent=a.name;pendKey=a.k;
+    if(runModal&&runModal.isConnected)runModal.remove();
+    if(runScrim&&runScrim.isConnected)runScrim.remove();
     agDrawer.style.setProperty('--ac','var(--c-'+a.k+')');
     agDrawer.classList.add('agent-detail-colored');
     var histHtml=a.hist.length
@@ -2985,26 +3332,41 @@
         /* classe em vez de style inline: grid-template-columns inline vence
    qualquer media query (especificidade de atributo style), e por isso
    estas duas grades continuavam com 2 colunas mesmo a 320px */
-'<div class="key-stats ks2" style="margin-bottom:1.15rem">'+
+        '<div class="key-stats ks2" style="margin-bottom:1.15rem">'+
           '<div class="kstat"><small>Custo</small><b>'+agentCostHTML(a)+'</b></div>'+
           '<div class="kstat"><small>Tempo médio</small><b>'+a.time+'</b></div>'+
         '</div>'+
+        canonicalRunSection(a,ctxProj)+
         '<div class="dsec"><h4>O que '+(a.k==='banca'?'a banca faz':a.name+' faz')+' por você</h4><ul class="yes">'+a.does.map(function(d){return '<li>'+d+'</li>'}).join('')+'</ul></div>'+
         (a.nots.length?'<div class="dsec"><h4>O que fica fora (expectativa alinhada)</h4><ul class="no">'+a.nots.map(function(d){return '<li>'+d+'</li>'}).join('')+'</ul></div>':'')+
         '<div class="dsec"><h4>Histórico com você</h4><div class="dhist">'+histHtml+'</div></div>'+
         sourcesSec(a)+relSec(a)+autonomySec(a)+
         '<div class="dsec dfaq"><h4>Perguntas frequentes</h4>'+
-          a.faq.map(function(f){return '<details><summary>'+f[0]+'</summary><p>'+f[1]+'</p></details>'}).join('')+
+          faqForMode(a).map(function(f){return '<details><summary>'+f[0]+'</summary><p>'+f[1]+'</p></details>'}).join('')+
         '</div>'+
       '</div>'+
       '<div class="drawer-foot">'+
         (a.soon
           ? '<button class="btn-ghost" data-toast="Anotado! Vamos te avisar quando '+a.name+' for lançado. (demo)">🔔 Avisar-me quando chegar</button>'
-          : '<button class="btn-primary" data-agent="'+a.k+'">'+agentActionHTML(a)+'</button>'+
-            '<button class="btn-ghost" data-toast="Exemplo de resultado de '+a.name+' - em breve no piloto (demo)">Ver exemplo de resultado</button>')+
+          : '<button class="btn-primary" id="runConfirm">Confirmar e executar</button>'+
+            '<button class="btn-ghost" data-agent-example="'+i+'">Ver exemplo de resultado</button>')+
       '</div>';
+    if(!agDrawer.classList.contains('open'))lockPageScroll();
     agDrawer.classList.add('open');agScrim.classList.add('show');
     agInner.querySelector('#dClose').addEventListener('click',closeDrawer);
+    if(!a.soon){
+      runHost=agInner;
+      var canonicalVariant=agInner.querySelector('#runVariant');
+      if(canonicalVariant){
+        pendVariant=canonicalVariant.value;
+        canonicalVariant.addEventListener('change',function(){pendVariant=this.value;updateRunState()});
+      }else pendVariant=null;
+      wireRunProjEvents();
+      updateRunState();
+      agInner.querySelector('#runConfirm').addEventListener('click',confirmRun);
+    }
+    var exampleBtn=agInner.querySelector('[data-agent-example]');
+    if(exampleBtn)exampleBtn.addEventListener('click',function(){openResultLab(i,exampleBtn)});
     agInner.querySelectorAll('.t-view').forEach(function(b){
       b.addEventListener('click',function(){
         if(a.k==='ada'){closeDrawer();openWs()}
@@ -3152,6 +3514,10 @@
   var AUT_LVL={rico:2,iris:2,ada:1,aurora:1,kai:1,mike:1};
   var AUT_BUDGET={rico:10,iris:20};
   function autonomySec(a){
+    /* Acesso Beta Antecipado: não expõe os níveis de autonomia por agente.
+       O cliente decide cada execução pelas Aprovações; a escada N1-N4 fica
+       reservada à versão completa. */
+    if(isMvpMode)return '';
     if(a.soon)return '<div class="dsec"><h4>Você no comando (autonomia)</h4><p style="font-size:.74rem;color:var(--text-3)">Os níveis de autonomia ficam disponíveis no lançamento do agente.</p></div>';
     var max=AUT_MAX[a.k]||2,cur=AUT_LVL[a.k]||1,rows='';
     for(var l=1;l<=4;l++){
@@ -3192,8 +3558,9 @@
      roda 1x no boot (demo populada, usa o nome do p1) ou 1x na criação do projeto (modo
      conta nova). Depois disso ressincroniza .orig/.stOrig para o fluxo de edição/revert
      já existente do workspace continuar funcionando normalmente. */
+  var WS_BASE_TEXTS=WS_SECS.map(function(s){return s.tx});
   function wsApplyProjName(name){
-    WS_SECS.forEach(function(s){s.tx=s.tx.split('{{PROJETO}}').join(name);s.orig=s.tx;s.stOrig=s.st});
+    WS_SECS.forEach(function(s,i){s.tx=WS_BASE_TEXTS[i].split('{{PROJETO}}').join(name);s.orig=s.tx;s.stOrig=s.st});
   }
   if(!isFreshAccountMode)wsApplyProjName(PROJECTS.p1.name);
   /* Modo conta nova: o token só é substituído quando o cliente cadastra o projeto
@@ -3265,7 +3632,16 @@
     var dn=e.target.closest('[data-done]');
     if(dn){renderWs()}
   });
-  function openWs(){wsDirty=false;renderWs();ws.classList.add('open');document.body.style.overflow='hidden';document.documentElement.style.overflow='hidden'}
+  function openWs(pid){
+    var project=PROJECTS[pid]||PROJECTS.p1;
+    if(project){
+      wsApplyProjName(project.name);
+      var title=$('#wsProjectName'),meta=$('#wsProjectMeta');
+      if(title)title.textContent=project.name;
+      if(meta)meta.textContent='Projeto elaborado pela Ada · revise e copie cada seção antes da submissão';
+    }
+    wsDirty=false;renderWs();ws.classList.add('open');document.body.style.overflow='hidden';document.documentElement.style.overflow='hidden'
+  }
   function closeWs(){ws.classList.remove('open');document.body.style.overflow='';document.documentElement.style.overflow=''}
   function attemptCloseWs(){
     if(wsDirty){open($('#wsExitModal'))}
@@ -3287,6 +3663,10 @@
   document.addEventListener('click',function(e){
     var t=e.target.closest('[data-ws]');
     if(t)openWs();
+  });
+  document.addEventListener('click',function(e){
+    var t=e.target.closest('[data-ws-project]');
+    if(t){e.preventDefault();openWs(t.getAttribute('data-ws-project'))}
   });
   document.addEventListener('keydown',function(e){
     if(e.key==='Escape'&&ws.classList.contains('open')&&!$('#wsExitModal').classList.contains('open')){attemptCloseWs()}
@@ -3584,7 +3964,7 @@
   }
   renderPrest();
   var prDrawer=$('#prDrawer'),prScrim=$('#prScrim'),prInner=$('#prInner');
-  function closePr(){prDrawer.classList.remove('open');prScrim.classList.remove('show')}
+  function closePr(){if(prDrawer.classList.contains('open'))unlockPageScroll();prDrawer.classList.remove('open');prScrim.classList.remove('show')}
   function openPr(i){
     var pr=PREST[i];
     prInner.innerHTML=
@@ -3618,6 +3998,7 @@
           :'<button class="btn-primary" data-conn="'+i+'">Solicitar conexão</button>')+
         '<button class="btn-ghost" data-toast="Perfis salvos - em breve no piloto (demo)">☆ Salvar</button>'+
       '</div>';
+    if(!prDrawer.classList.contains('open'))lockPageScroll();
     prDrawer.classList.add('open');prScrim.classList.add('show');
     prInner.querySelector('#prClose').addEventListener('click',closePr);
   }
@@ -4042,7 +4423,7 @@
   }
   var OB_STEPS=[
     {h:'Você acaba de ganhar uma equipe 👋',
-     b:'<div class="ob-hero"><svg width="84" height="84" aria-hidden="true"><use href="#monyu-symbol"/></svg></div>'+
+     b:'<div class="ob-hero"><a href="https://www.monyu.com.br" target="_blank" rel="noopener noreferrer" aria-label="Abrir o site oficial da MonyU em nova janela"><svg width="84" height="84" aria-hidden="true"><use href="#monyu-symbol"/></svg></a></div>'+
        '<p>A <b>MonyU</b> é um time de <b>14 agentes de IA</b> que trabalha a sua captação de recursos - de achar a oportunidade certa a deixar o projeto escrito e pronto para você enviar. <b>Você comanda; eles executam.</b></p>'+
        '<div class="ob-team" id="obTeamRow"></div>'},
     {h:'Fichas: a moeda do seu time 🪙',
@@ -4056,7 +4437,7 @@
        '<div class="ob-note">O documento final fica pronto na tela, seção por seção, para você revisar e colar no formulário oficial do edital.</div>'},
     {h:'Descobrir - onde está o dinheiro e o que vale perseguir 🔍',
      b:'<div class="ob-cards">'+
-       obAgent('rico','Rico','Vigia centenas de fontes de fomento, calcula o match e mostra um checklist objetivo de premissas do edital: o que o seu projeto já cumpre e o que falta.','Você nunca mais perde um edital - nem um prazo.','1 a 3 fichas por scan','on')+
+       obAgent('rico','Rico','Vigia milhares de fontes de fomento do país, calcula o match e mostra um checklist objetivo de premissas do edital: o que o seu projeto já cumpre e o que falta.','Você nunca mais perde um edital - nem um prazo.','1 a 3 fichas por scan','on')+
        obAgent('aurora','Aurora','Mapa estratégico completo: mercado, tendências e tese de captação.','A foto do potencial do seu negócio.','15 fichas por discovery','on')+
        obAgent('romeu','Romeu','Pesquisa novas aplicações da sua solução e monta o roadmap pelos 3 horizontes de crescimento.','Deixa de esperar edital aparecer - você cria o próprio pipeline.','15 fichas por geração','em desenvolvimento')+
        obAgent('mike','Mike','Dinheiro além da subvenção: incentivo fiscal, investimento, capital de risco e fomento internacional.','Mais de um caminho para financiar a mesma ideia.','10 fichas por tese','beta')+
@@ -4137,7 +4518,7 @@
   ];
   if(isMvpMode)OB_STEPS=[
     {h:'Bem-vindo ao Acesso Beta Antecipado',
-     b:'<div class="ob-hero"><svg width="84" height="84" aria-hidden="true"><use href="#monyu-symbol"/></svg></div><p>Nesta fase, você terá acesso a Rico, Íris e Ada. O primeiro passo é cadastrar a ideia/projeto que você quer captar. É gratuito e leva poucos minutos.</p><div class="ob-note">Com nome, tema e um resumo, o Rico já consegue começar a procurar oportunidades aderentes.</div><div style="display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap"><button class="btn-primary" id="obZeroBtn" style="flex:1">Cadastrar meu projeto</button><button class="btn-ghost" id="obContinueBtn" style="flex:1">Conhecer o acesso</button></div>'},
+     b:'<div class="ob-hero"><a href="https://www.monyu.com.br" target="_blank" rel="noopener noreferrer" aria-label="Abrir o site oficial da MonyU em nova janela"><svg width="84" height="84" aria-hidden="true"><use href="#monyu-symbol"/></svg></a></div><p>Nesta fase, você terá acesso a Rico, Íris e Ada. O primeiro passo é cadastrar a ideia/projeto que você quer captar. É gratuito e leva poucos minutos.</p><div class="ob-note">Com nome, tema e um resumo, o Rico já consegue começar a procurar oportunidades aderentes.</div><div style="display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap"><button class="btn-primary" id="obZeroBtn" style="flex:1">Cadastrar meu projeto</button><button class="btn-ghost" id="obContinueBtn" style="flex:1">Conhecer os 3 agentes</button></div>'},
     {h:'Encontre, decida e elabore',
      b:'<div class="ob-cards">'+obAgent('rico','Rico','Encontra oportunidades aderentes ao seu projeto.','Comece pelo edital certo.','1 a 3 fichas por rodada','on')+obAgent('iris','Íris','Mostra se vale a pena competir antes da escrita.','Decida com clareza.','5 fichas por projeto','on')+obAgent('ada','Ada','Elabora o projeto no formato do edital.','Revise antes de submeter.','20 fichas por projeto','beta')+'</div><div class="ob-note">A Ada prepara o material. A submissão continua sob seu controle.</div>'},
     {h:'Fichas e planos continuam valendo',
@@ -4190,7 +4571,17 @@
     }
   }
   function openOb(i){obIdx=i||0;renderOb();obOv.classList.add('open');document.body.style.overflow='hidden';document.documentElement.style.overflow='hidden'}
-  function finishOb(completed){if(obLvlTimer){clearInterval(obLvlTimer);obLvlTimer=null}obOv.classList.remove('open');document.body.style.overflow='';document.documentElement.style.overflow='';store.set('onboarded','1');if(completed&&typeof rwUnlock==='function')rwUnlock('boasvindas');if(completed)mvpCelebrate('tutorial','Tutorial concluído!','Você já conhece o caminho básico do Acesso Beta Antecipado e pode revê-lo em Ajuda & FAQ.','✅')}
+  function finishOb(completed){
+    if(obLvlTimer){clearInterval(obLvlTimer);obLvlTimer=null}
+    obOv.classList.remove('open');
+    document.body.style.overflow='';document.documentElement.style.overflow='';
+    // O tutorial é uma camada de entrada, não uma âncora da Home: ao fechá-lo,
+    // a pessoa sempre vê o topo completo, com busca, fichas e navegação.
+    requestAnimationFrame(function(){window.scrollTo({top:0,left:0,behavior:'auto'})});
+    store.set('onboarded','1');
+    if(completed&&typeof rwUnlock==='function')rwUnlock('boasvindas');
+    if(completed)mvpCelebrate('tutorial','Tutorial concluído!','Você já conhece o caminho básico do Acesso Beta Antecipado e pode revê-lo em Ajuda & FAQ.','✅')
+  }
   $('#obNext').addEventListener('click',function(){if(obIdx<OB_STEPS.length-1){obIdx++;renderOb()}});
   $('#obPrev').addEventListener('click',function(){if(obIdx>0){obIdx--;renderOb()}});
   $('#obSkip').addEventListener('click',function(){finishOb(false);toast('Tutorial disponível a qualquer momento em Ajuda & FAQ.')});

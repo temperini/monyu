@@ -54,7 +54,7 @@
   <!-- ================= SIDEBAR ================= -->
   <nav class="sidebar" id="sidebar" aria-label="Navegação principal">
     <div class="logo-row">
-      <button class="logo" id="logoBtn" data-nav="inicio" aria-label="Ir para o início" data-tip="Início">
+      <button class="logo" id="logoBtn" type="button" aria-label="Expandir menu lateral" data-tip="Expandir menu">
         <span class="logo-badge">
           <svg class="logo-ico" aria-hidden="true"><use href="#monyu-symbol"/></svg>
           <span class="logo-expand-ico" aria-hidden="true">
@@ -309,7 +309,6 @@
           <div>
             <h1 id="greeting">Boa tarde, <em>Evandro</em>
               <span class="plan-badge">Plano Starter</span>
-              <span class="demo-badge" data-tip="Dados ilustrativos do piloto - sem conexão com sistemas reais">◈ demo</span>
             </h1>
           </div>
           <button class="btn-ghost" id="btnResumo">
@@ -573,7 +572,7 @@
              financeiro. Oferta comercial nao pode disputar atencao com o que o
              usuario veio fazer. -->
         <div class="banner banner-promo hidden" id="promoBanner" role="status">
-          <svg class="av" aria-hidden="true"><use href="#monyu-symbol"/></svg>
+          <a href="https://www.monyu.com.br" target="_blank" rel="noopener noreferrer" aria-label="Abrir o site oficial da MonyU em nova janela"><svg class="av" aria-hidden="true"><use href="#monyu-symbol"/></svg></a>
           <div class="banner-body">
             <b>🎉 Lançamento da plataforma: 50% de desconto em todos os agentes</b>
             <p id="promoBannerSub"></p>
@@ -621,7 +620,7 @@
         <p style="font-size:.75rem;color:var(--text-3);line-height:1.6;max-width:900px">
           Os agentes da MonyU são assistentes de IA e podem cometer erros. Projetos elaborados pela Ada exigem
           revisão humana antes da submissão. A MonyU não garante aprovação em editais via plataforma self-service.
-          Para acompanhamento especialista de ponta a ponta, conheça a <a href="#" data-toast="Assessoria MonyU: setup + success fee sobre o captado">Assessoria MonyU</a>.
+          Para acompanhamento especialista de ponta a ponta, conheça a <a href="https://www.monyu.com.br" target="_blank" rel="noopener noreferrer">Assessoria MonyU</a>.
         </p>
       </section>
 
@@ -677,8 +676,8 @@
       <section class="view" id="view-projetos" aria-label="Meus projetos">
         <div class="hero">
           <div>
-            <div class="page-title">Meus projetos <span class="demo-badge">◈ demo</span></div>
-            <p class="page-sub" id="projSub">4 de 5 projetos do plano Starter · cadastro e importação de projetos existentes são gratuitos</p>
+            <div class="page-title">Meus projetos</div>
+            <p class="page-sub" id="projSub">4 ideias/projetos cadastrados · cadastro e importação são gratuitos</p>
           </div>
           <button class="btn-primary" id="btnNewProj">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
@@ -721,7 +720,7 @@
             <div class="proj-meta">
               <div>Valor pleiteado<b>R$ 3,2 mi</b></div>
               <div>Prazo de submissão<b>28 jul · 25 dias</b></div>
-              <div>Fichas investidas<b>24</b></div>
+              <div title="Total de fichas consumidas pelos agentes nesta ideia/projeto">Fichas usadas no projeto<b>24</b></div>
               <div>Match com o edital<b style="color:var(--ok-text)">92%</b></div>
             </div>
             <div class="proj-actions">
@@ -751,7 +750,7 @@
             <div class="proj-meta">
               <div>Melhor oportunidade<b>FUNCAP · 78%</b></div>
               <div>Prazo mais próximo<b>15 jul · 12 dias</b></div>
-              <div>Fichas investidas<b>6</b></div>
+              <div title="Total de fichas consumidas pelos agentes nesta ideia/projeto">Fichas usadas no projeto<b>6</b></div>
               <div>Diagnóstico Íris<b style="color:var(--ok-text)">Potencial alto</b></div>
             </div>
             <div class="proj-actions">
@@ -780,7 +779,7 @@
             <div class="proj-meta">
               <div>Valor pleiteado<b>R$ 780 mil</b></div>
               <div>Resultado previsto<b>set/2026</b></div>
-              <div>Fichas investidas<b>31</b></div>
+              <div title="Total de fichas consumidas pelos agentes nesta ideia/projeto">Fichas usadas no projeto<b>31</b></div>
               <div>Nota simulada (A Banca)<b style="color:var(--ok-text)">8,4 / 10</b></div>
             </div>
             <div class="proj-actions">
@@ -798,14 +797,22 @@
               </div>
               <span class="stage-chip draft-chip">Rascunho</span>
             </div>
+            <div class="stepper project-stepper" role="list" aria-label="Jornada da ideia/projeto">
+              <div class="step current" role="listitem"><span class="step-dot">1</span><span class="step-name">Rico</span><span class="step-desc">Próximo recomendado</span></div>
+              <div class="step" role="listitem"><span class="step-dot">2</span><span class="step-name">Íris</span><span class="step-desc">Diagnóstico de elegibilidade</span></div>
+              <div class="step" role="listitem"><span class="step-dot">3</span><span class="step-name">Documentação</span><span class="step-desc">Informações do projeto</span></div>
+              <div class="step" role="listitem"><span class="step-dot">4</span><span class="step-name">Ada</span><span class="step-desc">Elaboração do projeto</span></div>
+              <div class="step" role="listitem"><span class="step-dot">5</span><span class="step-name">A Banca</span><span class="step-desc">Avaliação simulada</span></div>
+              <div class="step" role="listitem"><span class="step-dot">6</span><span class="step-name">Submissão</span><span class="step-desc">Revisão humana</span></div>
+            </div>
             <div class="proj-meta">
-              <div>Próximo passo<b>Rodar Rico (radar)</b></div>
-              <div>Fichas investidas<b>0</b></div>
+              <div title="Total de fichas consumidas pelos agentes nesta ideia/projeto">Fichas usadas no projeto<b>0</b></div>
               <div>Maturidade<b>Ideia estruturada</b></div>
             </div>
-            <div class="proj-actions">
-              <button class="btn-primary" data-agent="rico" style="font-size:.84rem">Buscar oportunidades · 1 ficha</button>
-              <button class="btn-ghost" data-agent="kai" data-proj="p4">Validar com Kai · 6 fichas</button>
+            <div class="proj-actions project-next-actions">
+              <div class="project-next-intro"><b>Próximos agentes recomendados</b><span>Comece pelo Rico para encontrar oportunidades e use a Íris para validar a elegibilidade.</span></div>
+              <button class="btn-primary project-agent-action project-agent-primary" data-agent="rico" data-proj="p4"><span><strong>Começar com Rico</strong><small>Buscar oportunidades aderentes</small></span><em>1 ficha</em></button>
+              <button class="btn-ghost project-agent-action" data-agent="iris" data-proj="p4"><span><strong>Também recomendado: Íris</strong><small>Diagnosticar a elegibilidade</small></span><em>5 fichas</em></button>
               <button class="btn-ghost" data-toast="Edição dos dados do projeto - em breve no piloto">Editar dados</button>
             </div>
           </article>
@@ -818,7 +825,7 @@
       <section class="view" id="view-radar" aria-label="Oportunidades">
         <div class="hero">
           <div>
-            <div class="page-title">Oportunidades <span style="font-size:.80rem;color:var(--c-rico);font-weight:700">● by Rico</span> <span class="demo-badge">◈ demo</span></div>
+            <div class="page-title">Oportunidades <span style="font-size:.80rem;color:var(--c-rico);font-weight:700">● by Rico</span></div>
             <p class="page-sub" id="oppPageSub">6 oportunidades ativas com match para as suas ideias/projetos · último scan: hoje, 08:12</p>
           </div>
           <button class="btn-primary" data-agent="rico">
@@ -855,7 +862,7 @@
       <section class="view" id="view-agentes" aria-label="Meus Agentes">
         <div class="hero">
           <div>
-            <div class="page-title">Meus Agentes <span class="demo-badge">◈ demo</span></div>
+            <div class="page-title">Meus Agentes</div>
             <p class="page-sub" id="agentesPageSub">Sua equipe de IA trabalhando pela sua captação, 6 ativos e 8 a caminho</p>
           </div>
         </div>
@@ -895,7 +902,7 @@
       <section class="view" id="view-conhecimento" aria-label="Memória">
         <div class="hero">
           <div>
-            <div class="page-title">Memória <span class="demo-badge">◈ demo</span></div>
+            <div class="page-title">Memória</div>
             <p class="page-sub">Documentos organizados por projeto ou globais - os contextos nunca se misturam</p>
           </div>
           <button class="btn-primary" id="btnKbAdd">
@@ -953,7 +960,7 @@
       <section class="view" id="view-giga" aria-label="GigaMonyU">
         <div class="hero">
           <div>
-            <div class="page-title">GigaMonyU <span class="demo-badge">◈ demo</span></div>
+            <div class="page-title">GigaMonyU</div>
             <p class="page-sub">Encontre quem executa com você - consultores, pesquisadores e ICTs verificados pela MonyU</p>
           </div>
         </div>
@@ -1080,7 +1087,7 @@
       <section class="view" id="view-rewards" aria-label="Recompensas">
         <div class="hero">
           <div>
-            <div class="page-title">Recompensas <span class="demo-badge">◈ demo</span></div>
+            <div class="page-title">Recompensas</div>
             <p class="page-sub">Sua jornada de uso na MonyU, com selos, missões e níveis que valem benefícios reais</p>
           </div>
         </div>
@@ -1091,7 +1098,7 @@
       <section class="view" id="view-trein" aria-label="Treinamentos">
         <div class="hero">
           <div>
-            <div class="page-title">Treinamentos <span class="demo-badge">◈ demo</span></div>
+            <div class="page-title">Treinamentos</div>
             <p class="page-sub">Trilhas práticas para dominar a captação de recursos - do primeiro edital à captação recorrente</p>
           </div>
         </div>
@@ -1405,7 +1412,7 @@
 
 
       <footer class="app-footer" aria-label="Assinatura MonyU">
-        <svg viewBox="0 0 1563 938" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo MonyU">
+        <a class="footer-logo-link" href="https://www.monyu.com.br" target="_blank" rel="noopener noreferrer" aria-label="Abrir o site oficial da MonyU em nova janela"><svg viewBox="0 0 1563 938" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo MonyU">
 <path transform="translate(164,311)" d="m0 0h17l13 4 11 7 7 7 10 13 14 18 10 13 4-2 11-14 13-16 11-14 9-8 12-6 8-2h17l13 4 9 5 10 9 6 9 4 9 2 10v141l-3 12-6 11-10 11-13 8-9 3-7 1-17-1-12-4-10-6-7-7-6-12-2-10 14-19 13-18 4-5 1-3-6 5-9 11-14 14-13 9-11 4h-10l-11-4-11-8-13-12-9-11-6-7-1 1 12 17 14 19 5 7-2 10-6 12-8 8-14 7-16 3h-8l-11-2-14-7-11-10-7-11-4-11-1-5v-142l3-12 5-10 9-10 8-6 11-5z" fill="#FE0058"/>
 <path transform="translate(674,308)" d="m0 0h19l13 4 10 6 10 9 10 10 8 7 34 34 3-1-13-19-6-9 2-9 6-11 11-11 12-7 10-3h20l14 5 10 7 8 8 7 12 3 11 1 10v128l-2 16-5 12-8 10-11 8-12 5-5 1h-19l-13-4-10-6-8-8-8-7-45-45h-2l1 5 16 25 1 2-4 11-6 9-10 10-14 7-8 2h-19l-15-5-10-7-7-7-6-10-4-11-1-6v-143l3-12 6-11 9-10 9-6 12-5z" fill="#FE0058"/>
 <path transform="translate(491,305)" d="m0 0h23l14 2 20 6 21 11 14 11 13 13 10 14 10 21 5 17 2 14v24l-4 20-6 16-8 15-11 14-14 14-10 7-14 8-12 5-13 4-11 2-11 1h-12l-21-3-16-5-17-8-13-9-12-11-8-8-9-13-8-15-6-18-3-17v-27l4-19 6-16 9-16 10-13 13-13 14-10 12-7 19-7z" fill="#FE0058"/>
@@ -1443,7 +1450,7 @@
 <path transform="translate(1287,347)" d="m0 0 2 1z" fill="#fc0"/>
 <path transform="translate(1197,295)" d="m0 0" fill="#fc0"/>
 
-</svg>
+</svg></a>
         <p>Plataforma Agêntica MonyU · © 2026 - Conectar inovadores ao financiamento certo, no tempo certo, da forma certa.</p>
       </footer>
 </main>
@@ -1674,7 +1681,7 @@
   <div class="modal-box mid">
     <button class="modal-close" data-close="newProjModal" aria-label="Fechar">✕</button>
     <h3 id="npTitle">Nova ideia/projeto</h3>
-    <p class="sub">Você usa <b><span id="npSlots">4</span> de <span id="npSlotsMax">10</span> ideias/projetos</b> do plano <span id="npPlanName">Starter</span>. Cadastro e importação são gratuitos - as fichas só entram quando os agentes trabalham.</p>
+    <p class="sub">Você tem <b><span id="npSlots">4</span> ideias/projetos cadastrados</b>. Não há limite por plano. Cadastro e importação são gratuitos - as fichas só entram quando os agentes trabalham.</p>
     <div class="np-modes">
       <button class="np-mode on" data-npmode="zero"><b>Começar do zero</b><span>A plataforma guia você do radar à submissão</span></button>
       <button class="np-mode" data-npmode="import"><b>Já tenho uma ideia/projeto estruturada</b><span>Importe seus documentos e acelere adaptações, melhorias e pesquisas</span></button>
@@ -1891,8 +1898,8 @@
   <div class="ws-head">
     <svg class="av" aria-hidden="true"><use href="#ins-ada"/></svg>
     <div class="ws-title">
-      <b>Sistema de gestão inteligente de microrredes solares</b>
-      <span>FINEP Mais Inovação 2026 · submissão até 28 jul (25 dias) · pronto para colar no formulário oficial, seção por seção</span>
+      <b id="wsProjectName">Sistema de gestão inteligente de microrredes solares</b>
+      <span id="wsProjectMeta">FINEP Mais Inovação 2026 · submissão até 28 jul (25 dias) · pronto para colar no formulário oficial, seção por seção</span>
     </div>
     <div class="ws-progress"><span id="wsCopied">0 de 6 seções copiadas</span></div>
     <button class="ws-close" id="wsClose" aria-label="Fechar revisão">✕</button>
@@ -2010,6 +2017,12 @@
   <div id="agDrawerInner" style="display:flex;flex-direction:column;height:100%"></div>
 </aside>
 
+<!-- Laboratório: amostra navegável do resultado de cada agente -->
+<div class="result-lab-scrim" id="resultLabScrim" aria-hidden="true"></div>
+<section class="result-lab" id="resultLab" role="dialog" aria-modal="true" aria-labelledby="resultLabTitle" aria-hidden="true">
+  <div id="resultLabInner" style="height:100%"></div>
+</section>
+
 <!-- Drawer: perfil do prestador -->
 <div class="drawer-scrim" id="prScrim" aria-hidden="true"></div>
 <aside class="drawer" id="prDrawer" role="dialog" aria-modal="true" aria-label="Perfil do prestador">
@@ -2123,11 +2136,11 @@
 
 <!-- Central de atividade dos agentes -->
 <div class="tray" id="tray" role="status" aria-label="Atividade dos agentes">
-  <div class="tray-head">
+  <button type="button" class="tray-head" id="trayMin" data-tip="Ocultar (fica no canto da tela)" aria-label="Minimizar painel de atividades">
     <span class="spin" id="traySpin" aria-hidden="true"></span>
     Atividade dos agentes <span id="trayCount" style="color:var(--text-3);font-weight:600;font-size:.72rem"></span>
-    <button id="trayMin" data-tip="Ocultar (fica no canto da tela)" aria-label="Minimizar painel de atividades">-</button>
-  </div>
+    <span class="tray-min-symbol" aria-hidden="true">-</span>
+  </button>
   <div class="tray-list" id="trayList"></div>
 </div>
 <button class="tray-pill" id="trayPill" aria-label="Reabrir painel de atividades">
