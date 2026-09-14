@@ -1,0 +1,20 @@
+{
+  "id": "./?app=monyu",
+  "name": "MonyU - Sistema Operacional Agêntico",
+  "short_name": "MonyU",
+  "description": "Sua jornada de captação de recursos potencializada por agentes de IA.",
+  "lang": "pt-BR",
+  "start_url": "./2026-08-09_monyu-so-agentico_app_v30.html?mode=mvp&source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "icons": [
+    {
+      "src": "2026-08-09_monyu-so-agentico_favicon_v30.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -22,7 +22,7 @@
     if(isMvpMode)document.body.classList.add('mvp-account');
     document.body.classList.add('zero-account');
     try{
-      var zmKeep=['monyu-so:theme','monyu-so:font','monyu-so:contrast','monyu-so:motion','monyu-so:sidebarCollapsed'];
+      var zmKeep=['monyu-so:theme','monyu-so:font','monyu-so:contrast','monyu-so:motion','monyu-so:sidebarCollapsed','monyu-so:install-visits','monyu-so:install-nudge-dismissed'];
       var zmRemove=[];
       for(var zi=0;zi<localStorage.length;zi++){
         var zk=localStorage.key(zi);
@@ -284,15 +284,17 @@
   function mvpShowNextMilestone(){
     if(!isMvpMode||MVP_MILESTONE_OPEN||!MVP_MILESTONE_QUEUE.length)return;
     var item=MVP_MILESTONE_QUEUE.shift(),modal=$('#mvpMilestoneModal');if(!modal)return;
-    $('#mvpMilestoneIcon').textContent=item.icon;
+    var icon=$('#mvpMilestoneIcon');
+    if(item.agent){icon.classList.add('has-agent');icon.innerHTML='<span class="agent-identity milestone-agent"><img class="agent-avatar" src="'+avatarSrc(item.agent)+'" alt=""><svg class="identity-insignia" aria-hidden="true"><use href="'+insigniaHref(item.agent)+'"/></svg></span>'}
+    else{icon.classList.remove('has-agent');icon.textContent=item.icon}
     $('#mvpMilestoneTitle').textContent=item.title;
     $('#mvpMilestoneText').textContent=item.text;
     MVP_MILESTONE_OPEN=true;open(modal);
   }
-  function mvpCelebrate(id,title,text,icon){
+  function mvpCelebrate(id,title,text,icon,agent){
     if(!isMvpMode||store.get('mvp-milestone-'+id,'')==='1')return false;
     store.set('mvp-milestone-'+id,'1');
-    MVP_MILESTONE_QUEUE.push({title:title,text:text,icon:icon||'✨'});
+    MVP_MILESTONE_QUEUE.push({title:title,text:text,icon:icon||'✨',agent:agent||''});
     mvpShowNextMilestone();return true;
   }
   var mvpMilestoneClose=$('#mvpMilestoneClose');
@@ -306,6 +308,8 @@
 
   var RW_ONESHOTS=[
     {id:'boasvindas',cat:'dominio',name:'Boas-vindas',ico:'👋',desc:'Concluiu o tutorial de boas-vindas.',how:'Abra o tutorial de boas-vindas e passe pelas telas.',nav:null,navLbl:null,pts:50},
+    {id:'primeiro-feedback',cat:'dominio',name:'Sua voz constrói',ico:'💬',desc:'Enviou o primeiro feedback para ajudar a melhorar a MonyU.',how:'Envie um feedback objetivo pelo ícone de mensagem.',nav:null,navLbl:null,pts:20},
+    {id:'monyu-como-app',cat:'dominio',name:'MonyU sempre à mão',ico:'📲',desc:'Instalou a MonyU como aplicativo no seu dispositivo.',how:'Use o atalho Instalar app para abrir o prompt do navegador.',nav:null,navLbl:null,pts:20},
     {id:'gigaativado',cat:'giga',name:'Conta GigaMonyU ativada',ico:'🔓',desc:'Ativou a conta gratuita no GigaMonyU.',how:'Ative sua conta gratuita (freemium) direto na tela do GigaMonyU.',nav:'giga',navLbl:'Ver GigaMonyU',pts:50},
     {id:'gigaperfil',cat:'giga',name:'Perfil completo no GigaMonyU',ico:'🧾',desc:'Completou os campos do perfil no GigaMonyU.',how:'Complete seu perfil na tela do GigaMonyU.',nav:'giga',navLbl:'Ver GigaMonyU',pts:30},
     {id:'evt-verao2026-participante',cat:'eventos',name:'Desafio de Verão 2026',ico:'🎪',desc:'Participou do Desafio de Verão 2026.',how:'Fique de olho nos avisos de campeonatos internos da MonyU.',nav:null,navLbl:null,pts:100},
@@ -761,6 +765,7 @@
         '</button>';
       }).join('');
     }
+    if(typeof renderGlobalStatusGuide==='function')renderGlobalStatusGuide();
   }
   var AGLABEL={rico:'scan de oportunidades',iris:'diagnóstico de elegibilidade',ada:'elaboração de projeto',aurora:'discovery estratégico',kai:'sessão PSF',mike:'tese de funding'};
   var ACTIONS={
@@ -1029,6 +1034,58 @@
     window.scrollTo({top:0,behavior:'auto'});
     closeSidebar();
   }
+  /* Faixa global de orientação: uma única linha, presente em toda view apenas
+     quando há algo em curso ou uma decisão aguardando o usuário. Ação pendente
+     vem antes de execução em andamento: é a única situação em que o usuário
+     pode desbloquear a jornada imediatamente. */
+  function globalAgentNames(items){
+    var names=[];
+    items.forEach(function(item){
+      var key=item.dataAgent||item.agent||item;
+      var name=AG[key]&&AG[key].name;
+      if(name&&names.indexOf(name)===-1)names.push(name);
+    });
+    if(names.length<3)return names.join(' e ');
+    return names.slice(0,2).join(', ')+' e mais '+(names.length-2);
+  }
+  function openGlobalActivity(){
+    trayMin=false;
+    updateTray();
+    if(tray&&tray.classList.contains('show'))tray.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+  function renderGlobalStatusGuide(){
+    var guide=$('#globalStatusGuide');if(!guide)return;
+    var pending=getPendingApprovals();
+    var runningKeys=[];
+    Object.keys(MVP_RUNNING||{}).forEach(function(key){
+      if(MVP_RUNNING[key])runningKeys.push(key.split('|')[1]);
+    });
+    var state='',copy='',link='',action='';
+    if(pending.length){
+      var urgent=pending.some(function(j){return j.days!=null&&j.days<=7});
+      state=urgent?'critical':'attention';
+      var agents=globalAgentNames(pending);
+      copy='<b>'+pending.length+' aprovação'+(pending.length>1?'ões':'')+' aguardam você</b> · '+agents+' recomend'+(pending.length>1?'am':'a')+' o próximo passo';
+      if(runningKeys.length)copy+=' · '+runningKeys.length+' agente'+(runningKeys.length>1?'s':'')+' rodando agora';
+      link='Revisar aprovações →';action='approvals';
+    }else if(runningKeys.length||activeCount>0){
+      state='running';
+      var runningNames=globalAgentNames(runningKeys);
+      copy='<b>'+runningNames+' rodando agora</b> · '+(activeCount||runningKeys.length)+' execução'+((activeCount||runningKeys.length)>1?'ões':'')+' em andamento';
+      link='Ver atividade →';action='activity';
+    }else{
+      guide.hidden=true;guide.innerHTML='';guide.className='global-status-guide';return;
+    }
+    guide.hidden=false;
+    guide.className='global-status-guide is-'+state;
+    guide.innerHTML='<button type="button" class="global-status-action" data-global-status-action="'+action+'"><span class="global-status-dot" aria-hidden="true"></span><span class="global-status-copy">'+copy+'</span><span class="global-status-link">'+link+'</span></button>';
+  }
+  document.addEventListener('click',function(e){
+    var trigger=e.target.closest('[data-global-status-action]');if(!trigger)return;
+    e.preventDefault();
+    if(trigger.getAttribute('data-global-status-action')==='approvals')showView('aprovacoes');
+    else openGlobalActivity();
+  });
   document.addEventListener('click',function(e){
     var t=e.target.closest('[data-nav]');
     if(t){e.preventDefault();showView(t.getAttribute('data-nav'))}
@@ -1139,8 +1196,8 @@
   function syncSidebarBrandControls(){
     var collapsed=isDesktopSidebar()&&appEl.classList.contains('sidebar-collapsed');
     if(logoBtn){
-      logoBtn.setAttribute('aria-label',collapsed?'Expandir menu e abrir Início':'Abrir Início e recolher menu');
-      logoBtn.setAttribute('data-tip',collapsed?'Expandir menu':'Início e recolher menu');
+      logoBtn.setAttribute('aria-label',collapsed?'Expandir menu lateral':'Ir para Início');
+      logoBtn.setAttribute('data-tip',collapsed?'Expandir menu':'Início');
     }
     if(sidebarCollapseBtn){
       sidebarCollapseBtn.setAttribute('aria-label','Recolher menu lateral');
@@ -1190,9 +1247,18 @@
     e.preventDefault();e.stopPropagation();
     if(isDesktopSidebar()){
       var collapsed=appEl.classList.contains('sidebar-collapsed');
-      setSidebarCollapsed(!collapsed);
+      if(collapsed){setSidebarCollapsed(false);return}
     }
     showView('inicio');
+  });
+
+  /* No rail recolhido os nomes continuam disponíveis para tecnologias
+     assistivas e para o tooltip nativo. Rótulo visual fora do menu não é
+     navegação: gera sobreposição, não funciona em toque e compete com a tela. */
+  $$('.nav-item[data-tip]').forEach(function(item){
+    var label=item.getAttribute('data-tip');
+    item.setAttribute('aria-label',label);
+    item.setAttribute('title',label);
   });
 
   /* ================= Perfil: flyout no rodapé da sidebar ================= */
@@ -1981,8 +2047,15 @@
   /* Reaproveita JORNADA: itens com dataAgent+dataProj têm custo estimável e viram linha aprovável
      (checkbox); itens com dataOpp (ex.: "abrir oportunidade para decidir") não consomem fichas por si só -
      viram um botão de navegação, não uma linha de aprovação em lote. Nada começa marcado. */
+  function getPendingApprovals(){
+    return JORNADA.filter(function(j){
+      if(!j.dataAgent||!isAllowedAgent(j.dataAgent)||!PROJECTS[j.proj])return false;
+      var running=typeof MVP_RUNNING!=='undefined'&&MVP_RUNNING&&MVP_RUNNING[mvpRunKey(j.proj,j.dataAgent)];
+      return !running;
+    });
+  }
   function aprovSorted(){
-    return JORNADA.map(function(j,idx){return {j:j,idx:idx}}).sort(function(a,b){
+    return getPendingApprovals().map(function(j){return {j:j,idx:JORNADA.indexOf(j)}}).sort(function(a,b){
       var da=a.j.days==null?9999:a.j.days,db=b.j.days==null?9999:b.j.days;
       return da-db;
     });
@@ -2141,24 +2214,27 @@
   });
   function syncAutoModeUi(){
     var bar=$('#autoStatusBar'),activate=$('#autoModeBtn'),selectAll=$('#aprovSelAllBtn'),title=$('#aprovActionsTitle');
+    /* "Selecionar todas" é controle de lote, não CTA persistente. Sem
+       execução recomendada, mantê-lo visível sugere uma ação que não existe. */
+    var hasRunnableApproval=getPendingApprovals().length>0;
     if(isMvpMode){
       AUTO_MODE.active=false;
       if(bar)bar.style.display='none';
       if(activate){activate.style.display='';setMvpAutomaticComingSoon()}
-      if(selectAll)selectAll.style.display='';
+      if(selectAll)selectAll.style.display=hasRunnableApproval?'':'none';
       if(title)title.textContent='Ações recomendadas';
       return;
     }
     if(bar)bar.style.display=AUTO_MODE.active?'':'none';
     if(activate)activate.style.display=AUTO_MODE.active?'none':'';
-    if(selectAll)selectAll.style.display=AUTO_MODE.active?'none':'';
+    if(selectAll)selectAll.style.display=(!AUTO_MODE.active&&hasRunnableApproval)?'':'none';
     if(title)title.textContent=AUTO_MODE.active?'Execuções automáticas e manuais':'Ações recomendadas';
     var agentsTxt=$('#autoAgentsTxt');
     if(agentsTxt)agentsTxt.textContent=AUTO_MODE.agents.map(function(k){return AG[k]&&AG[k].name||k}).join(', ');
   }
   function renderAprov(){
     var list=$('#aprovList');
-    var execItems=JORNADA.filter(function(j){return j.dataAgent});
+    var execItems=getPendingApprovals();
     if(list){
       var items=aprovSorted();
       if(AUTO_MODE.active){
@@ -2188,6 +2264,7 @@
         $('#aprovBannerSub').textContent=execItems.length+' ação'+(execItems.length>1?'ões':'')+' recomendada'+(execItems.length>1?'s':'')+' pelos seus agentes, aguardando sua aprovação - você decide o que rodar.';
       }else{banner.style.display='none'}
     }
+    if(typeof renderGlobalStatusGuide==='function')renderGlobalStatusGuide();
   }
   var aprovConfirmBtn=$('#aprovConfirm');
   if(aprovConfirmBtn)aprovConfirmBtn.addEventListener('click',function(){
@@ -2510,6 +2587,7 @@
       $('#pillLabel').textContent=activeCount>0?activeCount+' agente(s) trabalhando…':'Atividades concluídas - ver';
       $('#pillSpin').style.display=activeCount>0?'block':'none';
     }else{tray.classList.add('show');trayPill.classList.remove('show')}
+    if(typeof renderGlobalStatusGuide==='function')renderGlobalStatusGuide();
   }
   function syncNotifBadge(){
     var unread=$$('#notifList .notif-item:not(.read)').length;
@@ -2544,6 +2622,22 @@
     if(MVP_RUNNING[mvpRunKey(pid,agent)])return;
     JORNADA.push({agent:agent,proj:pid,days:null,here:true,label:label,detail:detail,actionLabel:'Executar',actionCost:cost,btnClass:'btn-primary',dataAgent:agent,dataProj:pid,mvpGenerated:true});
   }
+  /* MVP: a jornada recomendada tem um único próximo passo. Rico e Íris são
+     complementares, mas não concorrem com Ada nem ficam acumulados na Central.
+     Se Ada foi rodada diretamente, o contexto novo reabre Rico e Íris, um de cada vez. */
+  function mvpNextAgent(pid){
+    var ran=PROJ_RAN[pid]||[],hasRico=ran.indexOf('rico')>-1,hasIris=ran.indexOf('iris')>-1,hasAda=ran.indexOf('ada')>-1;
+    if(hasAda){if(!hasRico)return'rico';if(!hasIris)return'iris';return null}
+    if(!hasRico)return'rico';
+    if(!hasIris)return'iris';
+    return'ada';
+  }
+  function mvpRecommendationCopy(pid,agent){
+    var ran=PROJ_RAN[pid]||[],hasAda=ran.indexOf('ada')>-1,p=PROJECTS[pid];
+    if(agent==='rico')return{label:hasAda?'Rico · mapear oportunidades com a proposta':'Rico · mapear oportunidades',detail:hasAda?'A proposta elaborada trouxe novas informações. O Rico pode buscar oportunidades mais aderentes a esta versão.':'A ideia/projeto foi cadastrada. O Rico pode buscar oportunidades aderentes e transformar o ponto de partida em opções concretas.',cost:1};
+    if(agent==='iris')return{label:hasAda?'Íris · revisar potencial da proposta':'Íris · diagnosticar potencial',detail:hasAda?'Com a proposta elaborada e o radar atualizado, a Íris avalia o potencial de captação desta versão antes de uma submissão.':'O Rico já mapeou oportunidades. A Íris agora avalia o potencial de captação e o que precisa ser fortalecido antes da escrita.',cost:5};
+    return{label:'Ada · completar a escrita',detail:'Rico e Íris já incrementaram esta ideia/projeto. Agora a Ada transforma essas informações em uma primeira versão para sua revisão.',cost:20};
+  }
   function mvpRefreshJourney(pid,trigger,completedAgent){
     if(!isMvpMode||!PROJECTS[pid])return;
     var p=PROJECTS[pid],ran=PROJ_RAN[pid]||(PROJ_RAN[pid]=[]);
@@ -2554,26 +2648,22 @@
       PROJ_SPENT[pid]=(PROJ_SPENT[pid]||0)+consumed;
     }
     mvpRemoveProjectRecommendations(pid);
-    if(trigger==='created'||trigger==='updated'){
-      mvpRecommendation(pid,'rico','Rico · mapear oportunidades','A ideia/projeto foi '+(trigger==='created'?'cadastrada':'atualizada')+'. O Rico pode buscar oportunidades aderentes e transformar o ponto de partida em opções concretas.',1);
-      mvpRecommendation(pid,'iris','Íris · diagnosticar potencial','A Íris pode analisar o potencial de captação e apontar o que precisa ser fortalecido antes da escrita.',5);
-      mvpHomeEvent({ag:'rico',txt:'<b>Ideia/projeto '+(trigger==='created'?'cadastrada':'atualizada')+':</b> '+p.short,why:'O estado atual foi analisado e há recomendações de Rico e Íris aguardando sua decisão em Aprovações.',org:'auto',orgTxt:'análise automática',custo:'0 fichas',quando:'agora'});
-      addNotif('rico','<b>Próximos passos para '+p.short+':</b> Rico e Íris estão recomendados e aguardam sua decisão em Aprovações.','aprovacoes');
-    }else if(completedAgent==='rico'||completedAgent==='iris'){
-      if(completedAgent==='rico')mvpUnlockRicoOpportunities(pid);
-      p.stage='diagnosed';
-      if(!MVP_RUNNING[mvpRunKey(pid,'ada')]){
-        mvpRecommendation(pid,'ada','Ada · completar a escrita','Com as informações incorporadas por '+nomeAgente(completedAgent)+', a Ada é o próximo passo recomendado para completar a escrita da ideia/projeto para sua revisão.',20);
-        mvpHomeEvent({ag:'ada',txt:'<b>Novo próximo passo:</b> Ada para '+p.short,why:nomeAgente(completedAgent)+' incrementou as informações da ideia/projeto. O estado foi reanalisado e a escrita completa agora é a recomendação prioritária.',org:'auto',orgTxt:'análise automática',custo:'0 fichas',quando:'agora'});
-        addNotif('ada','<b>Ada é o próximo passo para '+p.short+'.</b> A recomendação está aguardando sua decisão em Aprovações.','aprovacoes');
-      }
+    if(completedAgent==='rico')mvpUnlockRicoOpportunities(pid);
+    if(completedAgent==='ada'){p.stage='elaborated';p.complete=true}
+    else if(ran.indexOf('rico')>-1&&ran.indexOf('iris')>-1)p.stage='diagnosed';
+    var next=mvpNextAgent(pid);
+    if(next&&!MVP_RUNNING[mvpRunKey(pid,next)]){
+      var rec=mvpRecommendationCopy(pid,next);
+      mvpRecommendation(pid,next,rec.label,rec.detail,rec.cost);
+      mvpHomeEvent({ag:next,txt:'<b>Próximo passo:</b> '+nomeAgente(next)+' para '+p.short,why:rec.detail,org:'auto',orgTxt:'análise automática',custo:'0 fichas',quando:'agora'});
+      addNotif(next,'<b>Próximo passo para '+p.short+':</b> '+nomeAgente(next)+' está recomendado e aguarda sua decisão.','aprovacoes');
     }else if(completedAgent==='ada'){
-      p.stage='elaborated';p.complete=true;
       mvpHomeEvent({ag:'ada',txt:'<b>Escrita concluída:</b> '+p.short,why:'A ideia/projeto foi reanalisada. O próximo passo agora é sua revisão humana antes de qualquer submissão externa.',org:'auto',orgTxt:'análise automática',custo:'0 fichas',quando:'agora'});
       addNotif('ada','<b>'+p.short+' está pronta para sua revisão.</b> Nada será submetido automaticamente.','projetos');
     }
     if(typeof refreshProjectTimeline==='function')refreshProjectTimeline(pid);
     if(typeof refreshProjectActions==='function')refreshProjectActions(pid);
+    if(typeof refreshProjectState==='function')refreshProjectState(pid);
     if(typeof refreshProjectSpent==='function')refreshProjectSpent(pid);
     refreshFreeProjectCtas();
     renderJornada();renderAprov();renderInicioZero();renderHomeV29();renderOpps();syncNavBadges();
@@ -2611,14 +2701,15 @@
     e.preventDefault();
     var entry=EXECUTION_LOG.filter(function(item){return item.id===link.getAttribute('data-execution-result')})[0];
     if(!entry)return;
-    if(entry.agent==='ada')openWs();
+    if(entry.agent==='rico')showView('radar');
+    else if(entry.agent==='ada')openWs();
     else toast(entry.result+' - visualização completa em breve no piloto. (demo)');
   });
   renderExecutionLog();
   function startTask(agentKey,label,doneLabel,dur,projectIds,executionOrigin){
     executionOrigin=executionOrigin||'manual';
     if(agentKey==='rico'||agentKey==='iris'||agentKey==='ada'){
-      mvpCelebrate('first-'+agentKey,'Primeira execução de '+((AG[agentKey]&&AG[agentKey].name)||agentKey)+'!','Você deu mais um passo na jornada de captação da sua ideia/projeto.','✨');
+      mvpCelebrate('first-'+agentKey,'Primeira execução de '+((AG[agentKey]&&AG[agentKey].name)||agentKey)+'!','Você deu mais um passo na jornada de captação da sua ideia/projeto.','✨',agentKey);
     }
     dur=dur||9000;activeCount++;
     (projectIds||[]).forEach(function(pid){MVP_RUNNING[mvpRunKey(pid,agentKey)]=true});
@@ -2640,7 +2731,11 @@
       item.classList.add('done');
       item.querySelector('.t-label-text').textContent=doneLabel;
       var view=document.createElement('button');view.className='t-view';view.textContent='Ver resultado';
-      view.addEventListener('click',function(){if(agentKey==='ada'){openWs()}else{toast('Abrindo o resultado - visualização completa em breve no piloto (demo)')}});
+      view.addEventListener('click',function(){
+        if(agentKey==='rico')showView('radar');
+        else if(agentKey==='ada')openWs();
+        else toast('Abrindo o resultado - visualização completa em breve no piloto (demo)');
+      });
       var x=document.createElement('button');x.className='t-x';x.setAttribute('aria-label','Dispensar');x.textContent='✕';
       x.addEventListener('click',function(){item.remove();updateTray()});
       item.appendChild(view);item.appendChild(x);
@@ -2720,6 +2815,7 @@
     $('#npDocsHint').textContent=m==='import'?'- envie a ideia/projeto estruturada, pitch e materiais de apoio':'- opcional, melhora os outputs dos agentes';
     var docsField=$('#npDrop')&&$('#npDrop').closest('.form-field');
     if(isMvpMode&&docsField)docsField.style.display=m==='import'?'':'none';
+    var policy=$('#npDocsPolicy');if(policy&&isMvpMode)policy.textContent='Os arquivos ficam vinculados a esta ideia/projeto e aparecem somente como histórico na Memória.';
   }
   document.addEventListener('click',function(e){
     var mb=e.target.closest('[data-npmode]');
@@ -2727,18 +2823,17 @@
   });
   function npAddDoc(name,ext,type){
     var row=document.createElement('div');
-    row.className='np-doc';
-    row.innerHTML='<span class="kd-ico">'+ext+'</span><span class="nd-name"></span>'+
-      '<button class="np-type" data-cycle data-tip="Clique para trocar o tipo">'+type+'</button>'+
-      '<label class="np-scope" data-tip="Padrão: somente este projeto"><span class="switch kb-scope-switch"><input type="checkbox" data-scope><span class="track-sw"></span><span class="thumb"></span></span> Global</label>'+
+    row.className='np-doc'+(isMvpMode?' np-doc-simple':'');
+    row.innerHTML='<span class="kd-ico">'+ext+'</span><span class="nd-name"></span>'+ 
+      (isMvpMode?'':'<button class="np-type" data-cycle data-tip="Clique para trocar o tipo">'+type+'</button><label class="np-scope" data-tip="Padrão: somente este projeto"><span class="switch kb-scope-switch"><input type="checkbox" data-scope><span class="track-sw"></span><span class="thumb"></span></span><span>Global</span></label>')+ 
       '<button class="np-x" aria-label="Remover documento">✕</button>';
     row.querySelector('.nd-name').textContent=name;
     row.querySelector('.np-x').addEventListener('click',function(){row.remove()});
-    row.querySelector('[data-cycle]').addEventListener('click',function(){
+    var cycle=row.querySelector('[data-cycle]');if(cycle)cycle.addEventListener('click',function(){
       var ix=NP_TYPES.indexOf(this.textContent);
       this.textContent=NP_TYPES[(ix+1)%NP_TYPES.length];
     });
-    row.querySelector('[data-scope]').addEventListener('change',function(){
+    var scope=row.querySelector('[data-scope]');if(scope)scope.addEventListener('change',function(){
       toast(this.checked?'Este documento ficará acessível a TODOS os agentes e projetos.':'Documento restrito a este projeto.');
     });
     $('#npDocList').appendChild(row);
@@ -2777,9 +2872,9 @@
     docRows.forEach(function(row){
       DOCS.push({
         n:row.querySelector('.nd-name').textContent,
-        type:row.querySelector('[data-cycle]').textContent,
+        type:row.querySelector('[data-cycle]')?row.querySelector('[data-cycle]').textContent:'Arquivo',
         orig:'upload',date:hoje,use:'-',
-        proj:row.querySelector('[data-scope]').checked?null:pid
+        proj:row.querySelector('[data-scope]')&&row.querySelector('[data-scope]').checked?null:pid
       });
     });
     if(typeof renderKb==='function')renderKb();
@@ -2791,14 +2886,13 @@
     card.innerHTML=
       '<div class="proj-head">'+
         projIconHTML(nome,tema)+
-        '<div class="proj-title"><b></b><span>'+(imported?'Importado':'Rascunho')+' · Tema: '+tema+' · criado em '+hoje+(nDocs?' · '+nDocs+' documento(s) na Memória':'')+'</span></div>'+
-        '<span class="stage-chip draft-chip">'+(imported?'Importado':'Rascunho')+'</span>'+
+        '<div class="proj-title"><b></b><span data-project-caption="'+pid+'">'+(imported?'Projeto importado':'Projeto cadastrado')+' · Tema: '+tema+' · criado em '+hoje+(nDocs?' · '+nDocs+' documento(s) na Memória':'')+'</span></div>'+ 
+        '<span data-project-state="'+pid+'">'+projectStateHTML(pid)+'</span>'+ 
       '</div>'+ 
       projectJourneyHTML(pid)+
-      '<div class="proj-meta">'+
-        (isMvpMode?'':'<div>Memória do projeto<b>'+nDocs+' doc(s)</b></div>')+
-        '<div data-project-spent="'+pid+'" title="Total de fichas consumidas pelos agentes nesta ideia/projeto">Fichas usadas no projeto<b>0</b></div>'+
-      '</div>'+
+      '<div class="project-usage-row">'+
+        '<span class="project-usage-pill" data-project-spent="'+pid+'" title="Total de fichas consumidas pelos agentes nesta ideia/projeto"><span class="ficha-coin" aria-hidden="true">M</span><b>0</b> fichas usadas por agentes</span>'+ 
+      '</div>'+ 
       '<div class="proj-actions project-next-actions" data-project-actions="'+pid+'">'+projectNextActionsHTML(pid)+'</div>';
     card.querySelector('b').textContent=nome;
     $('#projList').appendChild(card);
@@ -3014,7 +3108,7 @@
     $$('#packsGrid .pack').forEach(function(pack,index){var d=mvpPackData[index];if(!d)return;pack.setAttribute('data-price',d[1]);var price=pack.querySelector('.price'),per=pack.querySelector('.per');if(price)price.textContent='R$ '+d[1].toFixed(2).replace('.',',');if(per)per.textContent='R$ 1,75/ficha'});
     packPrice=87.5;
     var mvpBuyNote=document.querySelector('#buyModal .modal-note');if(mvpBuyNote)mvpBuyNote.innerHTML='Benefício especial de lançamento: 50% de desconto aplicado automaticamente a todas as compras de fichas adicionais.';
-    var mvpPlans=$('#plansModal');if(mvpPlans){var plansTitle=$('#plansTitle'),plansSub=mvpPlans.querySelector('.sub'),plans=mvpPlans.querySelectorAll('.plan');if(plansTitle)plansTitle.textContent='Acesso Antecipado';if(plansSub)plansSub.innerHTML='Condição especial de lançamento para participantes selecionados do Acesso Beta Antecipado.';plans.forEach(function(plan){plan.style.display=plan.classList.contains('current')?'':'none'});var current=mvpPlans.querySelector('.plan.current');if(current){current.querySelector('h4').textContent='Acesso Antecipado';current.querySelector('.p-price').textContent='Grátis no lançamento';current.querySelector('.p-fichas').innerHTML='<span class="ficha-coin" aria-hidden="true">M</span>30 fichas grátis/mês';current.querySelector('ul').innerHTML='<li>30 fichas gratuitas todos os meses</li><li>50% de desconto em fichas adicionais</li><li>Acesso a Rico, Íris e Ada</li><li>Ideias/projetos ilimitados</li><li>Suporte pela Ajuda & FAQ</li>'}var planNote=mvpPlans.querySelector('.modal-note');if(planNote)planNote.textContent='Benefícios especiais válidos durante o período de lançamento do Acesso Antecipado.';var refer=mvpPlans.querySelector('.refer-card');if(refer)refer.style.display='none'}
+    var mvpPlans=$('#plansModal');if(mvpPlans){var plansTitle=$('#plansTitle'),plansSub=mvpPlans.querySelector('.sub'),plans=mvpPlans.querySelectorAll('.plan'),plansGrid=mvpPlans.querySelector('.plans');if(plansTitle)plansTitle.textContent='Acesso Beta Antecipado';if(plansSub)plansSub.textContent='Condição especial de lançamento para participantes selecionados.';if(plansGrid)plansGrid.classList.add('plans-mvp-single');plans.forEach(function(plan){plan.style.display=plan.classList.contains('current')?'':'none'});var current=mvpPlans.querySelector('.plan.current');if(current){current.classList.add('plan-mvp-current');current.innerHTML='<span class="p-tag">Seu acesso</span><section class="mvp-plan-summary"><span class="mvp-plan-eyebrow">ACESSO ANTECIPADO</span><h4>Acesso Beta Antecipado</h4><div class="p-price">Grátis no lançamento</div><div class="p-fichas"><span class="ficha-coin" aria-hidden="true">M</span>30 fichas grátis por mês</div></section><section class="mvp-plan-benefits"><div><b>Três agentes para transformar sua ideia em proposta</b><div class="mvp-agent-access"><span class="mvp-agent rico">Rico</span><span class="mvp-agent iris">Íris</span><span class="mvp-agent ada">Ada</span></div></div><ul><li>50% de desconto em fichas adicionais</li><li>Ideias e projetos ilimitados</li><li>Revisão humana antes de qualquer submissão</li><li>Suporte pela Ajuda</li></ul></section>'}var planNote=mvpPlans.querySelector('.modal-note');if(planNote)planNote.textContent='Benefícios válidos durante o período de lançamento do Acesso Beta Antecipado.';var refer=mvpPlans.querySelector('.refer-card');if(refer)refer.style.display='none'}
     var mvpNpSub=document.querySelector('#newProjModal .sub');if(mvpNpSub)mvpNpSub.innerHTML='Você tem <b><span id="npSlots">0</span> ideias/projetos cadastrados</b>. Não há limite por plano. O cadastro é gratuito - as fichas só entram quando Rico, Íris ou Ada trabalham.';
     var mvpProjSub=$('#projSub');if(mvpProjSub)mvpProjSub.textContent='0 ideias/projetos cadastrados · cadastro gratuito';
     var mvpNotif=$('#notifList');if(mvpNotif){mvpNotif.innerHTML='<button class="notif-item" data-nav="projetos"><svg class="av" aria-hidden="true"><use href="#ins-rico"/></svg><p><b>Rico</b> está pronto. Cadastre sua primeira ideia/projeto para começar.<span class="ntime">agora</span></p><span class="undot" aria-hidden="true"></span></button>';syncNotifBadge()}
@@ -3115,23 +3209,90 @@
   }
 
   function projectJourneyHTML(pid){
-    var ran=PROJ_RAN[pid]||[], mvp=isMvpMode;
-    var steps=mvp
-      ? [{k:'rico',n:'Rico',d:'Radar de oportunidades'},{k:'iris',n:'Íris',d:'Diagnóstico de elegibilidade'},{k:'ada',n:'Ada',d:'Elaboração do projeto'},{k:'review',n:'Revisão humana',d:'Pronto para a próxima decisão'}]
-      : [{k:'rico',n:'Rico',d:'Radar de oportunidades'},{k:'iris',n:'Íris',d:'Diagnóstico de elegibilidade'},{k:'docs',n:'Documentação',d:'Informações do projeto'},{k:'ada',n:'Ada',d:'Elaboração do projeto'},{k:'banca',n:'A Banca',d:'Avaliação simulada'},{k:'submission',n:'Submissão',d:'Revisão humana'}];
-    var next=steps.findIndex(function(s){return s.k!=='review'&&s.k!=='docs'&&s.k!=='submission'&&ran.indexOf(s.k)<0});
-    if(next<0)next=Math.min(steps.length-1,ran.indexOf('ada')>-1?steps.length-1:0);
-    return '<div class="stepper project-stepper" data-project-timeline="'+pid+'" role="list" aria-label="Jornada da ideia/projeto">'+steps.map(function(s,i){
-      var done=ran.indexOf(s.k)>-1,cl=done?'done':(i===next?'current':'');
-      return '<div class="step '+cl+'" role="listitem"><span class="step-dot">'+(done?'✓':(i+1))+'</span><span class="step-name">'+s.n+'</span><span class="step-desc">'+(i===next&&!done?'Próximo recomendado':s.d)+'</span></div>';
+    var ran=PROJ_RAN[pid]||[],project=PROJECTS[pid]||{};
+    /* A jornada pertence ao projeto. Agentes são participantes possíveis de
+       cada etapa e o array aceita quantos forem necessários, inclusive em
+       paralelo. Assim, novos agentes não obrigam a redesenhar a timeline. */
+    var steps=isMvpMode
+      ? [
+          {k:'opportunities',n:'Mapear oportunidades',agents:['rico'],done:ran.indexOf('rico')>-1},
+          {k:'potential',n:'Avaliar potencial',agents:['iris'],done:ran.indexOf('iris')>-1},
+          {k:'proposal',n:'Elaborar proposta',agents:['ada'],done:project.stage==='elaborated'||project.stage==='submitted'||project.stage==='complete'},
+          {k:'submission',n:'Submeter proposta',people:['Revisão humana'],done:project.stage==='submitted'}
+        ]
+      : [
+          {k:'discovery',n:'Estruturar oportunidade',agents:['aurora','barto','mike'],done:false,optional:true},
+          {k:'opportunities',n:'Mapear oportunidades',agents:['rico'],done:ran.indexOf('rico')>-1},
+          {k:'potential',n:'Avaliar potencial',agents:['iris'],done:ran.indexOf('iris')>-1},
+          {k:'proposal',n:'Elaborar proposta',agents:['ada'],done:project.stage==='elaborated'||project.stage==='submitted'||project.stage==='complete'},
+          {k:'validation',n:'Validar proposta',agents:['banca'],done:ran.indexOf('banca')>-1,optional:true},
+          {k:'submission',n:'Submeter proposta',people:['Revisão humana'],done:project.stage==='submitted'||project.stage==='complete'}
+        ];
+    steps=steps.filter(function(s){return !s.optional||s.done||s.recommended});
+    var required=steps.filter(function(s){return !s.optional}),nextKey=(required.filter(function(s){return !s.done})[0]||{}).k;
+    function participants(step){
+      var names=(step.agents||[]).filter(isAllowedAgent).map(function(k){return '<span class="step-agent"><svg aria-hidden="true"><use href="'+insigniaHref(k)+'"/></svg>'+nomeAgente(k)+'</span>'});
+      (step.people||[]).forEach(function(name){names.push('<span class="step-person">'+name+'</span>')});
+      return names.join('');
+    }
+    return '<div class="stepper project-stepper project-stage-timeline" data-project-timeline="'+pid+'" role="list" aria-label="Etapas para chegar à submissão">'+steps.map(function(s,i){
+      var cl=s.done?'done':(s.k===nextKey?'current':'');
+      return '<div class="step '+cl+'" role="listitem"'+(s.k===nextKey?' aria-current="step"':'')+'><span class="step-dot">'+(s.done?'✓':(i+1))+'</span><span class="step-name">'+s.n+'</span><span class="step-desc">'+(s.k===nextKey?'Próxima etapa':s.optional?'Quando necessário':'')+'</span><span class="step-participants">'+participants(s)+'</span></div>';
     }).join('')+'</div>';
   }
   function refreshProjectTimeline(pid){
     $$('.project-stepper[data-project-timeline="'+pid+'"]').forEach(function(el){el.outerHTML=projectJourneyHTML(pid)});
   }
+  function projectLastAgent(pid){
+    var ran=PROJ_RAN[pid]||[];return ran.length?ran[ran.length-1]:'';
+  }
+  function projectStateHTML(pid){
+    var agent=projectLastAgent(pid),project=PROJECTS[pid]||{};
+    if(!agent)return '<span class="stage-chip draft-chip">Projeto cadastrado</span>';
+    var byStage={new:'Projeto cadastrado',diagnosed:'Potencial avaliado',elaborating:'Elaboração em andamento',elaborated:'Proposta elaborada',submitted:'Proposta submetida',complete:'Proposta concluída'};
+    var label=byStage[project.stage]||({rico:'Oportunidades mapeadas',iris:'Potencial avaliado',ada:'Proposta elaborada',banca:'Proposta validada'}[agent]||'Etapa concluída');
+    return '<button type="button" class="stage-chip project-result-chip" style="--sc:var(--c-'+agent+')" data-project-result="'+agent+'" data-proj="'+pid+'" aria-label="Abrir último resultado de '+nomeAgente(agent)+'"><svg aria-hidden="true"><use href="'+insigniaHref(agent)+'"/></svg><span>'+label+'<small>Último resultado · '+nomeAgente(agent)+'</small></span></button>';
+  }
+  function refreshProjectState(pid){
+    $$('[data-project-state="'+pid+'"]').forEach(function(el){el.innerHTML=projectStateHTML(pid)});
+    var caption=$('[data-project-caption="'+pid+'"]'),agent=projectLastAgent(pid);
+    if(caption){var suffix=caption.textContent.indexOf(' · Tema:')>-1?caption.textContent.slice(caption.textContent.indexOf(' · Tema:')):'';var names={rico:'Oportunidades mapeadas',iris:'Potencial avaliado',ada:'Proposta elaborada',banca:'Proposta validada'};caption.textContent=(agent?(names[agent]||'Etapa concluída'):'Projeto cadastrado')+suffix}
+  }
+  function openProjectResult(agent,pid,source){
+    if(agent==='rico'){showView('radar');return}
+    if(agent==='ada'){openWs(pid);return}
+    var index=agentIndexByKey(agent);if(index>-1)openResultLab(index,source,{actual:true,project:pid});
+  }
+  document.addEventListener('click',function(e){
+    var trigger=e.target.closest('[data-project-result]');if(!trigger)return;
+    e.preventDefault();openProjectResult(trigger.getAttribute('data-project-result'),trigger.getAttribute('data-proj'),trigger);
+  });
+  (function hydrateStaticProjectJourneys(){
+    if(isFreshAccountMode)return;
+    $$('#projListStaticWrap .proj-card').forEach(function(card,index){
+      var pid='p'+(index+1);card.setAttribute('data-project-id',pid);
+      var oldTimeline=card.querySelector('.stepper');if(oldTimeline)oldTimeline.outerHTML=projectJourneyHTML(pid);
+      var caption=card.querySelector('.proj-title span');if(caption)caption.setAttribute('data-project-caption',pid);
+      var oldState=card.querySelector('.proj-head>.stage-chip');if(oldState)oldState.outerHTML='<span data-project-state="'+pid+'">'+projectStateHTML(pid)+'</span>';
+    });
+  })();
   function projectNextActionsHTML(pid){
     var ran=PROJ_RAN[pid]||[],hasRico=ran.indexOf('rico')>-1,hasIris=ran.indexOf('iris')>-1,hasAda=ran.indexOf('ada')>-1;
-    if(hasAda)return '<div class="project-next-intro"><b>Próxima etapa: sua revisão humana</b><span>A escrita foi concluída. Revise e copie o material antes de qualquer submissão.</span></div><button class="btn-primary project-agent-action project-agent-primary" data-ws-project="'+pid+'"><span><strong>Revisar e copiar projeto elaborado</strong><small>Abrir o workspace da Ada, seção por seção</small></span></button>';
+    if(isMvpMode){
+      var next=mvpNextAgent(pid);
+      if(next){
+        var rec=mvpRecommendationCopy(pid,next),title=next==='rico'?'Conhecer Rico':(next==='iris'?'Conhecer Íris':'Conhecer a Ada');
+        return '<div class="project-next-intro"><b>Próximo agente recomendado: '+nomeAgente(next)+'</b><span>'+rec.detail+'</span></div><button class="btn-primary project-agent-action project-agent-primary" data-agent="'+next+'" data-agent-detail-cta data-proj="'+pid+'"><span><strong>'+title+'</strong><small>'+AGLABEL[next]+'</small></span><em>'+costBadgeHTML(next,rec.cost)+'</em></button>';
+      }
+      return '<div class="project-next-intro"><b>Próxima etapa: submissão da proposta</b><span>A proposta está elaborada e já passou pelas análises recomendadas. Prepare a versão final para submeter no canal oficial do edital.</span></div><button class="btn-primary project-agent-action project-agent-primary" data-ws-project="'+pid+'"><span><strong>Preparar submissão da proposta</strong><small>Abrir a versão final e concluir a conferência obrigatória</small></span></button><div class="project-human-review"><strong>Revisão humana obrigatória</strong><span>Antes de submeter, confira cada seção, os anexos e as regras do edital. A MonyU não submete nem garante aprovação.</span></div>';
+    }
+    if(hasAda){
+      var ricoTitle=hasRico?'Atualizar busca com Rico':'Rodar novo scan com Rico';
+      var ricoDesc=hasRico?'Use a escrita atualizada para buscar oportunidades mais aderentes.':'Use a escrita da Ada como contexto para buscar oportunidades aderentes.';
+      var irisTitle=hasIris?'Atualizar diagnóstico com Íris':'Diagnosticar potencial com Íris';
+      var irisDesc=hasIris?'Rode uma nova leitura se o projeto mudou antes da submissão.':'Revise a elegibilidade com base na escrita completa antes da submissão.';
+      return '<div class="project-next-intro"><b>Próxima etapa: submissão da proposta</b><span>A proposta está elaborada. Prepare a versão final para submeter no canal oficial do edital.</span></div><button class="btn-primary project-agent-action project-agent-primary" data-ws-project="'+pid+'"><span><strong>Preparar submissão da proposta</strong><small>Abrir a versão final e concluir a conferência obrigatória</small></span></button><div class="project-human-review"><strong>Revisão humana obrigatória</strong><span>Antes de submeter, confira cada seção, os anexos e as regras do edital. A MonyU não submete nem garante aprovação.</span></div><div class="project-agent-refinements" aria-label="Recomendações complementares após a elaboração"><p>Com a escrita pronta, você também pode aprofundar:</p><button class="project-agent-refine" data-agent="rico" data-agent-detail-cta data-proj="'+pid+'"><span><strong>'+ricoTitle+'</strong><small>'+ricoDesc+'</small></span><em>'+costBadgeHTML('rico',1)+'</em></button><button class="project-agent-refine" data-agent="iris" data-agent-detail-cta data-proj="'+pid+'"><span><strong>'+irisTitle+'</strong><small>'+irisDesc+'</small></span><em>'+costBadgeHTML('iris',5)+'</em></button></div>';
+    }
     if(hasRico||hasIris)return '<div class="project-next-intro"><b>Próximo agente recomendado: Ada</b><span>Rico e/ou Íris já incrementaram esta ideia/projeto. Agora a Ada transforma essas informações em uma primeira versão para sua revisão.</span></div><button class="btn-primary project-agent-action project-agent-primary" data-agent="ada" data-agent-detail-cta data-proj="'+pid+'"><span><strong>Conhecer a Ada para elaborar o projeto</strong><small>Veja como ela estrutura a escrita a partir das análises já concluídas</small></span><em>'+costBadgeHTML('ada',20)+'</em></button>';
     return '<div class="project-next-intro"><b>Próximos agentes recomendados</b><span>Conheça os agentes indicados para concluir as etapas pendentes. A execução é confirmada no detalhe de cada agente.</span></div><button class="btn-primary project-agent-action project-agent-primary" data-agent="rico" data-agent-detail-cta data-proj="'+pid+'"><span><strong>Conhecer Rico</strong><small>Buscar oportunidades aderentes</small></span><em>'+costBadgeHTML('rico',1)+'</em></button><button class="btn-ghost project-agent-action" data-agent="iris" data-agent-detail-cta data-proj="'+pid+'"><span><strong>Conhecer Íris</strong><small>Diagnosticar a elegibilidade da ideia/projeto</small></span><em>'+costBadgeHTML('iris',5)+'</em></button>';
   }
@@ -3141,7 +3302,7 @@
   function refreshProjectSpent(pid){
     var spent=PROJ_SPENT[pid]||0;
     $$('[data-project-spent="'+pid+'"]').forEach(function(el){
-      el.innerHTML='Fichas usadas no projeto<b>'+spent+'</b>';
+      el.innerHTML='<span class="ficha-coin" aria-hidden="true">M</span><b>'+spent+'</b> ficha'+(spent===1?'':'s')+' usada'+(spent===1?'':'s')+' por agentes';
     });
   }
 
@@ -3219,11 +3380,12 @@
     resultLab.classList.remove('open');resultLab.setAttribute('aria-hidden','true');resultLabScrim.classList.remove('show');
     if(resultLabReturn&&resultLabReturn.focus)resultLabReturn.focus();
   }
-  function openResultLab(i,source){
+  function openResultLab(i,source,context){
     var a=AGD[i],c=resultExampleConfig(a),hasProjects=Object.keys(PROJECTS).length>0;
+    var actual=!!(context&&context.actual),projectName=context&&PROJECTS[context.project]&&PROJECTS[context.project].short;
     resultLabReturn=source||document.activeElement;
     resultLabInner.innerHTML='<div class="result-lab-shell" style="--accent:var(--c-'+a.k+')">'+
-      '<main class="result-lab-main" id="resultLabScroll"><div class="result-lab-head"><div><span class="result-eyebrow">Exemplo navegável - '+a.name+'</span><h2 id="resultLabTitle">'+c.title+'</h2><p>Simulação de como o resultado chega para você.</p></div><button class="result-lab-close" data-result-lab-close aria-label="Fechar exemplo">✕</button></div>'+ 
+      '<main class="result-lab-main" id="resultLabScroll"><div class="result-lab-head"><div><span class="result-eyebrow">'+(actual?'Resultado mais recente - '+a.name:'Exemplo navegável - '+a.name)+'</span><h2 id="resultLabTitle">'+c.title+'</h2><p>'+(actual?'Resultado incorporado à memória de '+(projectName||'sua ideia/projeto')+'.':'Simulação de como o resultado chega para você.')+'</p></div><button class="result-lab-close" data-result-lab-close aria-label="Fechar resultado">✕</button></div>'+ 
       '<article class="result-document"><section class="result-doc-hero" data-result-chapter="resumo"><span class="result-eyebrow">Visão executiva</span><h3>'+c.title+'</h3><p>'+c.lead+'</p></section>'+ 
       '<div class="result-kpis">'+c.kpis.map(function(k){return '<div class="result-kpi"><small>'+k[0]+'</small><b>'+k[1]+'</b></div>'}).join('')+'</div>'+ 
       '<section class="result-section" data-result-chapter="evidencias"><span class="result-eyebrow">Evidências e análise</span><h3>O que sustenta esta leitura</h3><p>O resultado reúne dados úteis para a sua decisão, sem esconder os pontos que ainda precisam evoluir.</p><table class="result-table"><thead><tr><th>Item</th><th>Status</th><th>Próxima leitura</th></tr></thead><tbody>'+c.rows.map(function(r){return '<tr><td>'+r[0]+'</td><td class="result-score">'+r[1]+'</td><td>'+r[2]+'</td></tr>'}).join('')+'</tbody></table></section>'+ 
@@ -3296,8 +3458,47 @@
     }
   });
   function closeDrawer(){if(agDrawer.classList.contains('open'))unlockPageScroll();agDrawer.classList.remove('open');agScrim.classList.remove('show')}
+  /* Nomes de agentes são sempre atalhos para o detalhe canônico. A conversão
+     é aplicada ao texto renderizado e a cada inserção posterior, evitando que
+     uma nova tela ou estado de projeto esqueça de criar esse acesso. Não mexe
+     em controles que já possuem sua própria ação de agente. */
+  function linkifyAgentNames(scope){
+    var rootScope=scope||document.body;if(!rootScope||!AGD||!AGD.length)return;
+    var names=AGD.filter(function(a){return isAllowedAgent(a.k)}).map(function(a){return a.name}).sort(function(a,b){return b.length-a.length});
+    if(!names.length)return;
+    var esc=function(v){return v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')};
+    var matcher=new RegExp('('+names.map(esc).join('|')+')','g');
+    var nodes=[],walker=document.createTreeWalker(rootScope,NodeFilter.SHOW_TEXT,{acceptNode:function(node){
+      if(!node.nodeValue||!matcher.test(node.nodeValue)){matcher.lastIndex=0;return NodeFilter.FILTER_REJECT}matcher.lastIndex=0;
+      var parent=node.parentElement;
+      return parent&&!parent.closest('button,a,input,textarea,select,option,script,style,svg,#agDrawer,#resultLab,#obOv,#plansModal,[data-agent-name-link]')?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;
+    }});
+    while(walker.nextNode())nodes.push(walker.currentNode);
+    nodes.forEach(function(node){
+      var text=node.nodeValue,frag=document.createDocumentFragment(),last=0;
+      text.replace(matcher,function(match,_name,offset){
+        if(offset>last)frag.appendChild(document.createTextNode(text.slice(last,offset)));
+        var agent=AGD.filter(function(a){return a.name===match})[0];
+        if(agent){var link=document.createElement('button');link.type='button';link.className='agent-name-link';link.setAttribute('data-agent-name-link',agent.k);link.setAttribute('aria-label','Abrir detalhes de '+agent.name);link.textContent=match;frag.appendChild(link)}else frag.appendChild(document.createTextNode(match));
+        last=offset+match.length;return match;
+      });
+      if(last<text.length)frag.appendChild(document.createTextNode(text.slice(last)));
+      node.parentNode.replaceChild(frag,node);
+    });
+  }
+  document.addEventListener('click',function(e){
+    var link=e.target.closest('[data-agent-name-link]');if(!link)return;
+    e.preventDefault();e.stopPropagation();
+    var index=agentIndexByKey(link.getAttribute('data-agent-name-link'));if(index>-1)openDrawer(index);
+  });
+  linkifyAgentNames(document.body);
+  new MutationObserver(function(changes){changes.forEach(function(change){Array.from(change.addedNodes||[]).forEach(function(node){if(node.nodeType===1)linkifyAgentNames(node)})})}).observe(document.body,{childList:true,subtree:true});
   function canonicalRunSection(a,ctxProj){
     if(a.soon)return '';
+    /* Sem projeto não existe execução a configurar. O próximo passo é criar a
+       ideia/projeto, então a configuração e o custo não devem competir com esse
+       CTA no primeiro contato. */
+    if(Object.keys(PROJECTS).length===0)return '';
     var variants=AG_VARIANTS[a.k],variantHtml='';
     if(variants){
       var options=variants.map(function(v){return '<option value="'+v.id+'">'+v.label+' · '+v.cost+' fichas</option>'}).join('');
@@ -3313,6 +3514,7 @@
   function openDrawer(i,ctxProj){
     var a=AGD[i];
     pendAgent=a.name;pendKey=a.k;
+    var hasProjects=Object.keys(PROJECTS).length>0;
     if(runModal&&runModal.isConnected)runModal.remove();
     if(runScrim&&runScrim.isConnected)runScrim.remove();
     agDrawer.style.setProperty('--ac','var(--c-'+a.k+')');
@@ -3348,7 +3550,9 @@
       '<div class="drawer-foot">'+
         (a.soon
           ? '<button class="btn-ghost" data-toast="Anotado! Vamos te avisar quando '+a.name+' for lançado. (demo)">🔔 Avisar-me quando chegar</button>'
-          : '<button class="btn-primary" id="runConfirm">Confirmar e executar</button>'+
+          : (hasProjects
+              ? '<button class="btn-primary" id="runConfirm">Confirmar e executar</button>'
+              : '<button class="btn-primary new-project-primary free-project-cta-empty" id="runProjNew">Cadastrar nova ideia/projeto <span class="free-action-badge">GRÁTIS</span></button>')+
             '<button class="btn-ghost" data-agent-example="'+i+'">Ver exemplo de resultado</button>')+
       '</div>';
     if(!agDrawer.classList.contains('open'))lockPageScroll();
@@ -3362,14 +3566,17 @@
         canonicalVariant.addEventListener('change',function(){pendVariant=this.value;updateRunState()});
       }else pendVariant=null;
       wireRunProjEvents();
-      updateRunState();
-      agInner.querySelector('#runConfirm').addEventListener('click',confirmRun);
+      if(hasProjects){
+        updateRunState();
+        agInner.querySelector('#runConfirm').addEventListener('click',confirmRun);
+      }
     }
     var exampleBtn=agInner.querySelector('[data-agent-example]');
     if(exampleBtn)exampleBtn.addEventListener('click',function(){openResultLab(i,exampleBtn)});
     agInner.querySelectorAll('.t-view').forEach(function(b){
       b.addEventListener('click',function(){
-        if(a.k==='ada'){closeDrawer();openWs()}
+        if(a.k==='rico'){closeDrawer();showView('radar')}
+        else if(a.k==='ada'){closeDrawer();openWs()}
         else{toast('Abrindo o resultado - visualização completa em breve no piloto (demo)')}
       });
     });
@@ -4412,14 +4619,22 @@
 
   /* ================= Onboarding ================= */
   function obAgent(k,name,what,value,cost,state){
-    var st=state==='on'?'<span class="ob-state on">✓ Incluído no seu plano</span>'
-      :state==='beta'?'<span class="ob-state on">✓ Incluído · beta com revisão humana</span>'
+    var st=state==='on'?'<span class="ob-state on">✓ Disponível no acesso</span>'
+      :state==='beta'?'<span class="ob-state on">✓ Disponível · revisão humana</span>'
       :'<button class="ob-state soon" '+(k==='banca'?'data-soonmod="banca"':'data-toast="Anotado! Vamos te avisar quando '+name+' chegar. (demo)"')+'>🔔 '+state+' · Avisar-me</button>';
     return '<div class="ob-agent" style="--ac:var(--c-'+k+')">'+
-      '<svg class="av" aria-hidden="true"><use href="'+insigniaHref(k)+'"/></svg>'+
+      '<span class="ob-agent-identity"><img class="agent-avatar" src="'+avatarSrc(k)+'" alt=""><svg class="av" aria-hidden="true"><use href="'+insigniaHref(k)+'"/></svg></span>'+
       '<b>'+name+'</b><span class="oa-what">'+what+'</span>'+
-      '<span class="oa-value">→ '+value+'</span>'+
+      '<span class="oa-value">→ '+value+'</span>'+ 
       '<span class="oa-cost"><span class="ficha-coin">M</span>'+cost+'</span>'+st+'</div>';
+  }
+  function obMvpAgent(k,role,cost){
+    var name=(AG[k]&&AG[k].name)||k;
+    return '<article class="ob-mvp-agent" style="--ac:var(--c-'+k+')">'+
+      '<span class="ob-agent-identity"><img class="agent-avatar" src="'+avatarSrc(k)+'" alt="Retrato de '+name+'"><svg class="av" aria-hidden="true"><use href="'+insigniaHref(k)+'"/></svg></span>'+
+      '<span class="ob-mvp-agent-copy"><b>'+name+'</b><small>'+role+'</small></span>'+
+      '<span class="ob-mvp-cost"><span class="ficha-coin">M</span>'+cost+'</span>'+
+    '</article>';
   }
   var OB_STEPS=[
     {h:'Você acaba de ganhar uma equipe 👋',
@@ -4517,14 +4732,17 @@
        '<button class="btn-ghost" id="obFreeBtn" style="flex:1">Explorar sozinho</button></div>'}
   ];
   if(isMvpMode)OB_STEPS=[
-    {h:'Bem-vindo ao Acesso Beta Antecipado',
-     b:'<div class="ob-hero"><a href="https://www.monyu.com.br" target="_blank" rel="noopener noreferrer" aria-label="Abrir o site oficial da MonyU em nova janela"><svg width="84" height="84" aria-hidden="true"><use href="#monyu-symbol"/></svg></a></div><p>Nesta fase, você terá acesso a Rico, Íris e Ada. O primeiro passo é cadastrar a ideia/projeto que você quer captar. É gratuito e leva poucos minutos.</p><div class="ob-note">Com nome, tema e um resumo, o Rico já consegue começar a procurar oportunidades aderentes.</div><div style="display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap"><button class="btn-primary" id="obZeroBtn" style="flex:1">Cadastrar meu projeto</button><button class="btn-ghost" id="obContinueBtn" style="flex:1">Conhecer os 3 agentes</button></div>'},
-    {h:'Encontre, decida e elabore',
-     b:'<div class="ob-cards">'+obAgent('rico','Rico','Encontra oportunidades aderentes ao seu projeto.','Comece pelo edital certo.','1 a 3 fichas por rodada','on')+obAgent('iris','Íris','Mostra se vale a pena competir antes da escrita.','Decida com clareza.','5 fichas por projeto','on')+obAgent('ada','Ada','Elabora o projeto no formato do edital.','Revise antes de submeter.','20 fichas por projeto','beta')+'</div><div class="ob-note">A Ada prepara o material. A submissão continua sob seu controle.</div>'},
-    {h:'Fichas e planos continuam valendo',
-     b:'<div class="ob-hero"><span class="ficha-coin" style="width:64px;height:64px;font-size:1.6rem">M</span></div><p>Cada ação consome fichas do seu plano. O custo aparece antes da confirmação e o saldo fica sempre visível.</p><div class="ob-note">Rico: 1 a 3 fichas por rodada<br>Íris: 5 fichas por diagnóstico<br>Ada: 20 fichas por elaboração<br><br>Fichas não usadas acumulam conforme as regras do plano.</div>'},
-    {h:'Você acompanha e decide',
-     b:'<p>A Home reúne suas ideias/projetos em andamento, os três agentes e o histórico de análises, recomendações e execuções. Prazos urgentes, lembretes e Aprovações continuam ativos com os recursos disponíveis no Acesso Beta Antecipado.</p><div class="ob-note">Nada é submetido automaticamente. A Ada exige revisão humana antes do envio no portal oficial.</div><div style="display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap"><button class="btn-primary" id="obZeroBtn" style="flex:1">Cadastrar meu projeto</button><button class="btn-ghost" id="obFreeBtn" style="flex:1">Concluir tutorial</button></div>'}
+    {h:'Bem-vindo(a) ao Acesso Beta Antecipado',
+     next:'Conhecer os 3 agentes →',
+     b:'<div class="ob-hero"><a href="https://www.monyu.com.br" target="_blank" rel="noopener noreferrer" aria-label="Abrir o site oficial da MonyU em nova janela"><svg width="84" height="84" aria-hidden="true"><use href="#monyu-symbol"/></svg></a></div><p>Nesta fase, você conta com Rico, Íris e Ada para transformar uma ideia em um projeto mais preparado para captação.</p><div class="ob-note">Comece quando quiser: cadastrar uma ideia/projeto é gratuito e leva poucos minutos.</div><div style="display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap"><button class="btn-primary" id="obZeroBtn" style="flex:1">Cadastrar minha ideia/projeto <span class="free-action-badge">GRÁTIS</span></button></div>'},
+    {h:'Sua equipe para captar melhor',
+     next:'Ver como usar fichas →',
+     b:'<p>Três assistentes de IA, cada um com uma responsabilidade clara. Você vê o custo antes de confirmar qualquer execução.</p><div class="ob-mvp-agents">'+obMvpAgent('rico','Mapeia oportunidades aderentes','1 a 3 por rodada')+obMvpAgent('iris','Diagnostica o potencial de captação','5 por projeto')+obMvpAgent('ada','Elabora o projeto para o edital','20 por projeto')+'</div><div class="ob-note">A Ada prepara o material. A revisão humana acontece antes de qualquer submissão.</div>'},
+    {h:'Fichas ativam o trabalho dos agentes',
+     next:'Ver como você fica no comando →',
+     b:'<div class="ob-hero"><span class="ficha-coin" style="width:64px;height:64px;font-size:1.6rem">M</span></div><p>Fichas são usadas apenas quando você ativa uma execução. O custo e o saldo depois da ação aparecem antes da confirmação.</p><div class="ob-ficha-rules"><span><b>1</b> Você escolhe a ação</span><span><b>2</b> Confere custo e saldo</span><span><b>3</b> Confirma a execução</span></div><div class="ob-note">No Acesso Beta Antecipado, todas as execuções seguem essa mesma lógica simples.</div>'},
+    {h:'Você acompanha. Você decide.',
+     b:'<p>Uma visão simples mostra o que está em andamento e qual ação merece sua atenção agora.</p><div class="ob-control-preview"><div class="ob-control-card journey"><span>IDEIA/PROJETO</span><b>Energia limpa para comunidades</b><small><i></i><i></i><i></i> Próximo passo: diagnóstico com Íris</small></div><div class="ob-control-grid"><div class="ob-control-card approval"><span>AÇÕES RECOMENDADAS</span><b>1 aprovação aguardando você</b><small>Íris · 5 fichas</small></div><div class="ob-control-card activity"><span>ATIVIDADE</span><b><i></i> Rico pesquisando oportunidades</b><small>Ver andamento quando quiser</small></div></div></div><div class="ob-note"><b>Você escolhe o que executar.</b> Nada é submetido automaticamente, e projetos elaborados pela Ada passam por revisão humana.</div><div style="display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap"><button class="btn-primary" id="obZeroBtn" style="flex:1">Cadastrar minha ideia/projeto <span class="free-action-badge">GRÁTIS</span></button><button class="btn-ghost" id="obFreeBtn" style="flex:1">Concluir tutorial</button></div>'}
   ];
   /* Amostra de 5 agentes por render (pedido do usuário, 2026-08-08): em vez
      dos mesmos 5 fixos + o símbolo da MonyU sobrando como 6º item (que
@@ -4549,6 +4767,7 @@
     $('#obProg').style.width=Math.round((obIdx+1)/OB_STEPS.length*100)+'%';
     $('#obPrev').style.visibility=obIdx===0?'hidden':'visible';
     $('#obNext').style.display=obIdx===OB_STEPS.length-1?'none':'';
+    $('#obNext').textContent=s.next||'Avançar →';
     var b1=$('#obImportBtn'),bZero=$('#obZeroBtn'),bFree=$('#obFreeBtn'),bContinue=$('#obContinueBtn');
     if(b1){
       b1.addEventListener('click',function(){
@@ -4591,7 +4810,7 @@
   });
   if(store.get('onboarded','')!=='1'){
     if(isMvpMode){
-      MVP_OPEN_ONBOARD_AFTER_MILESTONE=mvpCelebrate('first-access','Bem-vindo ao Acesso Beta Antecipado!','Este é o começo da sua jornada para transformar ideias em projetos mais preparados para captação.','👋');
+      MVP_OPEN_ONBOARD_AFTER_MILESTONE=mvpCelebrate('first-access','Bem-vindo(a) ao Acesso Beta Antecipado!','Este é o começo da sua jornada para transformar ideias em projetos mais preparados para captação.','👋');
       if(!MVP_OPEN_ONBOARD_AFTER_MILESTONE)setTimeout(function(){openOb(0)},600);
     }else setTimeout(function(){openOb(0)},600);
   }
@@ -5271,7 +5490,7 @@
   function renderAgentsState(){
     var el=$('#agentsStateTxt'), box=$('#agentsState');
     if(!el||!box)return;
-    var pend = isMvpMode?JORNADA.filter(function(j){return isAllowedAgent(j.agent)}).length:((typeof APROVACOES!=='undefined' && APROVACOES) ? APROVACOES.length : 2);
+    var pend=getPendingApprovals().length;
     if(isMvpMode){
       var hasProjects=Object.keys(PROJECTS).length>0;
       box.style.display=hasProjects?'':'none';
@@ -5398,6 +5617,63 @@
       setModoManual('avancado');
       toast('Página inicial completa. Você pode voltar ao modo guiado em Configurações.');
     });
+  })();
+
+  /* Feedback global: anônimo por padrão. Perfil agregado sem identificadores
+     diretos; nome, e-mail e organização só entram após escolha explícita. */
+  (function(){
+    var trigger=$('#feedbackBtn'),modal=$('#feedbackModal'),form=$('#feedbackForm'),textInput=$('#feedbackText'),count=$('#feedbackCount'),status=$('#feedbackStatus'),identify=$('#feedbackIdentify'),preview=$('#feedbackIdentityPreview'),privacyTitle=$('#feedbackPrivacyTitle'),privacyDesc=$('#feedbackPrivacyDesc'),submit=$('#feedbackSubmit'),terms=$('#feedbackTerms'),termsHint=$('#feedbackTermsHint'),termsOpen=$('#feedbackTermsOpen'),termsModal=$('#feedbackTermsModal'),termsAccept=$('#feedbackTermsAccept'),feature=$('#feedbackFeature'),activeFeature=$('#feedbackActiveFeature'),screenLabel=$('#feedbackScreenLabel'),TERMS_VERSION='2026-09-14';
+    if(!trigger||!modal||!form)return;
+    function fieldValue(id,fallback){var el=$(id);return el&&el.value?el.value.trim():fallback}
+    function browserFamily(){var ua=navigator.userAgent.toLowerCase();if(ua.indexOf('edg/')>-1)return'Edge';if(ua.indexOf('opr/')>-1)return'Opera';if(ua.indexOf('firefox/')>-1)return'Firefox';if(ua.indexOf('safari/')>-1&&ua.indexOf('chrome/')===-1)return'Safari';if(ua.indexOf('chrome/')>-1)return'Chrome';return'Outro'}
+    function range(value){if(value===0)return'0';if(value===1)return'1';if(value<=5)return'2-5';return'6+'}
+    function profile(){return{access:accessMode||'full',language:document.documentElement.lang||'pt-BR',device:window.innerWidth<700?'celular':(window.innerWidth<1024?'tablet':'desktop'),browser:browserFamily(),projects:range(Object.keys(PROJECTS||{}).length),executions:range($$('#executionLog .exec-log-row').length)}}
+    function identity(){return{name:fieldValue('#pfNome',''),email:fieldValue('#pfEmail',''),organization:fieldValue('#empFantasia','')}}
+    function activeContext(){var active=$('.view.active'),view=active?active.id.replace('view-',''):'unknown',labels={home:'Início',projetos:'Projetos',radar:'Oportunidades',aprovacoes:'Central de Aprovações',agentes:'Agentes',memoria:'Memória',perfil:'Perfil',planos:'Planos',ajuda:'Ajuda e FAQ'};return{view:view,label:labels[view]||'Tela atual'}}
+    function syncContext(){var context=activeContext();if(screenLabel)screenLabel.textContent='Você está em '+context.label;if(activeFeature){activeFeature.value='tela:'+context.view;activeFeature.textContent='Esta tela - '+context.label}return context}
+    function termsRecord(){try{var saved=JSON.parse(store.get('feedback-terms',''));return saved&&saved.version===TERMS_VERSION?saved:null}catch(err){return null}}
+    function saveTerms(){var record={version:TERMS_VERSION,acceptedAt:new Date().toISOString()};store.set('feedback-terms',JSON.stringify(record));return record}
+    function syncTerms(){var accepted=termsRecord();terms.checked=!!accepted;submit.disabled=!accepted;termsHint.textContent=accepted?'Termos aceitos em '+new Date(accepted.acceptedAt).toLocaleDateString('pt-BR')+'. O aceite vale para esta versão.':'Leia e aceite os termos para enviar. Quando a versão mudar, pediremos novo aceite.';terms.closest('.feedback-terms').classList.toggle('is-required',!accepted)}
+    function syncIdentity(){var on=!!identify.checked,id=identity();preview.hidden=!on;privacyTitle.textContent=on?'Feedback identificado':'Seu feedback começa anônimo';privacyDesc.textContent=on?'Nome, e-mail e organização do seu perfil serão anexados.':'Sem nome, e-mail, empresa ou conteúdo dos seus projetos.';submit.textContent=on?'Enviar identificado':'Enviar anonimamente';$('#feedbackIdentityName').textContent=id.name||'Perfil sem nome';$('#feedbackIdentityMeta').textContent=[id.email,id.organization].filter(Boolean).join(' · ');$('#feedbackIdentityAvatar').textContent=(id.name||'U').split(/\s+/).slice(0,2).map(function(part){return part.charAt(0)}).join('').toUpperCase()}
+    trigger.addEventListener('click',function(){status.textContent='';identify.checked=false;syncIdentity();syncTerms();syncContext();open(modal);setTimeout(function(){var first=form.querySelector('input[name="feedbackType"]');if(first)first.focus()},0)});
+    identify.addEventListener('change',syncIdentity);syncIdentity();syncTerms();
+    terms.addEventListener('change',function(){if(terms.checked)saveTerms();else store.set('feedback-terms','');syncTerms()});
+    termsOpen.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();open(termsModal)});
+    termsAccept.addEventListener('click',function(){terms.checked=true;saveTerms();syncTerms();close(termsModal);terms.focus()});
+    textInput.addEventListener('input',function(){count.textContent=textInput.value.length});
+    form.addEventListener('submit',function(e){
+      e.preventDefault();
+      var type=form.querySelector('input[name="feedbackType"]:checked'),impact=form.querySelector('input[name="feedbackImpact"]:checked');
+      if(!type||!textInput.value.trim())return;
+      if(!terms.checked){termsHint.textContent='Você precisa aceitar os termos antes de enviar.';terms.closest('.feedback-terms').classList.add('is-required');terms.focus();return}
+      var context=syncContext(),selectedFeature=feature&&feature.options[feature.selectedIndex],anonymous=!identify.checked;
+      var payload={id:'fb-'+Date.now(),anonymous:anonymous,type:type.value,impact:impact?impact.value:'medio',feature:{id:selectedFeature?selectedFeature.value:'tela-atual',label:selectedFeature?selectedFeature.textContent:'Esta tela'},message:textInput.value.trim(),createdAt:new Date().toISOString(),terms:termsRecord()||saveTerms(),profile:profile(),context:{view:context.view,viewLabel:context.label,version:document.body.getAttribute('data-app-version')||'v30'}};
+      if(!anonymous)payload.identity=identity();
+      var saved=[];try{saved=JSON.parse(store.get('feedback','[]'))||[]}catch(err){saved=[]}
+      saved.unshift(payload);store.set('feedback',JSON.stringify(saved.slice(0,50)));
+      var celebrateFeedback=isMvpMode&&store.get('mvp-milestone-primeiro-feedback','')!=='1';if(!isMvpMode)rwUnlock('primeiro-feedback');
+      status.textContent=anonymous?'Feedback anônimo registrado. Obrigado por ajudar a melhorar a MonyU.':'Feedback identificado registrado. Obrigado por ajudar a melhorar a MonyU.';
+      form.reset();count.textContent='0';syncIdentity();setTimeout(function(){close(modal);if(celebrateFeedback)setTimeout(function(){mvpCelebrate('primeiro-feedback','Sua voz constrói','Seu primeiro feedback foi enviado. Obrigado por ajudar a melhorar a MonyU.','💬')},180)},900);
+    });
+  })();
+
+  /* Instalação progressiva: um clique abre o prompt nativo quando suportado.
+     Convite aparece só após interesse e respeita dispensa por 30 dias. */
+  (function(){
+    var deferred=null,btn=$('#installAppBtn'),navBtn=$('#navInstallBtn'),topBtn=$('#installTopBtn'),modal=$('#installModal'),confirm=$('#installConfirm'),help=$('#installHelp'),nudge=$('#installNudge'),nudgeAction=$('#installNudgeAction'),nudgeClose=$('#installNudgeClose');
+    if(!btn||!modal||!confirm)return;
+    var installControls=[btn,navBtn,topBtn].filter(Boolean);
+    var standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+    if(standalone){installControls.forEach(function(control){control.style.display='none'});if(nudge)nudge.hidden=true;return}
+    var visits=parseInt(store.get('install-visits','0'),10)||0;store.set('install-visits',String(visits+1));
+    function hideNudge(remember){if(nudge)nudge.hidden=true;if(remember)store.set('install-nudge-dismissed',String(Date.now()))}
+    function canNudge(){var dismissed=parseInt(store.get('install-nudge-dismissed','0'),10)||0;return Date.now()-dismissed>30*24*60*60*1000&&(visits>=2||Object.keys(PROJECTS||{}).length>0)}
+    function fallback(){var ua=navigator.userAgent,isiOS=/iphone|ipad|ipod/i.test(ua),isSafari=/safari/i.test(ua)&&!/chrome|chromium|android/i.test(ua);help.textContent=isiOS?'No Safari, toque em Compartilhar e depois em Adicionar à Tela de Início.':(isSafari?'No Safari, abra Arquivo e escolha Adicionar ao Dock.':'Use o ícone de instalação na barra de endereço ou abra o menu do navegador e escolha Instalar página como app.');confirm.textContent='Entendi';open(modal)}
+    function requestInstall(){if($('#profileFlyout'))$('#profileFlyout').classList.remove('open');hideNudge(false);if(!deferred){fallback();return}var prompt=deferred;deferred=null;prompt.prompt();prompt.userChoice.then(function(result){if(result.outcome!=='accepted')store.set('install-nudge-dismissed',String(Date.now()))})}
+    window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;installControls.forEach(function(control){control.classList.add('install-ready')});if(canNudge())setTimeout(function(){if(deferred&&nudge)nudge.hidden=false},1400)});
+    window.addEventListener('appinstalled',function(){deferred=null;installControls.forEach(function(control){control.style.display='none'});hideNudge(false);close(modal);store.set('app-installed','1');if(isMvpMode)mvpCelebrate('monyu-como-app','MonyU sempre à mão','Você instalou a MonyU como app. Agora ela fica mais perto do seu trabalho.','📲');else rwUnlock('monyu-como-app');toast('MonyU instalada. Agora ela está junto dos seus aplicativos.')});
+    installControls.forEach(function(control){control.addEventListener('click',requestInstall)});if(nudgeAction)nudgeAction.addEventListener('click',requestInstall);if(nudgeClose)nudgeClose.addEventListener('click',function(){hideNudge(true)});confirm.addEventListener('click',function(){if(deferred){requestInstall();return}close(modal)});
+    if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./monyu-sw.js').catch(function(){});
   })();
 
   /* ================= Animações ================= */

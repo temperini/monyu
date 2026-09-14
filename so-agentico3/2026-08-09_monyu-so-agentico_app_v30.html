@@ -6,11 +6,13 @@
 <title>MonyU - Inovação financiada</title>
 <meta name="description" content="MonyU - sua jornada de captação de recursos potencializada por agentes de IA.">
 <link rel="icon" type="image/svg+xml" href="2026-08-09_monyu-so-agentico_favicon_v30.svg">
+<link rel="manifest" href="monyu-app.webmanifest">
+<meta name="theme-color" content="#111111">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="2026-08-09_monyu-so-agentico_tokens_v30.css?v=1">
-<link rel="stylesheet" href="2026-08-09_monyu-so-agentico_app_v30.css?v=1">
+<link rel="stylesheet" href="2026-08-09_monyu-so-agentico_tokens_v30.css?v=8">
+<link rel="stylesheet" href="2026-08-09_monyu-so-agentico_app_v30.css?v=8">
 </head>
 <body data-app-version="30">
 <a class="skip-link" href="#conteudo">Pular para o conteúdo principal</a>
@@ -68,7 +70,7 @@
       </button>
     </div>
     <div class="nav" tabindex="0">
-      <span class="nav-label">Sua jornada</span>
+      <span class="nav-label">Trabalho</span>
       <a class="nav-item" href="#" data-nav="inicio" aria-current="page" data-tip="Início">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
         <span class="nit-label">Início</span>
@@ -85,17 +87,17 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
         <span class="nit-label">Aprovações <span class="nav-tag" id="navAprovTag" style="display:none">0</span></span>
       </a>
-      <a class="nav-item" href="#" data-nav="projetos" data-tip="Meus projetos">
+      <a class="nav-item" href="#" data-nav="projetos" data-tip="Projetos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg>
-        <span class="nit-label">Meus projetos <span class="nav-tag" id="navProjTag">4</span></span>
+        <span class="nit-label">Projetos <span class="nav-tag" id="navProjTag">4</span></span>
       </a>
       <a class="nav-item" href="#" data-nav="radar" data-tip="Oportunidades">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/><path d="M12 3v3M21 12h-3"/></svg>
         <span class="nit-label">Oportunidades <span class="nav-tag" id="navOppTag">6</span></span>
       </a>
-      <a class="nav-item" href="#" data-nav="agentes" data-tip="Meus Agentes">
+      <a class="nav-item" href="#" data-nav="agentes" data-tip="Agentes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="7" width="16" height="12" rx="3"/><path d="M12 7V4"/><circle cx="12" cy="3" r="1"/><circle cx="9" cy="13" r="1"/><circle cx="15" cy="13" r="1"/></svg>
-        <span class="nit-label">Meus Agentes <span class="nav-tag" id="navAgentsTag">14</span></span>
+        <span class="nit-label">Agentes <span class="nav-tag" id="navAgentsTag">14</span></span>
       </a>
       <a class="nav-item" href="#" data-nav="conhecimento" data-tip="Memória">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 0 2 2h13"/></svg>
@@ -105,11 +107,15 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l5-6 4 4 4-6 5 5"/><path d="M3 21h18"/></svg>
         <span class="nit-label">Resultados</span>
       </a>
-      <span class="nav-label">Conta</span>
-      <a class="nav-item" href="#" id="navFichas" data-tip="Fichas & plano">
+      <span class="nav-label">Conta e suporte</span>
+      <a class="nav-item" href="#" id="navFichas" data-tip="Fichas e plano">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/></svg>
-        <span class="nit-label">Fichas &amp; plano</span>
+        <span class="nit-label">Fichas e plano</span>
       </a>
+      <button class="nav-item" type="button" id="navInstallBtn" data-tip="Instalar MonyU como app" aria-label="Instalar MonyU como app">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M5 18h14"/></svg>
+        <span class="nit-label">Instalar app</span>
+      </button>
       <a class="nav-item" href="#" data-nav="rewards" data-tip="Recompensas">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="m9 13.5-1.5 7L12 18l4.5 2.5-1.5-7"/></svg>
         <span class="nit-label">Recompensas <span class="nav-tag nav-tag-sm" id="rwNavTag">Bronze</span></span>
@@ -122,9 +128,9 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2 9l10 5 10-5-10-5z"/><path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/><path d="M22 9v5"/></svg>
         <span class="nit-label">Treinamentos <span class="nav-tag nav-tag-sm">prévia</span></span>
       </a>
-      <a class="nav-item" href="#" data-ob="0" data-tip="Ajuda & FAQ">
+      <a class="nav-item" href="#" data-ob="0" data-tip="Ajuda">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.9.8c0 1.6-2.4 2.2-2.4 3.7M12 17h.01"/></svg>
-        <span class="nit-label">Ajuda &amp; FAQ</span>
+        <span class="nit-label">Ajuda</span>
       </a>
       <!-- "Configurações" removido daqui em 2026-08-06: já existe idêntico
            dentro do menu de perfil (profileFlyout, abaixo) - repetir na
@@ -153,6 +159,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83"/></svg>
           Configurações
         </a>
+        <button class="pf-item" type="button" id="installAppBtn" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M5 18h14"/></svg>
+          Instalar MonyU como app
+        </button>
         <div class="pf-sep"></div>
         <a class="pf-item pf-danger" href="#" id="logoutBtn" role="menuitem">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
@@ -196,6 +206,12 @@
         </button>
       </div>
       <div class="topbar-actions">
+        <button class="icon-btn" id="installTopBtn" data-tip="Instalar MonyU como app" aria-label="Instalar MonyU como app">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M5 18h14"/></svg>
+        </button>
+        <button class="icon-btn" id="feedbackBtn" data-tip="Enviar feedback" aria-label="Enviar feedback sobre esta tela">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/><path d="M8 9h8M8 13h5"/></svg>
+        </button>
         <button class="icon-btn" id="themeBtn" data-tip="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">
           <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
           <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2 12h2.5M19.5 12H22M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
@@ -209,6 +225,7 @@
         </button>
       </div>
     </header>
+    <section class="global-status-guide" id="globalStatusGuide" role="status" aria-live="polite" aria-atomic="true" hidden></section>
 
     <!-- Painel de notificações -->
     <div class="notif-panel" id="notifPanel" role="dialog" aria-label="Notificações">
@@ -318,7 +335,7 @@
         </div>
 
         <!-- Próxima ação recomendada (v29) - preenchido por renderNextBest().
-             É a primeira coisa da Home porque responde a pergunta que o usuário
+             É a primeira coisa da Home porque responde à pergunta que você
              realmente tem ao abrir a plataforma: "e agora, o que eu faço?" -->
         <section class="nba" id="nbaCard" aria-labelledby="nbaTitle" hidden></section>
 
@@ -1390,7 +1407,7 @@
             <select id="teamInviteRole"><option value="Editor">Editor</option><option value="Visualizador">Visualizador</option><option value="Administrador">Administrador</option></select>
             <button class="btn-primary" id="teamInviteBtn">Convidar</button>
           </div>
-          <div style="overflow-x:auto">
+          <div class="team-table-wrap">
             <table class="team-table">
               <thead><tr><th>Membro</th><th>Papel</th><th>Status</th><th></th></tr></thead>
               <tbody id="teamTableBody"></tbody>
@@ -1705,7 +1722,7 @@
       <label>Memória desta ideia/projeto <span id="npDocsHint" style="font-weight:500;color:var(--text-3)">- opcional, melhora os outputs dos agentes</span></label>
       <div class="dropzone" id="npDrop">📄 Arraste múltiplos arquivos ou clique para selecionar<br><span style="font-size:.66rem">ideia/projeto estruturada, pitch deck, roteiro de pitch, lean canvas, orçamento…</span></div>
       <div id="npDocList"></div>
-      <p style="font-size:.64rem;color:var(--text-3);line-height:1.5;margin-top:.4rem">
+      <p id="npDocsPolicy" style="font-size:.64rem;color:var(--text-3);line-height:1.5;margin-top:.4rem">
         Importação gratuita: até 10 documentos ou 200 páginas por ideia/projeto. Acima disso, indexação a 1 ficha por lote de 20 páginas.
         Cada documento nasce restrito a esta ideia/projeto - você decide, um a um, o que vira Global.
       </p>
@@ -1758,6 +1775,74 @@
       <button class="btn-ghost" data-close="kbModal">Cancelar</button>
       <button class="btn-primary" id="kbConfirm">Indexar · 1 ficha</button>
     </div>
+  </div>
+</div>
+
+<!-- Feedback contextual: curto, estruturado e disponível em todas as telas -->
+<div class="modal" id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+  <div class="modal-box feedback-box">
+    <button class="modal-x" type="button" data-close="feedbackModal" aria-label="Fechar feedback">✕</button>
+    <h3 id="feedbackTitle">Ajude a melhorar a MonyU</h3>
+    <p class="sub">Leva menos de um minuto. Escolha o assunto e conte o essencial.</p>
+    <form id="feedbackForm">
+      <div class="feedback-screen-context" id="feedbackScreenContext" role="status"><span aria-hidden="true">⌁</span><div><small>Contexto enviado automaticamente</small><b id="feedbackScreenLabel">Tela atual</b></div></div>
+      <div class="feedback-feature"><label for="feedbackFeature">Qual funcionalidade você quer pontuar?</label><select id="feedbackFeature"><option id="feedbackActiveFeature" value="tela-atual">Esta tela</option><option value="navegacao">Navegação e menu</option><option value="projetos">Projetos e jornada</option><option value="agentes">Agentes e recomendações</option><option value="oportunidades">Oportunidades</option><option value="aprovacoes">Central de Aprovações</option><option value="feedback">Feedback e privacidade</option><option value="outro">Outra funcionalidade</option></select></div>
+      <fieldset class="feedback-types">
+        <legend>Sobre o que você quer falar?</legend>
+        <label><input type="radio" name="feedbackType" value="erro" required><span>Algo não funcionou</span></label>
+        <label><input type="radio" name="feedbackType" value="melhoria"><span>Ideia de melhoria</span></label>
+        <label><input type="radio" name="feedbackType" value="clareza"><span>Conteúdo confuso</span></label>
+        <label><input type="radio" name="feedbackType" value="elogio"><span>Algo funcionou bem</span></label>
+      </fieldset>
+      <div class="form-field"><label for="feedbackText">O que aconteceu ou o que você melhoraria?</label><textarea id="feedbackText" maxlength="600" rows="4" required placeholder="Conte em poucas palavras..."></textarea><small><span id="feedbackCount">0</span>/600</small></div>
+      <fieldset class="feedback-impact"><legend>Quanto isso afeta seu trabalho?</legend><label><input type="radio" name="feedbackImpact" value="baixo"><span>Pouco</span></label><label><input type="radio" name="feedbackImpact" value="medio" checked><span>Moderadamente</span></label><label><input type="radio" name="feedbackImpact" value="alto"><span>Muito</span></label></fieldset>
+      <section class="feedback-privacy" aria-labelledby="feedbackPrivacyTitle">
+        <div class="feedback-privacy-head"><span class="feedback-shield" aria-hidden="true">✓</span><div><b id="feedbackPrivacyTitle">Seu feedback começa anônimo</b><span id="feedbackPrivacyDesc">Sem nome, e-mail, empresa ou conteúdo dos seus projetos.</span></div></div>
+        <label class="feedback-identify"><input type="checkbox" id="feedbackIdentify"><span><b>Quero me identificar</b><small>Ajuda nossa equipe a conversar com você sobre este feedback.</small></span></label>
+        <div class="feedback-identity-preview" id="feedbackIdentityPreview" hidden><span class="avatar" id="feedbackIdentityAvatar" aria-hidden="true">EV</span><span><b id="feedbackIdentityName">Evandro Temperini</b><small id="feedbackIdentityMeta">evandro@novatechenergia.com.br · NovaTech Energia</small></span></div>
+        <details class="feedback-data"><summary>Quais informações serão enviadas?</summary><p>Para entender o contexto sem identificar você: tela, versão da MonyU, tipo de dispositivo, navegador, idioma e faixa de uso. Nunca enviamos automaticamente textos, resultados ou arquivos dos seus projetos.</p></details>
+        <div class="feedback-terms"><label><input type="checkbox" id="feedbackTerms" required><span>Li e aceito os <button type="button" class="link-button" id="feedbackTermsOpen">Termos de participação do feedback</button>.</span></label><small id="feedbackTermsHint">Seu aceite será guardado para os próximos envios desta versão dos termos.</small></div>
+      </section>
+      <div class="modal-actions"><button class="btn-ghost" type="button" data-close="feedbackModal">Cancelar</button><button class="btn-primary" type="submit" id="feedbackSubmit">Enviar anonimamente</button></div>
+      <p class="feedback-status" id="feedbackStatus" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="feedbackTermsModal" role="dialog" aria-modal="true" aria-labelledby="feedbackTermsTitle">
+  <div class="modal-box terms-box">
+    <button class="modal-x" type="button" data-close="feedbackTermsModal" aria-label="Fechar termos">✕</button>
+    <p class="eyebrow">TERMOS DE PARTICIPAÇÃO DO FEEDBACK · VERSÃO 2026-09-14</p>
+    <h3 id="feedbackTermsTitle">Feedback para melhorar a MonyU</h3>
+    <div class="terms-content">
+      <p><b>1. Finalidade.</b> Seu feedback será usado para entender problemas, priorizar melhorias e aperfeiçoar a experiência da MonyU.</p>
+      <p><b>2. Envio anônimo por padrão.</b> Sem sua escolha de identificação, não anexamos nome, e-mail ou organização. Registramos apenas contexto técnico e perfil agregado descritos neste formulário.</p>
+      <p><b>3. Identificação opcional.</b> Ao marcar “Quero me identificar”, você autoriza o envio do nome, e-mail e organização já presentes no seu perfil para viabilizar contato sobre aquele feedback.</p>
+      <p><b>4. Conteúdo seguro.</b> Não inclua senhas, documentos, dados pessoais sensíveis, segredos industriais ou o conteúdo de ideias/projetos neste campo. Use os fluxos próprios e autorizados da plataforma para materiais do projeto.</p>
+      <p><b>5. Proteção e uso.</b> A MonyU usa o feedback para melhoria interna, respeitando a política de Segurança, Propriedade Intelectual e Sigilo por Design. O envio não transfere a propriedade da sua ideia ou projeto.</p>
+      <p><b>6. Escolha e atualização.</b> A participação é voluntária. Você pode enviar de forma anônima ou identificada a cada vez. Quando esta versão dos termos mudar, pediremos novo aceite antes de outro envio.</p>
+      <p class="terms-note">No protótipo, o registro permanece neste navegador. Em produção, o aceite precisa ser armazenado de forma auditável no serviço de feedback.</p>
+    </div>
+    <div class="modal-actions"><button class="btn-ghost" type="button" data-close="feedbackTermsModal">Voltar</button><button class="btn-primary" type="button" id="feedbackTermsAccept">Li e aceito</button></div>
+  </div>
+</div>
+
+<aside class="install-nudge" id="installNudge" hidden role="region" aria-label="Instalar MonyU como aplicativo">
+  <span class="install-nudge-icon" aria-hidden="true">↙</span>
+  <span class="install-nudge-copy"><b>MonyU sempre à mão</b><small>Instale em segundos e abra como um aplicativo.</small></span>
+  <button class="install-nudge-action" type="button" id="installNudgeAction">Instalar</button>
+  <button class="install-nudge-close" type="button" id="installNudgeClose" aria-label="Agora não">✕</button>
+</aside>
+
+<!-- Instalação: prompt nativo quando disponível e orientação segura nos demais navegadores -->
+<div class="modal" id="installModal" role="dialog" aria-modal="true" aria-labelledby="installTitle">
+  <div class="modal-box install-box">
+    <button class="modal-x" type="button" data-close="installModal" aria-label="Fechar instalação">✕</button>
+    <h3 id="installTitle">Use a MonyU como app</h3>
+    <p class="sub" id="installIntro">Abra a MonyU em uma janela própria e encontre-a junto dos seus aplicativos.</p>
+    <div class="install-benefits"><span>✓ Acesso rápido</span><span>✓ Janela sem distrações</span><span>✓ Atalho no sistema</span></div>
+    <div class="modal-note" id="installHelp">Se o navegador não oferecer instalação direta, use o menu do navegador e escolha “Instalar página como app” ou “Criar atalho”.</div>
+    <div class="modal-actions"><button class="btn-ghost" type="button" data-close="installModal">Agora não</button><button class="btn-primary" type="button" id="installConfirm">Instalar como app</button></div>
   </div>
 </div>
 
@@ -2148,6 +2233,6 @@
   <span id="pillLabel">agentes trabalhando…</span>
 </button>
 
-<script src="2026-08-09_monyu-so-agentico_app_v30.js?v=1"></script>
+<script src="2026-08-09_monyu-so-agentico_app_v30.js?v=8"></script>
 </body>
 </html>
