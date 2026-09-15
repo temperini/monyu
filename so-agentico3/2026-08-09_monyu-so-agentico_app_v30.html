@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="2026-08-09_monyu-so-agentico_tokens_v30.css?v=13">
-<link rel="stylesheet" href="2026-08-09_monyu-so-agentico_app_v30.css?v=13">
+<link rel="stylesheet" href="2026-08-09_monyu-so-agentico_tokens_v30.css?v=23">
+<link rel="stylesheet" href="2026-08-09_monyu-so-agentico_app_v30.css?v=23">
 </head>
 <body data-app-version="30">
 <a class="skip-link" href="#conteudo">Pular para o conteúdo principal</a>
@@ -112,9 +112,9 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/></svg>
         <span class="nit-label">Fichas e plano</span>
       </a>
-      <button class="nav-item" type="button" id="navInstallBtn" data-tip="Instalar MonyU como app" aria-label="Instalar MonyU como app">
+      <button class="nav-item" type="button" id="navInstallBtn" data-tip="Transformar a MonyU em app" aria-label="Transformar a MonyU em app">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M5 18h14"/></svg>
-        <span class="nit-label">Instalar app</span>
+        <span class="nit-label">Transformar em app</span>
       </button>
       <a class="nav-item" href="#" data-nav="rewards" data-tip="Recompensas">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="m9 13.5-1.5 7L12 18l4.5 2.5-1.5-7"/></svg>
@@ -161,8 +161,9 @@
         </a>
         <button class="pf-item" type="button" id="installAppBtn" role="menuitem">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M5 18h14"/></svg>
-          Instalar MonyU como app
+          Transformar em app
         </button>
+        <div class="pf-renewal" aria-live="polite"><span>Próxima renovação mensal</span><b id="profileRenewal">em 15 dias</b></div>
         <div class="pf-sep"></div>
         <a class="pf-item pf-danger" href="#" id="logoutBtn" role="menuitem">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
@@ -199,14 +200,14 @@
           <span class="rw-chip-lv">Bronze</span>
           <span class="rw-chip-bar"><i></i></span>
         </a>
-        <button class="fichas-chip" id="fichasChip" data-tip="Próxima recarga mensal: 19-Set - 13:36" aria-label="Saldo de fichas. Próxima recarga mensal em 19 de setembro às 13:36. Comprar fichas.">
+        <button class="fichas-chip" id="fichasChip" data-tip="Próxima recarga mensal: em 15 dias" aria-label="Saldo de fichas. Próxima recarga mensal em 15 dias. Comprar fichas.">
           <span class="ficha-coin" aria-hidden="true">M</span>
           <span class="saldo-view">47</span>&nbsp;fichas
           <small>· renovam em 12 dias</small>
         </button>
       </div>
       <div class="topbar-actions">
-        <button class="icon-btn" id="installTopBtn" data-tip="Instalar MonyU como app" aria-label="Instalar MonyU como app">
+        <button class="icon-btn" id="installTopBtn" data-tip="Transformar a MonyU em app" aria-label="Transformar a MonyU em app">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M5 18h14"/></svg>
         </button>
         <button class="icon-btn" id="feedbackBtn" data-tip="Enviar feedback" aria-label="Enviar feedback sobre esta tela">
@@ -1397,6 +1398,12 @@
           <div class="a11y-row"><label for="notifNovidades">Novidades e treinamentos</label><span class="switch"><input type="checkbox" id="notifNovidades"><span class="track-sw"></span><span class="thumb"></span></span></div>
         </section>
 
+        <section class="card" aria-label="Sistema operacional imersivo de captação" style="margin-bottom:1.2rem">
+          <div class="section-head"><h2>Seu sistema operacional imersivo</h2></div>
+          <p class="hint" style="margin:0 0 .9rem;max-width:58ch">Transforme a MonyU em um ambiente contínuo de trabalho, com mais foco para conduzir projetos, agentes e próximas decisões.</p>
+          <button class="btn-primary" type="button" id="configInstallBtn">Transformar em app</button>
+        </section>
+
         <section class="card" aria-label="Equipe" style="margin-bottom:1.2rem">
           <div class="section-head">
             <h2>Membros da equipe</h2>
@@ -1827,10 +1834,10 @@
   </div>
 </div>
 
-<aside class="install-nudge" id="installNudge" hidden role="region" aria-label="Instalar MonyU como aplicativo">
+<aside class="install-nudge" id="installNudge" hidden role="region" aria-label="Transformar a MonyU em aplicativo">
   <span class="install-nudge-icon" aria-hidden="true">↙</span>
-  <span class="install-nudge-copy"><b>MonyU sempre à mão</b><small>Instale em segundos e abra como um aplicativo.</small></span>
-  <button class="install-nudge-action" type="button" id="installNudgeAction">Instalar</button>
+  <span class="install-nudge-copy"><b>Seu SO de captação, sempre à mão</b><small>Trabalhe com mais foco em uma experiência imersiva.</small></span>
+  <button class="install-nudge-action" type="button" id="installNudgeAction">Transformar</button>
   <button class="install-nudge-close" type="button" id="installNudgeClose" aria-label="Agora não">✕</button>
 </aside>
 
@@ -1838,11 +1845,16 @@
 <div class="modal" id="installModal" role="dialog" aria-modal="true" aria-labelledby="installTitle">
   <div class="modal-box install-box">
     <button class="modal-x" type="button" data-close="installModal" aria-label="Fechar instalação">✕</button>
-    <h3 id="installTitle">Use a MonyU como app</h3>
-    <p class="sub" id="installIntro">Abra a MonyU em uma janela própria e encontre-a junto dos seus aplicativos.</p>
-    <div class="install-benefits"><span>✓ Acesso rápido</span><span>✓ Janela sem distrações</span><span>✓ Atalho no sistema</span></div>
+    <h3 id="installTitle">Transforme a MonyU no seu sistema operacional imersivo</h3>
+    <p class="sub" id="installIntro">Trabalhe em uma janela própria, com uma experiência mais imersiva, focada e contínua para conduzir projetos, agentes e próximas decisões.</p>
+    <div class="install-benefits"><span>✓ Mais foco nos projetos</span><span>✓ Experiência imersiva</span><span>✓ Acesso direto no computador</span></div>
     <div class="modal-note" id="installHelp">Se o navegador não oferecer instalação direta, use o menu do navegador e escolha “Instalar página como app” ou “Criar atalho”.</div>
-    <div class="modal-actions"><button class="btn-ghost" type="button" data-close="installModal">Agora não</button><button class="btn-primary" type="button" id="installConfirm">Instalar como app</button></div>
+    <figure class="install-browser-guide" aria-label="Exemplo ilustrado de onde instalar a MonyU no navegador">
+      <div class="browser-address" aria-hidden="true"><span class="browser-lock"></span><span class="browser-url">monyu.com.br</span><span class="browser-install-icon">↓</span><span class="browser-more">•••</span></div>
+      <div class="browser-menu" aria-hidden="true"><span class="browser-menu-dot"></span><span>Instalar MonyU como app</span><b>↗</b></div>
+      <figcaption>Procure o ícone na barra de endereço ou esta opção no menu do navegador.</figcaption>
+    </figure>
+    <div class="modal-actions"><button class="btn-ghost" type="button" data-close="installModal">Agora não</button><button class="btn-primary" type="button" id="installConfirm">Transformar em app</button></div>
   </div>
 </div>
 
@@ -2233,6 +2245,6 @@
   <span id="pillLabel">agentes trabalhando…</span>
 </button>
 
-<script src="2026-08-09_monyu-so-agentico_app_v30.js?v=13"></script>
+<script src="2026-08-09_monyu-so-agentico_app_v30.js?v=23"></script>
 </body>
 </html>
