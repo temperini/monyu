@@ -285,16 +285,17 @@
     if(!isMvpMode||MVP_MILESTONE_OPEN||!MVP_MILESTONE_QUEUE.length)return;
     var item=MVP_MILESTONE_QUEUE.shift(),modal=$('#mvpMilestoneModal');if(!modal)return;
     var icon=$('#mvpMilestoneIcon');
+    modal.querySelector('.lvup-box').classList.toggle('milestone-gold',!!item.gold);
     if(item.agent){icon.classList.add('has-agent');icon.innerHTML='<span class="agent-identity milestone-agent"><img class="agent-avatar" src="'+avatarSrc(item.agent)+'" alt=""><svg class="identity-insignia" aria-hidden="true"><use href="'+insigniaHref(item.agent)+'"/></svg></span>'}
     else{icon.classList.remove('has-agent');icon.textContent=item.icon}
     $('#mvpMilestoneTitle').textContent=item.title;
     $('#mvpMilestoneText').textContent=item.text;
     MVP_MILESTONE_OPEN=true;open(modal);
   }
-  function mvpCelebrate(id,title,text,icon,agent){
+  function mvpCelebrate(id,title,text,icon,agent,gold){
     if(!isMvpMode||store.get('mvp-milestone-'+id,'')==='1')return false;
     store.set('mvp-milestone-'+id,'1');
-    MVP_MILESTONE_QUEUE.push({title:title,text:text,icon:icon||'✨',agent:agent||''});
+    MVP_MILESTONE_QUEUE.push({title:title,text:text,icon:icon||'✨',agent:agent||'',gold:!!gold});
     mvpShowNextMilestone();return true;
   }
   var mvpMilestoneClose=$('#mvpMilestoneClose');
@@ -737,6 +738,7 @@
       }).join('')+'</div></div>';
   }
   function renderJornada(){
+    if(isMvpMode)mvpReconcileTerminalProjects();
     var fl=$('#flowList');
     if(fl){
       if(isMvpMode){
@@ -745,7 +747,11 @@
         fl.innerHTML=grouped.map(flowProjectCard).join('');
       }else fl.innerHTML=JORNADA.map(flowCard).join('');
     }
-    var fe=$('#flowEmpty');if(fe)fe.style.display=JORNADA.length?'none':'';
+    var fe=$('#flowEmpty');if(fe){
+      var hasOpenMvp=isMvpMode&&Object.keys(PROJECTS).some(function(pid){return !mvpProjectIsTerminal(pid)});
+      fe.textContent=isMvpMode&&!hasOpenMvp&&Object.keys(PROJECTS).length?'Sua jornada atual foi concluída. Cadastre uma nova ideia/projeto para iniciar outra jornada de captação.':'Nenhuma recomendação ainda. Cadastre um projeto e rode o Rico para começar sua jornada de captação.';
+      fe.style.display=JORNADA.length?'none':'';
+    }
     var urgentes=JORNADA.filter(function(j){return j.days!=null&&j.days<=30});
     var chip=$('#urgentChipBtn');
     if(chip){
@@ -954,7 +960,7 @@
   function escolherFoco(){
     var cands=[];
     Object.keys(PROJECTS).forEach(function(pid){
-      if(PROJECTS[pid].stage==='submitted')return;
+      if(PROJECTS[pid].stage==='submitted'||(isMvpMode&&mvpProjectIsTerminal(pid)))return;
       /* Melhor oportunidade deste projeto = a de maior aderência entre as que
          ainda estão abertas. É o edital que o usuário de fato perseguiria. */
       var melhor=null;
@@ -1079,7 +1085,7 @@
     var pending=getPendingApprovals();
     var runningKeys=[];
     Object.keys(MVP_RUNNING||{}).forEach(function(key){
-      if(MVP_RUNNING[key])runningKeys.push(key.split('|')[1]);
+      if(MVP_RUNNING[key]&&!mvpProjectIsTerminal(key.split('|')[0]))runningKeys.push(key.split('|')[1]);
     });
     var state='',copy='',link='',action='';
     if(runningKeys.length||activeCount>0){
@@ -2014,7 +2020,10 @@
       if(ksA)ksA.textContent='0';
       if(ksF)ksF.textContent='0';
       if(ksO)ksO.textContent=hasProj?'-':'R$ 0';
-      if(ksN)ksN.textContent=hasProj?'Rodar o Rico':'Cadastrar 1º projeto';
+      if(ksN){
+        var hasOpenProject=Object.keys(PROJECTS).some(function(pid){return !mvpProjectIsTerminal(pid)});
+        ksN.textContent=hasOpenProject?'Rodar o Rico':'Cadastrar projeto';
+      }
     }
     /* Meus projetos: os 4 cards estáticos do HTML só representam a demo populada -
        em modo conta nova ficam ocultos e a lista some/aparece conforme PROJECTS. */
@@ -2052,8 +2061,9 @@
   if(ksNextBtn)ksNextBtn.addEventListener('click',function(){
     if(isFreshAccountMode){
       var zids=Object.keys(PROJECTS);
-      if(zids.length===0){npSetMode('zero');open($('#newProjModal'));}
-      else if(typeof openRun==='function'){openRun('rico',zids[0]);}
+      var openIds=zids.filter(function(pid){return !mvpProjectIsTerminal(pid)});
+      if(openIds.length===0){npSetMode('zero');open($('#newProjModal'));}
+      else if(typeof openRun==='function'){openRun('rico',openIds[0]);}
     }else if(typeof openWs==='function'){
       openWs();
     }
@@ -2085,6 +2095,9 @@
          Itens de cenário/demonstração não podem manter banner, contador, sino ou
          Central ativos depois que não há uma próxima ação real para a pessoa. */
       if(isMvpMode&&!j.mvpGenerated)return false;
+      /* Submissão é terminal no MVP: uma recomendação eventualmente deixada
+         na fila não pode reaparecer como aprovação depois da confirmação. */
+      if(isMvpMode&&mvpProjectIsTerminal(j.proj))return false;
       var running=typeof MVP_RUNNING!=='undefined'&&MVP_RUNNING&&MVP_RUNNING[mvpRunKey(j.proj,j.dataAgent)];
       return !running;
     });
@@ -2677,6 +2690,21 @@
   function mvpRemoveProjectRecommendations(pid){
     for(var i=JORNADA.length-1;i>=0;i--){if(JORNADA[i].mvpGenerated&&JORNADA[i].proj===pid)JORNADA.splice(i,1)}
   }
+  function mvpProjectIsTerminal(pid){
+    var p=PROJECTS&&PROJECTS[pid];
+    return !!(p&&(p.submittedAt||p.stage==='submitted'));
+  }
+  /* Higiene defensiva: estados antigos no DOM, cache ou JORNADA não podem
+     vencer o marco explícito de submissão informado pela pessoa. */
+  function mvpReconcileTerminalProjects(){
+    if(!isMvpMode)return;
+    Object.keys(PROJECTS||{}).forEach(function(pid){
+      if(!mvpProjectIsTerminal(pid))return;
+      mvpRemoveProjectRecommendations(pid);
+      $$('#notifList [data-mvp-recommendation="'+pid+'"]').forEach(function(item){item.remove()});
+    });
+    syncNotifBadge();
+  }
   var MVP_RUNNING={};
   function mvpRunKey(pid,agent){return pid+'|'+agent}
   function mvpDismissRecommendation(pid,agent){
@@ -2685,7 +2713,7 @@
     renderJornada();renderAprov();renderHomeV29();
   }
   function mvpRecommendation(pid,agent,label,detail,cost){
-    if(MVP_RUNNING[mvpRunKey(pid,agent)])return;
+    if(mvpProjectIsTerminal(pid)||MVP_RUNNING[mvpRunKey(pid,agent)])return;
     JORNADA.push({agent:agent,proj:pid,days:null,here:true,label:label,detail:detail,actionLabel:'Executar',actionCost:cost,btnClass:'btn-primary',dataAgent:agent,dataProj:pid,mvpGenerated:true});
   }
   /* MVP: a jornada parte do diagnóstico, não do matching. Uma ideia resumida
@@ -2693,6 +2721,7 @@
      com contexto suficiente. Quando um dos dois terminou, o outro segue prioritário
      e a Ada passa a ser uma alternativa contextual. */
   function mvpRecommendedAgents(pid){
+    if(mvpProjectIsTerminal(pid))return[];
     var ran=PROJ_RAN[pid]||[],hasRico=ran.indexOf('rico')>-1,hasIris=ran.indexOf('iris')>-1,hasAda=ran.indexOf('ada')>-1;
     if(hasAda){
       if(!hasIris&&!hasRico)return['iris','rico'];
@@ -2711,7 +2740,7 @@
   function mvpGuidanceState(){
     if(!isMvpMode)return null;
     var running=[];
-    Object.keys(MVP_RUNNING||{}).forEach(function(key){if(MVP_RUNNING[key])running.push(key)});
+    Object.keys(MVP_RUNNING||{}).forEach(function(key){if(MVP_RUNNING[key]&&!mvpProjectIsTerminal(key.split('|')[0]))running.push(key)});
     if(running.length)return{kind:'running'};
     var pending=getPendingApprovals();
     if(pending.length)return{kind:'agent',items:pending,primary:pending[0]};
@@ -2733,7 +2762,7 @@
     return{label:'Ada · elaborar a proposta',detail:'A análise já trouxe contexto para a escrita. A Ada pode começar a estruturar uma primeira versão, enquanto a outra leitura complementar segue recomendada.',cost:20};
   }
   function mvpRefreshJourney(pid,trigger,completedAgent){
-    if(!isMvpMode||!PROJECTS[pid])return;
+    if(!isMvpMode||!PROJECTS[pid]||mvpProjectIsTerminal(pid))return;
     var p=PROJECTS[pid],ran=PROJ_RAN[pid]||(PROJ_RAN[pid]=[]);
     var completedNow=completedAgent&&ran.indexOf(completedAgent)===-1;
     if(completedNow){
@@ -3425,8 +3454,10 @@
     modal.querySelector('#submissionConfirm').addEventListener('click',function(){
       var pid=submissionProjectId,p=PROJECTS[pid];if(!p)return;
       p.submittedAt=new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});p.stage='submitted';p.complete=true;
+      mvpRemoveProjectRecommendations(pid);mvpSyncRecommendationNotifs(pid,[]);mvpReconcileTerminalProjects();
       mvpHomeEvent({ag:'ada',txt:'<b>Submissão registrada:</b> '+p.short,why:'Você confirmou que enviou a proposta no canal oficial. Este marco ficará no histórico do projeto para orientar a jornada pós-captação.',org:'voce',orgTxt:'confirmação do usuário',custo:'0 fichas',quando:'agora'});
       close(modal);refreshProjectTimeline(pid);refreshProjectActions(pid);refreshProjectState(pid);refreshProjectSpent(pid);renderInicioZero();renderHomeV29();renderJornada();renderAprov();syncNavBadges();mvpSyncGuidanceNotif();
+      if(isMvpMode)mvpCelebrate('primeira-submissao','Primeira proposta submetida!','Você concluiu uma jornada completa de captação. Registramos este marco para orientar os próximos passos quando houver novidades.','🏆','',true);
       toast('Submissão registrada. Vamos usar este marco para orientar os próximos passos.');
     });
     return modal;

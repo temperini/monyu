@@ -96,9 +96,10 @@ html[data-theme="dark"]{
 html[data-theme="light"]{
   color-scheme:light;
   --bg:#E8E8E8; --surface:#FFF; --surface-2:#FAFAFA; --border:#DCDCDC;
-  /* --text-3 desceu de #8A8A8A para #767676 pelo mesmo motivo do tema escuro:
-     o valor antigo dava 3.45:1 sobre branco, reprovando AA em texto pequeno. */
-  --text:#111; --text-2:#555; --text-3:#5E5E5E;
+  /* No claro, texto secundário não pode parecer desabilitado. Estes três
+     níveis preservam hierarquia, mas aproximam a leitura do preto: #383838
+     tem 11.7:1 e #4B4B4B tem 8.7:1 sobre branco. */
+  --text:#111; --text-2:#383838; --text-3:#4B4B4B;
   --accent:var(--monyu-pink); --accent-soft:rgba(255,0,85,.08);
   /* Pink puro dá 3.90:1 sobre branco - insuficiente para link/texto pequeno. */
   --accent-text:#D10046;

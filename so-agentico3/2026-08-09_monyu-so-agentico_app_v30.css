@@ -697,6 +697,8 @@ html[data-theme="light"] .step.done .step-dot{color:#0A7D48}
   box-shadow:0 0 0 6px color-mix(in srgb,var(--lvc,var(--monyu-pink)) 18%,transparent);
   animation:lvup-ring-in .55s var(--ease) both}
 .lvup-ring.has-agent{border:0;background:transparent;box-shadow:none;overflow:visible}.milestone-agent{width:84px;height:84px;flex-basis:84px}.milestone-agent>.agent-avatar{border-radius:50%;object-fit:cover;border:3px solid var(--monyu-pink);box-shadow:0 0 0 6px color-mix(in srgb,var(--monyu-pink) 18%,transparent)}.milestone-agent>.identity-insignia{width:30px!important;height:30px!important;right:-3px;bottom:-3px;border-radius:50%}
+.lvup-box.milestone-gold{border-color:color-mix(in srgb,var(--monyu-yellow) 68%,var(--border));background:radial-gradient(circle at 50% 10%,color-mix(in srgb,var(--monyu-yellow) 13%,transparent),transparent 48%),var(--surface)}
+.lvup-box.milestone-gold .lvup-ring{--lvc:var(--monyu-yellow);background:radial-gradient(circle,color-mix(in srgb,var(--monyu-yellow) 22%,var(--surface-2)),var(--surface-2));box-shadow:0 0 0 6px color-mix(in srgb,var(--monyu-yellow) 18%,transparent),0 0 28px color-mix(in srgb,var(--monyu-yellow) 20%,transparent)}
 @keyframes lvup-ring-in{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
 .lvup-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .lvup-confetti i{position:absolute;top:-12px;width:7px;height:12px;border-radius:2px;opacity:0;animation:lvup-fall 1.4s ease-in forwards}
