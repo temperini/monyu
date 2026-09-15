@@ -211,6 +211,7 @@ a{color:var(--accent-text);text-decoration:none}
 .fichas-chip{display:flex;align-items:center;gap:.55rem;background:var(--surface);border:1px solid var(--border);
   border-radius:12px;padding:.45rem .8rem;font-size:.91rem;font-weight:700;transition:border-color var(--dur),transform .15s var(--ease)}
 .fichas-chip:hover{border-color:var(--monyu-yellow);transform:translateY(-1px)}
+.fichas-chip[data-tip]::after{top:calc(100% + 6px);font-size:.68rem;font-weight:650;padding:.3rem .5rem;box-shadow:0 5px 16px rgba(0,0,0,.18)}
 .urgent-chip{display:flex;align-items:center;gap:.5rem;background:color-mix(in srgb,var(--monyu-pink) 12%,var(--surface));
   border:1px solid color-mix(in srgb,var(--monyu-pink) 45%,transparent);border-radius:12px;padding:.45rem .8rem;
   font-size:.8rem;font-weight:700;color:var(--accent-text);white-space:nowrap;transition:border-color var(--dur),transform .15s var(--ease)}

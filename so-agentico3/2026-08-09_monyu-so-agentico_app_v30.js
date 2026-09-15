@@ -909,6 +909,14 @@
     var ot=$('#navOppTag');if(ot)ot.textContent=(typeof visibleOpps==='function'?PREMIUM_OPPS.length+visibleOpps().length:(typeof oppMatched==='function'?PREMIUM_OPPS.length+oppMatched().length:PREMIUM_OPPS.length));
     var dt=$('#navDocsTag');if(dt)dt.textContent=DOCS.length;
   }
+  /* No MVP a renovação mensal tem calendário demonstrativo fixo. Em produção,
+     este dado deve vir da assinatura no servidor, nunca do relógio do browser. */
+  function nextFichaReloadLabel(){
+    var now=new Date(),day=19,hour=13,minute=36,next=new Date(now.getFullYear(),now.getMonth(),day,hour,minute,0,0);
+    if(next<=now)next=new Date(now.getFullYear(),now.getMonth()+1,day,hour,minute,0,0);
+    var months=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    return String(next.getDate()).padStart(2,'0')+'-'+months[next.getMonth()]+' - '+String(next.getHours()).padStart(2,'0')+':'+String(next.getMinutes()).padStart(2,'0');
+  }
   function syncSaldo(){
     $$('.saldo-view').forEach(function(el){el.textContent=saldo});
     var fill=$('#fichasBarFill');
@@ -917,9 +925,9 @@
     if(chip){
       var low=saldo<10;
       chip.classList.toggle('low',low);
-      chip.setAttribute('data-tip',low
-        ?('Saldo baixo: não cobre a próxima ação recomendada (Ada · '+costPlainText('ada',20)+'). Clique para resolver.')
-        :'Suas fichas: moeda de uso dos agentes. Clique para comprar.');
+      var reloadLabel=nextFichaReloadLabel();
+      chip.setAttribute('data-tip','Próxima recarga mensal: '+reloadLabel);
+      chip.setAttribute('aria-label','Saldo de fichas. Próxima recarga mensal: '+reloadLabel+'. Comprar fichas.');
     }
   }
 
