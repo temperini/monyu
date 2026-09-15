@@ -1073,7 +1073,7 @@
       var urgent=pending.some(function(j){return j.days!=null&&j.days<=7});
       state=urgent?'critical':'attention';
       var primary=pending[0],agentName=nomeAgente(primary.dataAgent||primary.agent);
-      copy='<b>'+pending.length+' aprovação'+(pending.length>1?'ões':'')+' aguardam você</b> · prioridade: '+agentName;
+      copy='<b>'+pending.length+' '+(pending.length>1?'aprovações':'aprovação')+' aguardam você</b> · prioridade: '+agentName;
       link='Revisar aprovações →';action='approvals';
     }else{
       guide.hidden=true;guide.innerHTML='';guide.className='global-status-guide';return;
@@ -2263,7 +2263,7 @@
     if(banner){
       if(execItems.length){
         banner.style.display='';
-        $('#aprovBannerSub').textContent=execItems.length+' ação'+(execItems.length>1?'ões':'')+' recomendada'+(execItems.length>1?'s':'')+' pelos seus agentes, aguardando sua aprovação - você decide o que rodar.';
+        $('#aprovBannerSub').textContent=execItems.length+' '+(execItems.length>1?'ações':'ação')+' recomendada'+(execItems.length>1?'s':'')+' pelos seus agentes, aguardando sua aprovação - você decide o que rodar.';
       }else{banner.style.display='none'}
     }
     if(typeof renderGlobalStatusGuide==='function')renderGlobalStatusGuide();
