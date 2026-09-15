@@ -387,6 +387,7 @@ html[data-modo="essencial"] .modo-hint,html[data-modo="assistido"] .modo-hint{di
   border:1px solid color-mix(in srgb,var(--monyu-pink) 40%,transparent);animation:rise .5s var(--ease) backwards}
 .banner::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--grad-brand)}
 .banner .av{width:46px;height:46px}
+.banner-agent-avatar{width:46px;height:46px;object-fit:cover;border-radius:14px;flex:0 0 46px;border:1px solid color-mix(in srgb,var(--accent) 52%,var(--border));background:var(--surface-2)}
 .banner-body{flex:1;min-width:0}
 .banner-body b{font-size:1.03rem;display:block;margin-bottom:.15rem}
 .banner-body p{font-size:.89rem;color:var(--text-2);line-height:1.45}

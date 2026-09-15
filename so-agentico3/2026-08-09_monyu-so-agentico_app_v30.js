@@ -2263,7 +2263,11 @@
     if(banner){
       if(execItems.length){
         banner.style.display='';
-        $('#aprovBannerSub').textContent=execItems.length+' '+(execItems.length>1?'ações':'ação')+' recomendada'+(execItems.length>1?'s':'')+' pelos seus agentes, aguardando sua aprovação - você decide o que rodar.';
+        var primaryApproval=execItems[0],primaryAgent=primaryApproval.dataAgent||primaryApproval.agent||'iris';
+        var bannerAvatar=$('#aprovBannerAvatar'),bannerTitle=$('#aprovBannerTitle');
+        if(bannerAvatar){bannerAvatar.src=avatarSrc(primaryAgent);bannerAvatar.dataset.agent=primaryAgent}
+        if(bannerTitle)bannerTitle.textContent=execItems.length>1?'Você tem ações recomendadas aguardando aprovação':'Você tem uma ação recomendada aguardando aprovação';
+        $('#aprovBannerSub').textContent=execItems.length+' '+(execItems.length>1?'ações':'ação')+' recomendada'+(execItems.length>1?'s':'')+' - prioridade: '+nomeAgente(primaryAgent)+' - aguardando sua aprovação. Você decide o que rodar.';
       }else{banner.style.display='none'}
     }
     if(typeof renderGlobalStatusGuide==='function')renderGlobalStatusGuide();

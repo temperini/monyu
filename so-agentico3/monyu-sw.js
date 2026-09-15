@@ -1,9 +1,9 @@
-const CACHE_NAME='monyu-v30-20260915-10';
+const CACHE_NAME='monyu-v30-20260915-11';
 const CORE=[
   './2026-08-09_monyu-so-agentico_app_v30.html?mode=mvp',
-  './2026-08-09_monyu-so-agentico_app_v30.css?v=10',
-  './2026-08-09_monyu-so-agentico_app_v30.js?v=10',
-  './2026-08-09_monyu-so-agentico_tokens_v30.css?v=10',
+  './2026-08-09_monyu-so-agentico_app_v30.css?v=11',
+  './2026-08-09_monyu-so-agentico_app_v30.js?v=11',
+  './2026-08-09_monyu-so-agentico_tokens_v30.css?v=11',
   './2026-08-09_monyu-so-agentico_favicon_v30.svg'
 ];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));
