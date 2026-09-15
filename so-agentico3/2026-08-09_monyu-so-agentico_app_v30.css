@@ -941,6 +941,9 @@ html[data-theme="dark"] .origin-badge.origin-manual{color:#FFD84D;border-color:#
 .mvp-plan-benefits b{display:block;font-size:.78rem;line-height:1.4}.mvp-agent-access{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.65rem}
 .mvp-agent{display:inline-flex;align-items:center;min-height:30px;padding:.28rem .55rem;border:1px solid var(--border);border-left:3px solid var(--agent);border-radius:8px;background:var(--surface);font-size:.68rem;font-weight:800}.mvp-agent.rico{--agent:var(--c-rico)}.mvp-agent.iris{--agent:var(--c-iris)}.mvp-agent.ada{--agent:var(--c-ada)}
 .plan-mvp-current ul{display:grid;grid-template-columns:1fr 1fr;gap:.5rem .7rem;margin:0;align-content:center;font-size:.7rem}.plan-mvp-current ul li{padding-left:1rem}
+.agent-big.mvp-recommended{border-color:color-mix(in srgb,var(--ac) 62%,var(--border));box-shadow:0 0 0 1px color-mix(in srgb,var(--ac) 20%,transparent)}
+.agent-big.mvp-priority{background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 10%,var(--surface)),var(--surface))}
+.mvp-agent-recommendation{display:inline-flex;align-items:center;min-height:20px;padding:.14rem .45rem;border-radius:99px;background:color-mix(in srgb,var(--ac) 14%,var(--surface));color:var(--text);font-size:.56rem;font-weight:800;white-space:nowrap}
 .plan.current{border-color:var(--monyu-yellow)}
 .plan.popular{border-color:var(--monyu-pink);box-shadow:0 0 0 1px var(--monyu-pink)}
 .plan .p-tag{position:absolute;top:-10px;left:50%;translate:-50% 0;font-size:.59rem;font-weight:800;padding:.16rem .6rem;border-radius:99px;white-space:nowrap}

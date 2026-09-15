@@ -963,7 +963,10 @@
     var box=$('#nbaCard'); if(!box)return;
     var foco=escolherFoco();
     if(!foco){box.hidden=true;box.style.display='none';return}
-    var rec=nextBestAction(foco.pid,foco.opp?foco.opp.id:null);
+    var rec=isMvpMode?(function(){
+      var agent=mvpNextAgent(foco.pid);if(!agent)return{agent:null,tag:'próxima etapa',why:'As análises recomendadas foram concluídas. Prepare a submissão da proposta.'};
+      var mvpRec=mvpRecommendationCopy(foco.pid,agent);return{agent:agent,costNum:mvpRec.cost,tag:'prioridade agora',why:mvpRec.detail};
+    })():nextBestAction(foco.pid,foco.opp?foco.opp.id:null);
     if(!rec){box.hidden=true;box.style.display='none';return}
     var proj=PROJECTS[foco.pid];
 
@@ -1035,9 +1038,9 @@
     closeSidebar();
   }
   /* Faixa global de orientação: uma única linha, presente em toda view apenas
-     quando há algo em curso ou uma decisão aguardando o usuário. Ação pendente
-     vem antes de execução em andamento: é a única situação em que o usuário
-     pode desbloquear a jornada imediatamente. */
+     quando há algo em curso ou uma decisão aguardando o usuário. Execução em
+     andamento vence porque é o estado vivo do sistema; quando não há execução,
+     mostramos a decisão prioritária que depende da pessoa. */
   function globalAgentNames(items){
     var names=[];
     items.forEach(function(item){
@@ -1061,18 +1064,17 @@
       if(MVP_RUNNING[key])runningKeys.push(key.split('|')[1]);
     });
     var state='',copy='',link='',action='';
-    if(pending.length){
-      var urgent=pending.some(function(j){return j.days!=null&&j.days<=7});
-      state=urgent?'critical':'attention';
-      var agents=globalAgentNames(pending);
-      copy='<b>'+pending.length+' aprovação'+(pending.length>1?'ões':'')+' aguardam você</b> · '+agents+' recomend'+(pending.length>1?'am':'a')+' o próximo passo';
-      if(runningKeys.length)copy+=' · '+runningKeys.length+' agente'+(runningKeys.length>1?'s':'')+' rodando agora';
-      link='Revisar aprovações →';action='approvals';
-    }else if(runningKeys.length||activeCount>0){
+    if(runningKeys.length||activeCount>0){
       state='running';
       var runningNames=globalAgentNames(runningKeys);
       copy='<b>'+runningNames+' rodando agora</b> · '+(activeCount||runningKeys.length)+' execução'+((activeCount||runningKeys.length)>1?'ões':'')+' em andamento';
       link='Ver atividade →';action='activity';
+    }else if(pending.length){
+      var urgent=pending.some(function(j){return j.days!=null&&j.days<=7});
+      state=urgent?'critical':'attention';
+      var primary=pending[0],agentName=nomeAgente(primary.dataAgent||primary.agent);
+      copy='<b>'+pending.length+' aprovação'+(pending.length>1?'ões':'')+' aguardam você</b> · prioridade: '+agentName;
+      link='Revisar aprovações →';action='approvals';
     }else{
       guide.hidden=true;guide.innerHTML='';guide.className='global-status-guide';return;
     }
@@ -1963,8 +1965,8 @@
         Object.keys(PROJECTS).forEach(function(pid){
           var p=PROJECTS[pid],card=document.createElement('button');
           card.className='project';card.setAttribute('data-nav','projetos');
-          var isDiag=p.stage==='diagnosed',isDone=p.stage==='elaborated';
-          card.innerHTML='<svg class="av" aria-hidden="true"><use href="#ins-'+(isDone?'ada':isDiag?'iris':'rico')+'"/></svg><span class="project-body"><b></b><span class="project-sub">'+(isDone?'Escrita concluída · aguardando sua revisão':isDiag?'Informações incrementadas · pronta para escrita':'Ideia/projeto cadastrada · aguardando sua decisão')+'</span><span class="mini-stepper" style="--seg:var(--c-'+(isDone?'ada':isDiag?'iris':'rico')+')" aria-label="Etapa '+(isDone?'3':isDiag?'2':'1')+' de 3"><i class="done"></i><i class="'+(isDiag||isDone?'done':'')+'"></i><i class="'+(isDone?'done':'')+'"></i></span></span><span class="project-right"><span class="stage-chip" style="--sc:var(--c-'+(isDone?'ada':isDiag?'iris':'rico')+')">'+(isDone?'Revisão humana':isDiag?'Próximo passo · Ada':'Próximos passos · Rico e Íris')+'</span><span class="project-deadline">'+(isDone?'revisar antes de submeter':isDiag?'completar a escrita':'decidir em Aprovações')+'</span></span>';
+          var isDiag=p.stage==='diagnosed',isDone=p.stage==='elaborated',next=mvpNextAgent(pid)||'ada';
+          card.innerHTML='<svg class="av" aria-hidden="true"><use href="#ins-'+(isDone?'ada':next)+'"/></svg><span class="project-body"><b></b><span class="project-sub">'+(isDone?'Escrita concluída · aguardando sua revisão':isDiag?'Informações incrementadas · pronta para escrita':'Ideia/projeto cadastrada · aguardando sua decisão')+'</span><span class="mini-stepper" style="--seg:var(--c-'+(isDone?'ada':next)+')" aria-label="Etapa '+(isDone?'3':isDiag?'2':'1')+' de 3"><i class="done"></i><i class="'+(isDiag||isDone?'done':'')+'"></i><i class="'+(isDone?'done':'')+'"></i></span></span><span class="project-right"><span class="stage-chip" style="--sc:var(--c-'+(isDone?'ada':next)+')">'+(isDone?'Revisão humana':'Prioridade · '+nomeAgente(next))+'</span><span class="project-deadline">'+(isDone?'revisar antes de submeter':isDiag?'completar a escrita':'decidir em Aprovações')+'</span></span>';
           card.querySelector('.project-body b').textContent=p.name;
           wrap.appendChild(card);
         });
@@ -2602,6 +2604,16 @@
     b.innerHTML='<svg class="av" aria-hidden="true"><use href="#ins-'+agentKey+'"/></svg><p>'+html+'<span class="ntime">agora</span></p><span class="undot" aria-hidden="true"></span>';
     $('#notifList').prepend(b);
     syncNotifBadge();
+    return b;
+  }
+  function mvpSyncRecommendationNotifs(pid,agents){
+    if(!isMvpMode)return;
+    $$('#notifList [data-mvp-recommendation="'+pid+'"]').forEach(function(item){item.remove()});
+    (agents||[]).slice().reverse().forEach(function(agent){
+      var rec=mvpRecommendationCopy(pid,agent),item=addNotif(agent,'<b>'+nomeAgente(agent)+' recomendado para '+PROJECTS[pid].short+'.</b> '+rec.detail,'aprovacoes');
+      item.setAttribute('data-mvp-recommendation',pid);
+    });
+    syncNotifBadge();
   }
   function mvpHomeEvent(evento){
     if(!isMvpMode||!Array.isArray(MVP_HOME_EVENTOS))return;
@@ -2622,21 +2634,29 @@
     if(MVP_RUNNING[mvpRunKey(pid,agent)])return;
     JORNADA.push({agent:agent,proj:pid,days:null,here:true,label:label,detail:detail,actionLabel:'Executar',actionCost:cost,btnClass:'btn-primary',dataAgent:agent,dataProj:pid,mvpGenerated:true});
   }
-  /* MVP: a jornada recomendada tem um único próximo passo. Rico e Íris são
-     complementares, mas não concorrem com Ada nem ficam acumulados na Central.
-     Se Ada foi rodada diretamente, o contexto novo reabre Rico e Íris, um de cada vez. */
-  function mvpNextAgent(pid){
+  /* MVP: a jornada parte do diagnóstico, não do matching. Uma ideia resumida
+     primeiro ganha profundidade com a Íris; depois o Rico encontra oportunidades
+     com contexto suficiente. Quando um dos dois terminou, o outro segue prioritário
+     e a Ada passa a ser uma alternativa contextual. */
+  function mvpRecommendedAgents(pid){
     var ran=PROJ_RAN[pid]||[],hasRico=ran.indexOf('rico')>-1,hasIris=ran.indexOf('iris')>-1,hasAda=ran.indexOf('ada')>-1;
-    if(hasAda){if(!hasRico)return'rico';if(!hasIris)return'iris';return null}
-    if(!hasRico)return'rico';
-    if(!hasIris)return'iris';
-    return'ada';
+    if(hasAda){
+      if(!hasIris&&!hasRico)return['iris','rico'];
+      if(!hasIris)return['iris'];
+      if(!hasRico)return['rico'];
+      return[];
+    }
+    if(!hasIris&&!hasRico)return['iris','rico'];
+    if(!hasIris)return['iris','ada'];
+    if(!hasRico)return['rico','ada'];
+    return['ada'];
   }
+  function mvpNextAgent(pid){return mvpRecommendedAgents(pid)[0]||null}
   function mvpRecommendationCopy(pid,agent){
     var ran=PROJ_RAN[pid]||[],hasAda=ran.indexOf('ada')>-1,p=PROJECTS[pid];
-    if(agent==='rico')return{label:hasAda?'Rico · mapear oportunidades com a proposta':'Rico · mapear oportunidades',detail:hasAda?'A proposta elaborada trouxe novas informações. O Rico pode buscar oportunidades mais aderentes a esta versão.':'A ideia/projeto foi cadastrada. O Rico pode buscar oportunidades aderentes e transformar o ponto de partida em opções concretas.',cost:1};
-    if(agent==='iris')return{label:hasAda?'Íris · revisar potencial da proposta':'Íris · diagnosticar potencial',detail:hasAda?'Com a proposta elaborada e o radar atualizado, a Íris avalia o potencial de captação desta versão antes de uma submissão.':'O Rico já mapeou oportunidades. A Íris agora avalia o potencial de captação e o que precisa ser fortalecido antes da escrita.',cost:5};
-    return{label:'Ada · completar a escrita',detail:'Rico e Íris já incrementaram esta ideia/projeto. Agora a Ada transforma essas informações em uma primeira versão para sua revisão.',cost:20};
+    if(agent==='rico')return{label:hasAda?'Rico · atualizar oportunidades':'Rico · mapear oportunidades',detail:hasAda?'A proposta elaborada trouxe novas informações. O Rico pode buscar oportunidades mais aderentes a esta versão.':(ran.indexOf('iris')>-1?'A Íris trouxe pontos para fortalecer. Agora o Rico usa esse contexto para encontrar oportunidades mais aderentes.':'Mesmo com a Íris ainda pendente, o Rico já pode iniciar o mapa de oportunidades para esta ideia/projeto.'),cost:1};
+    if(agent==='iris')return{label:hasAda?'Íris · revisar potencial da proposta':'Íris · diagnosticar potencial',detail:hasAda?'Com a proposta elaborada, a Íris avalia o potencial de captação desta versão antes de uma submissão.':'Comece pela Íris: ela identifica forças, lacunas e prioridades para dar mais contexto às próximas decisões.',cost:5};
+    return{label:'Ada · elaborar a proposta',detail:'A análise já trouxe contexto para a escrita. A Ada pode começar a estruturar uma primeira versão, enquanto a outra leitura complementar segue recomendada.',cost:20};
   }
   function mvpRefreshJourney(pid,trigger,completedAgent){
     if(!isMvpMode||!PROJECTS[pid])return;
@@ -2648,15 +2668,16 @@
       PROJ_SPENT[pid]=(PROJ_SPENT[pid]||0)+consumed;
     }
     mvpRemoveProjectRecommendations(pid);
+    mvpSyncRecommendationNotifs(pid,[]);
     if(completedAgent==='rico')mvpUnlockRicoOpportunities(pid);
     if(completedAgent==='ada'){p.stage='elaborated';p.complete=true}
     else if(ran.indexOf('rico')>-1&&ran.indexOf('iris')>-1)p.stage='diagnosed';
-    var next=mvpNextAgent(pid);
-    if(next&&!MVP_RUNNING[mvpRunKey(pid,next)]){
-      var rec=mvpRecommendationCopy(pid,next);
-      mvpRecommendation(pid,next,rec.label,rec.detail,rec.cost);
-      mvpHomeEvent({ag:next,txt:'<b>Próximo passo:</b> '+nomeAgente(next)+' para '+p.short,why:rec.detail,org:'auto',orgTxt:'análise automática',custo:'0 fichas',quando:'agora'});
-      addNotif(next,'<b>Próximo passo para '+p.short+':</b> '+nomeAgente(next)+' está recomendado e aguarda sua decisão.','aprovacoes');
+    var nextAgents=mvpRecommendedAgents(pid).filter(function(agent){return !MVP_RUNNING[mvpRunKey(pid,agent)]});
+    if(nextAgents.length){
+      nextAgents.forEach(function(agent){var rec=mvpRecommendationCopy(pid,agent);mvpRecommendation(pid,agent,rec.label,rec.detail,rec.cost)});
+      var primary=nextAgents[0],primaryRec=mvpRecommendationCopy(pid,primary);
+      mvpHomeEvent({ag:primary,txt:'<b>Prioridade agora:</b> '+nomeAgente(primary)+' para '+p.short,why:primaryRec.detail,org:'auto',orgTxt:'análise automática',custo:'0 fichas',quando:'agora'});
+      mvpSyncRecommendationNotifs(pid,nextAgents);
     }else if(completedAgent==='ada'){
       mvpHomeEvent({ag:'ada',txt:'<b>Escrita concluída:</b> '+p.short,why:'A ideia/projeto foi reanalisada. O próximo passo agora é sua revisão humana antes de qualquer submissão externa.',org:'auto',orgTxt:'análise automática',custo:'0 fichas',quando:'agora'});
       addNotif('ada','<b>'+p.short+' está pronta para sua revisão.</b> Nada será submetido automaticamente.','projetos');
@@ -2666,7 +2687,7 @@
     if(typeof refreshProjectState==='function')refreshProjectState(pid);
     if(typeof refreshProjectSpent==='function')refreshProjectSpent(pid);
     refreshFreeProjectCtas();
-    renderJornada();renderAprov();renderInicioZero();renderHomeV29();renderOpps();syncNavBadges();
+    renderJornada();renderAprov();renderInicioZero();renderHomeV29();renderOpps();syncMvpAgentRecommendations();syncNavBadges();
     if(AUTO_MODE.active)setTimeout(runAutomaticApprovals,450);
   }
   var EXECUTION_LOG=[];
@@ -2911,7 +2932,7 @@
     mvpCelebrate('first-project','Primeira ideia/projeto cadastrada!','Seu ponto de partida já está pronto. Agora a MonyU pode recomendar os próximos passos.','📁');
     toast(imported
       ?'Ideia/projeto "'+nome+'" importada com '+nDocs+' documentos! Confira os próximos passos em Aprovações. (demo)'
-      :'Ideia/projeto "'+nome+'" cadastrada! Rico e Íris foram recomendados em Aprovações. (demo)');
+      :'Ideia/projeto "'+nome+'" cadastrada! Íris é a prioridade e Rico vem em seguida nas Aprovações. (demo)');
     if(obImport){obImport=false;openNextSteps(pid)}
     else if(pendingRunAgent){var ag=pendingRunAgent;pendingRunAgent=null;openRun(ag,pid)}
   });
@@ -3196,6 +3217,21 @@
       '<button class="ag-more">Detalhes completos →</button>'+
     '</article>';
   }).join('');
+  function syncMvpAgentRecommendations(){
+    if(!isMvpMode||!agGrid)return;
+    var pending=getPendingApprovals();
+    $$('#agentsGrid .agent-big').forEach(function(card){
+      card.classList.remove('mvp-recommended','mvp-priority');
+      var chip=card.querySelector('.mvp-agent-recommendation');if(chip)chip.remove();
+    });
+    pending.forEach(function(item,index){
+      var card=agGrid.querySelector('.agent-big[data-ag="'+agentIndexByKey(item.dataAgent)+'"]');if(!card)return;
+      card.classList.add('mvp-recommended');if(index===0)card.classList.add('mvp-priority');
+      var chip=document.createElement('span');chip.className='mvp-agent-recommendation';chip.textContent=index===0?'Prioridade agora':'Também recomendado';
+      var badges=card.querySelector('.agent-badges');if(badges)badges.appendChild(chip);
+    });
+  }
+  syncMvpAgentRecommendations();
 
   /* "N ativos, M a caminho" calculado a partir do catálogo real (AGD), não
      digitado - fonte única do número de agentes vive em
@@ -3215,8 +3251,8 @@
        paralelo. Assim, novos agentes não obrigam a redesenhar a timeline. */
     var steps=isMvpMode
       ? [
-          {k:'opportunities',n:'Mapear oportunidades',agents:['rico'],done:ran.indexOf('rico')>-1},
           {k:'potential',n:'Avaliar potencial',agents:['iris'],done:ran.indexOf('iris')>-1},
+          {k:'opportunities',n:'Mapear oportunidades',agents:['rico'],done:ran.indexOf('rico')>-1},
           {k:'proposal',n:'Elaborar proposta',agents:['ada'],done:project.stage==='elaborated'||project.stage==='submitted'||project.stage==='complete'},
           {k:'submission',n:'Submeter proposta',people:['Revisão humana'],done:project.stage==='submitted'}
         ]
@@ -3279,10 +3315,11 @@
   function projectNextActionsHTML(pid){
     var ran=PROJ_RAN[pid]||[],hasRico=ran.indexOf('rico')>-1,hasIris=ran.indexOf('iris')>-1,hasAda=ran.indexOf('ada')>-1;
     if(isMvpMode){
-      var next=mvpNextAgent(pid);
-      if(next){
-        var rec=mvpRecommendationCopy(pid,next),title=next==='rico'?'Conhecer Rico':(next==='iris'?'Conhecer Íris':'Conhecer a Ada');
-        return '<div class="project-next-intro"><b>Próximo agente recomendado: '+nomeAgente(next)+'</b><span>'+rec.detail+'</span></div><button class="btn-primary project-agent-action project-agent-primary" data-agent="'+next+'" data-agent-detail-cta data-proj="'+pid+'"><span><strong>'+title+'</strong><small>'+AGLABEL[next]+'</small></span><em>'+costBadgeHTML(next,rec.cost)+'</em></button>';
+      var recommended=mvpRecommendedAgents(pid);
+      if(recommended.length){
+        var next=recommended[0],rec=mvpRecommendationCopy(pid,next),title=next==='rico'?'Conhecer Rico':(next==='iris'?'Conhecer Íris':'Conhecer a Ada');
+        var complementary=recommended.slice(1).map(function(agent){var item=mvpRecommendationCopy(pid,agent),label=agent==='rico'?'Conhecer Rico':(agent==='iris'?'Conhecer Íris':'Conhecer a Ada');return '<button class="btn-ghost project-agent-action" data-agent="'+agent+'" data-agent-detail-cta data-proj="'+pid+'"><span><strong>'+label+'</strong><small>'+item.detail+'</small></span><em>'+costBadgeHTML(agent,item.cost)+'</em></button>'}).join('');
+        return '<div class="project-next-intro"><b>Prioridade: '+nomeAgente(next)+'</b><span>'+rec.detail+'</span></div><button class="btn-primary project-agent-action project-agent-primary" data-agent="'+next+'" data-agent-detail-cta data-proj="'+pid+'"><span><strong>'+title+'</strong><small>'+AGLABEL[next]+'</small></span><em>'+costBadgeHTML(next,rec.cost)+'</em></button>'+complementary;
       }
       return '<div class="project-next-intro"><b>Próxima etapa: submissão da proposta</b><span>A proposta está elaborada e já passou pelas análises recomendadas. Prepare a versão final para submeter no canal oficial do edital.</span></div><button class="btn-primary project-agent-action project-agent-primary" data-ws-project="'+pid+'"><span><strong>Preparar submissão da proposta</strong><small>Abrir a versão final e concluir a conferência obrigatória</small></span></button><div class="project-human-review"><strong>Revisão humana obrigatória</strong><span>Antes de submeter, confira cada seção, os anexos e as regras do edital. A MonyU não submete nem garante aprovação.</span></div>';
     }
@@ -5492,11 +5529,9 @@
     if(!el||!box)return;
     var pend=getPendingApprovals().length;
     if(isMvpMode){
-      var hasProjects=Object.keys(PROJECTS).length>0;
-      box.style.display=hasProjects?'':'none';
-      if(!hasProjects)return;
-      el.innerHTML=activeCount>0?'<b>Seus agentes estão trabalhando agora</b>':('<b>Rico, Íris e Ada</b> prontos'+(pend>0?' · '+pend+' aprovaç'+(pend>1?'ões':'ão')+' esperando você':''));
-      var mp=box.querySelector('.pulse');if(mp)mp.style.background=pend>0?'var(--warn)':'var(--ok)';
+      /* A faixa global já cobre este estado em toda a aplicação. Na Home,
+         repetir a mesma mensagem criava dois alertas concorrentes. */
+      box.style.display='none';
       return;
     }
     var rodando = 'rico';
