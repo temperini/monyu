@@ -2052,6 +2052,10 @@
   function getPendingApprovals(){
     return JORNADA.filter(function(j){
       if(!j.dataAgent||!isAllowedAgent(j.dataAgent)||!PROJECTS[j.proj])return false;
+      /* No MVP, somente recomendações geradas pela jornada atual são aprováveis.
+         Itens de cenário/demonstração não podem manter banner, contador, sino ou
+         Central ativos depois que não há uma próxima ação real para a pessoa. */
+      if(isMvpMode&&!j.mvpGenerated)return false;
       var running=typeof MVP_RUNNING!=='undefined'&&MVP_RUNNING&&MVP_RUNNING[mvpRunKey(j.proj,j.dataAgent)];
       return !running;
     });
